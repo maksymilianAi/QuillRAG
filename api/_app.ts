@@ -13,16 +13,19 @@ let app: Express | null = null;
 
 export function getApp(): Express {
   if (!app) {
+    console.log("[Vercel] Cold start — initializing app...");
     let llm = null;
     try {
       llm = createLLM(process.env.LLM_PROVIDER || "openai");
-    } catch {
-      // Users provide keys via frontend — this is expected
+      console.log("[Vercel] Default LLM created:", process.env.LLM_PROVIDER || "openai");
+    } catch (e) {
+      console.log("[Vercel] Default LLM skipped (expected):", e instanceof Error ? e.message : e);
     }
 
     const rag = new RAGService();
     const agent = new QuillAgent(llm as any, rag);
     app = createServer(agent);
+    console.log("[Vercel] App initialized successfully");
   }
   return app;
 }

@@ -46,6 +46,9 @@ Your JSON must strictly follow this exact structure:
 }
 `;
 
+    console.log(`[Gemini] Calling model gemini-2.5-flash...`);
+    console.log(`[Gemini] User prompt length: ${userPrompt.length} chars`);
+
     const response = await this.ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: userPrompt,
@@ -54,6 +57,8 @@ Your JSON must strictly follow this exact structure:
         responseMimeType: "application/json",
       }
     });
+
+    console.log(`[Gemini] Response received, text length: ${response.text?.length || 0}`);
 
     const text = response.text || "{}";
     
