@@ -129,7 +129,7 @@ export function IDEChat({
       <div className="shrink-0 px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-surface-elevated)]/50">
         <div className="flex items-center gap-3">
           <span className="text-lg">💬</span>
-          <h3 className="text-sm font-bold text-[var(--color-text-primary)] font-outfit">
+          <h3 className="text-sm font-bold text-[var(--color-text-primary)]">
             Quill Chat
           </h3>
         </div>

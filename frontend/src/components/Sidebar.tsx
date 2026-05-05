@@ -52,7 +52,7 @@ export function Sidebar({ onSettingsChange, activeView, onViewChange, onToggle }
             className="w-8 h-8"
             style={{ borderRadius: "4px" }}
           />
-          <span className="text-sm font-bold text-[var(--color-text-primary)] font-outfit">Quill</span>
+          <span className="text-sm font-bold text-[var(--color-text-primary)]">Quill</span>
         </div>
         <button
           onClick={onToggle}
@@ -95,7 +95,7 @@ export function Sidebar({ onSettingsChange, activeView, onViewChange, onToggle }
       </div>
 
       <div className="space-y-2">
-        <h2 className="text-sm font-bold text-[var(--color-text-primary)] font-outfit uppercase tracking-wider">
+        <h2 className="text-sm font-bold text-[var(--color-text-primary)] uppercase tracking-wider">
           LLM Settings
         </h2>
         <p className="text-[11px] text-[var(--color-text-muted)] leading-relaxed">

@@ -83,7 +83,7 @@ export function VisualIDE({ settings, isSidebarOpen: _isSidebarOpen, onToggleSid
             <span className="text-lg">🎨</span>
           </div>
           <div className="flex flex-col">
-            <h1 className="text-sm font-bold text-[var(--color-text-primary)] font-outfit tracking-tight leading-none">
+            <h1 className="text-sm font-bold text-[var(--color-text-primary)] tracking-tight leading-none">
               Visual IDE
             </h1>
             <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">
@@ -153,7 +153,7 @@ export function VisualIDE({ settings, isSidebarOpen: _isSidebarOpen, onToggleSid
                 <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[var(--color-brand)] to-purple-600 flex items-center justify-center mx-auto shadow-2xl shadow-indigo-500/20 rotate-3">
                   <span className="text-4xl">🎨</span>
                 </div>
-                <h2 className="text-2xl font-extrabold text-[var(--color-text-primary)] font-outfit tracking-tight">
+                <h2 className="text-2xl font-extrabold text-[var(--color-text-primary)] tracking-tight">
                   Visual Copywriting IDE
                 </h2>
                 <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">

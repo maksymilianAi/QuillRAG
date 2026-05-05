@@ -68,7 +68,7 @@ export function ResponseCard({ data, prompt }: Props) {
       {/* Copy Variants */}
       {data.variants.length > 0 && (
         <div>
-          <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-3 font-outfit">
+          <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-3">
             ✨ Copy Variants
           </h4>
           <div className="space-y-3">
@@ -121,7 +121,7 @@ export function ResponseCard({ data, prompt }: Props) {
       {/* Reasoning */}
       {data.reasoning.length > 0 && (
         <div>
-          <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-3 font-outfit">
+          <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-3">
             💡 Reasoning
           </h4>
           <ul className="space-y-1 text-sm text-[var(--color-text-secondary)]">
@@ -138,7 +138,7 @@ export function ResponseCard({ data, prompt }: Props) {
       {/* Grammar Fixes */}
       {data.fixes.length > 0 && (
         <div>
-          <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-3 font-outfit">
+          <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-3">
             🔧 Grammar & Style Fixes
           </h4>
           <div className="space-y-2">

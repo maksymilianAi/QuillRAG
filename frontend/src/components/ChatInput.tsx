@@ -1,4 +1,5 @@
 import { useState, type FormEvent, type KeyboardEvent } from "react";
+import arrowRightUrl from "../assets/arrow-right.svg";
 
 interface Props {
   onSend: (message: string) => void;
@@ -53,14 +54,7 @@ export function ChatInput({ onSend, disabled }: Props) {
             disabled={disabled || !value.trim()}
             className="flex items-center justify-center h-11 w-11 rounded-xl bg-[var(--color-brand)] text-white transition-all hover:bg-[var(--color-brand-dark)] hover:shadow-[0_0_25px_rgba(99,102,241,0.6)] disabled:opacity-5 disabled:grayscale active:scale-90"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-4 h-4"
-            >
-              <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086L2.28 16.762a.75.75 0 0 0 .826.95l15.19-4.55a.75.75 0 0 0 0-1.424L3.105 2.288Z" />
-            </svg>
+            <img src={arrowRightUrl} alt="" className="w-6 h-6" style={{ filter: "brightness(0) invert(1)" }} />
           </button>
         </div>
       </div>

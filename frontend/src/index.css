@@ -29,7 +29,7 @@
 }
 
 body {
-  font-family: 'Inter', 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--color-surface);
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;

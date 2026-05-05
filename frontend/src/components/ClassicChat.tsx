@@ -97,14 +97,14 @@ export function ClassicChat({ settings, isSidebarOpen: _isSidebarOpen, onToggleS
               <img
                 src="/quill-logo.png"
                 alt="Quill"
-                className="w-20 h-20 mb-6 shadow-2xl shadow-orange-500/20"
-                style={{ borderRadius: "4px" }}
+                className="w-20 h-20 mb-7"
+                style={{ borderRadius: "20px" }}
               />
-              <h2 className="text-3xl font-extrabold text-[var(--color-text-primary)] mb-3 font-outfit tracking-tight">
-                Design-Driven Copy
+              <h2 className="text-4xl font-extrabold text-[var(--color-text-primary)] mb-3 tracking-tight">
+                Quill
               </h2>
-              <p className="text-sm text-[var(--color-text-secondary)] max-w-sm mb-10 leading-relaxed">
-                Professional UX writing suggestions based on your Figma context and brand guidelines.
+              <p className="text-base text-[var(--color-text-muted)] mb-10">
+                Your Copywriting Assistant
               </p>
               
               <div className="w-full max-w-md space-y-3">
