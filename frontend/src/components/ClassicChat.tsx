@@ -17,7 +17,7 @@ interface ClassicChatProps {
   onToggleSidebar: () => void;
 }
 
-export function ClassicChat({ settings, isSidebarOpen, onToggleSidebar }: ClassicChatProps) {
+export function ClassicChat({ settings, isSidebarOpen: _isSidebarOpen, onToggleSidebar }: ClassicChatProps) {
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);

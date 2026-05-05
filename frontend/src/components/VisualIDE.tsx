@@ -17,7 +17,7 @@ interface VisualIDEProps {
   onToggleSidebar: () => void;
 }
 
-export function VisualIDE({ settings, isSidebarOpen, onToggleSidebar }: VisualIDEProps) {
+export function VisualIDE({ settings, isSidebarOpen: _isSidebarOpen, onToggleSidebar }: VisualIDEProps) {
   const [figmaUrl, setFigmaUrl] = useState("");
   const [figmaData, setFigmaData] = useState<FigmaExtractionResponse | null>(null);
   const [selectedNode, setSelectedNode] = useState<FigmaTextNode | null>(null);
