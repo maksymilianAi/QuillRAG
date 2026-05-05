@@ -7,10 +7,11 @@ import { createServer } from "../src/api/server.js";
 import { createLLM } from "../src/llm/index.js";
 import { RAGService } from "../src/rag/rag.service.js";
 import { QuillAgent } from "../src/agent/quill.agent.js";
+import type { Express } from "express";
 
-let app: ReturnType<typeof createServer> | null = null;
+let app: Express | null = null;
 
-export function getApp() {
+export function getApp(): Express {
   if (!app) {
     let llm = null;
     try {

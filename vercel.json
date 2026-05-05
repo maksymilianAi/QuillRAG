@@ -3,6 +3,11 @@
   "outputDirectory": "frontend/dist",
   "installCommand": "npm install",
   "framework": null,
+  "functions": {
+    "api/**/*.ts": {
+      "includeFiles": "data/**"
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/[...path]" },
     { "source": "/(.*)", "destination": "/index.html" }

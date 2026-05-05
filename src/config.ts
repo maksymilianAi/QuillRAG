@@ -1,9 +1,5 @@
-try {
-  const dotenv = await import("dotenv");
-  dotenv.config();
-} catch {
-  // dotenv not available (e.g., serverless) — env vars come from platform
-}
+import dotenv from "dotenv";
+dotenv.config();
 
 export const config = {
   /** LLM provider: "openai" | "claude" | "gemini" */
