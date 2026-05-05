@@ -31,7 +31,7 @@ export function ChatMessage({ message }: Props) {
         {!isUser && (
           <div className="space-y-3">
             {message.data ? (
-              <ResponseCard data={message.data} />
+              <ResponseCard data={message.data} prompt={message.prompt} />
             ) : (
               <p className="text-[15px] leading-relaxed text-[var(--color-text-secondary)]">
                 {message.content}

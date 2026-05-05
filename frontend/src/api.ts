@@ -2,7 +2,7 @@
  * API service — communicates with the CopywrightRAG backend.
  */
 
-import type { GenerateCopyRequest, GenerateCopyResponse, ExtractFigmaRequest, FigmaExtractionResponse } from "./types";
+import type { GenerateCopyRequest, GenerateCopyResponse, ExtractFigmaRequest, FigmaExtractionResponse, CopyFeedback } from "./types";
 
 const API_BASE = "/api";
 
@@ -30,6 +30,14 @@ export async function healthCheck(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export function sendCopyFeedback(feedback: CopyFeedback): void {
+  fetch(`${API_BASE}/feedback`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(feedback),
+  }).catch(() => {});
 }
 
 export async function extractFigma(

@@ -35,12 +35,22 @@ export interface GenerateCopyResponse {
   reasoning: string[];
 }
 
+export interface CopyFeedback {
+  prompt: string;
+  variantIndex: number;
+  variant: CopyVariant;
+  action: "copy";
+  timestamp: string;
+}
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
   /** Structured response (only for assistant messages) */
   data?: GenerateCopyResponse;
+  /** The user prompt that triggered this response */
+  prompt?: string;
   timestamp: Date;
 }
 

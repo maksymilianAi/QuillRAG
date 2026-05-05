@@ -4,6 +4,7 @@ interface SidebarProps {
   onSettingsChange: (settings: AppSettings) => void;
   activeView: "classic" | "ide";
   onViewChange: (view: "classic" | "ide") => void;
+  onToggle: () => void;
 }
 
 export interface AppSettings {
@@ -15,7 +16,7 @@ export interface AppSettings {
   localApiKey?: string;
 }
 
-export function Sidebar({ onSettingsChange, activeView, onViewChange }: SidebarProps) {
+export function Sidebar({ onSettingsChange, activeView, onViewChange, onToggle }: SidebarProps) {
   const [provider, setProvider] = useState(() => localStorage.getItem("copy_provider") || "openai");
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("copy_api_key") || "");
   const [figmaToken, setFigmaToken] = useState(() => localStorage.getItem("copy_figma_token") || "");
@@ -42,6 +43,28 @@ export function Sidebar({ onSettingsChange, activeView, onViewChange }: SidebarP
 
   return (
     <aside className="w-72 shrink-0 bg-[var(--color-surface-elevated)] border-r border-[var(--color-border)] flex flex-col p-6 space-y-6 h-screen z-30">
+      {/* Logo + collapse button */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <img
+            src="/quill-logo.png"
+            alt="Quill"
+            className="w-8 h-8"
+            style={{ borderRadius: "4px" }}
+          />
+          <span className="text-sm font-bold text-[var(--color-text-primary)] font-outfit">Quill</span>
+        </div>
+        <button
+          onClick={onToggle}
+          className="p-1.5 rounded-lg hover:bg-[var(--color-surface)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-all"
+          title="Collapse sidebar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+            <path fillRule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm2.25 5.25a.75.75 0 0 1 .75-.75h12a.75.75 0 0 1 0 1.5H5.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+          </svg>
+        </button>
+      </div>
+
       {/* View Switcher */}
       <div className="space-y-2">
         <label className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest">
@@ -197,7 +220,7 @@ export function Sidebar({ onSettingsChange, activeView, onViewChange }: SidebarP
 
       <div className="pt-6 border-t border-[var(--color-border)]">
         <p className="text-[10px] text-[var(--color-text-muted)] text-center">
-          CopywrightRAG v1.0.0
+          Quill v1.0.0
         </p>
       </div>
     </aside>

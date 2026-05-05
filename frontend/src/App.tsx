@@ -23,6 +23,7 @@ function App() {
           onSettingsChange={setSettings}
           activeView={activeView}
           onViewChange={handleViewChange}
+          onToggle={() => setIsSidebarOpen(false)}
         />
       )}
 
