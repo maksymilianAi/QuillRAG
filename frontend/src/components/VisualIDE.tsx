@@ -79,7 +79,7 @@ export function VisualIDE({ settings, isSidebarOpen: _isSidebarOpen, onToggleSid
               <path fillRule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm2.25 5.25a.75.75 0 0 1 .75-.75h12a.75.75 0 0 1 0 1.5H5.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
             </svg>
           </button>
-          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-brand-dark)] shadow-lg shadow-indigo-500/20">
+          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-brand-dark)] shadow-lg shadow-[var(--color-brand)]/20">
             <span className="text-lg">🎨</span>
           </div>
           <div className="flex flex-col">
@@ -150,7 +150,7 @@ export function VisualIDE({ settings, isSidebarOpen: _isSidebarOpen, onToggleSid
               </div>
             ) : (
               <div className="space-y-6 max-w-lg">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[var(--color-brand)] to-purple-600 flex items-center justify-center mx-auto shadow-2xl shadow-indigo-500/20 rotate-3">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-brand-dark)] flex items-center justify-center mx-auto shadow-2xl shadow-[var(--color-brand)]/20 rotate-3">
                   <span className="text-4xl">🎨</span>
                 </div>
                 <h2 className="text-2xl font-extrabold text-[var(--color-text-primary)] tracking-tight">

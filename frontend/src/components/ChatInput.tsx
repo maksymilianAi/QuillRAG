@@ -32,7 +32,7 @@ export function ChatInput({ onSend, disabled }: Props) {
       onSubmit={handleSubmit}
       className="flex items-center gap-3"
     >
-      <div className="relative flex-1 flex items-center gap-2 bg-[var(--color-surface-elevated)] rounded-2xl border border-[var(--color-border)] focus-within:border-[var(--color-brand)] focus-within:ring-4 focus-within:ring-[var(--color-brand)]/10 transition-all duration-300 shadow-2xl px-3">
+      <div className="relative flex-1 flex items-center gap-2 bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] focus-within:border-[var(--color-brand)] focus-within:ring-4 focus-within:ring-[var(--color-brand)]/10 transition-all duration-300 shadow-2xl px-3">
         <textarea
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -40,7 +40,7 @@ export function ChatInput({ onSend, disabled }: Props) {
           placeholder="Ask for copy or paste a Figma link..."
           disabled={disabled}
           rows={1}
-          className="flex-1 resize-none bg-transparent px-4 py-5 text-[16px] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] outline-none disabled:opacity-50 leading-normal"
+          className="flex-1 resize-none bg-transparent px-4 py-5 text-[16px] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] outline-none disabled:opacity-300 leading-normal"
           style={{ minHeight: "64px", maxHeight: "160px" }}
           onInput={(e) => {
             const target = e.target as HTMLTextAreaElement;
@@ -52,7 +52,7 @@ export function ChatInput({ onSend, disabled }: Props) {
           <button
             type="submit"
             disabled={disabled || !value.trim()}
-            className="flex items-center justify-center h-11 w-11 rounded-xl bg-[var(--color-brand)] text-white transition-all hover:bg-[var(--color-brand-dark)] hover:shadow-[0_0_25px_rgba(99,102,241,0.6)] disabled:opacity-5 disabled:grayscale active:scale-90"
+            className="flex items-center justify-center h-11 w-11 rounded-xl bg-[var(--color-brand)] text-white transition-all hover:bg-[var(--color-brand-dark)] disabled:opacity-30 disabled:grayscale active:scale-90"
           >
             <img src={arrowRightUrl} alt="" className="w-6 h-6" style={{ filter: "brightness(0) invert(1)" }} />
           </button>

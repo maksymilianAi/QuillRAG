@@ -42,7 +42,7 @@ export function Sidebar({ onSettingsChange, activeView, onViewChange, onToggle }
   };
 
   return (
-    <aside className="w-72 shrink-0 bg-[var(--color-surface-elevated)] border-r border-[var(--color-border)] flex flex-col p-6 space-y-6 h-screen z-30">
+    <aside className="w-72 shrink-0 bg-[var(--color-surface)] border-r border-[var(--color-border)] flex flex-col p-6 space-y-6 h-screen z-30">
       {/* Logo + collapse button */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
@@ -52,7 +52,7 @@ export function Sidebar({ onSettingsChange, activeView, onViewChange, onToggle }
             className="w-8 h-8"
             style={{ borderRadius: "4px" }}
           />
-          <span className="text-sm font-bold text-[var(--color-text-primary)]">Quill</span>
+          <span className="text-[20px] font-bold text-[var(--color-text-primary)]">Quill</span>
         </div>
         <button
           onClick={onToggle}
@@ -212,7 +212,7 @@ export function Sidebar({ onSettingsChange, activeView, onViewChange, onToggle }
         className={`w-full py-3.5 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all ${
           isSaved
             ? "bg-[var(--color-success)] text-white"
-            : "bg-[var(--color-brand)] hover:bg-[var(--color-brand-dark)] text-white shadow-lg shadow-indigo-500/20"
+            : "bg-[var(--color-brand)] hover:bg-[var(--color-brand-dark)] text-white shadow-lg shadow-[var(--color-brand)]/20"
         }`}
       >
         {isSaved ? "Saved!" : "Apply Changes"}

@@ -11,24 +11,27 @@ interface Props {
 export function ChatMessage({ message }: Props) {
   const isUser = message.role === "user";
 
+  if (isUser) {
+    return (
+      <div className="flex justify-end animate-slide-up">
+        <div className="max-w-[75%]">
+          <div className="border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/40 rounded-2xl px-4 py-3">
+            <p className="text-[14px] text-[var(--color-text-primary)] leading-relaxed">
+              {message.content}
+            </p>
+          </div>
+          <p className="text-[10px] text-[var(--color-text-muted)] text-right mt-1.5 pr-1">
+            {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={`flex animate-slide-up ${isUser ? "justify-end" : "justify-start"}`}
-    >
-      <div
-        className={`max-w-[85%] md:max-w-[80%] px-8 py-7 shadow-2xl ${
-          isUser
-            ? "bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-brand-dark)] text-white rounded-2xl rounded-br-none shadow-indigo-500/10"
-            : "bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] rounded-2xl rounded-bl-none border border-[var(--color-border)] glass-effect"
-        }`}
-      >
-        {/* For user: just show text */}
-        {isUser && <p className="text-[16px] leading-relaxed font-medium tracking-tight">{message.content}</p>}
-
-
-
-        {/* For assistant: show structured data if available, otherwise text */}
-        {!isUser && (
+    <div className="flex justify-start animate-slide-up">
+      <div className="max-w-[85%] md:max-w-[80%]">
+        <div className="bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] rounded-2xl border border-[var(--color-border)] px-6 py-5 glass-effect">
           <div className="space-y-3">
             {message.data ? (
               <ResponseCard data={message.data} prompt={message.prompt} />
@@ -38,24 +41,10 @@ export function ChatMessage({ message }: Props) {
               </p>
             )}
           </div>
-        )}
-
-        {/* Timestamp */}
-        <div className={`flex items-center gap-1.5 mt-3 ${isUser ? "justify-end" : "justify-start"}`}>
-          <div className={`w-1 h-1 rounded-full ${isUser ? "bg-white/40" : "bg-[var(--color-text-muted)]"}`} />
-          <p
-            className={`text-[9px] font-bold uppercase tracking-widest ${
-              isUser
-                ? "text-indigo-100/60"
-                : "text-[var(--color-text-muted)]"
-            }`}
-          >
-            {message.timestamp.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </p>
         </div>
+        <p className="text-[10px] text-[var(--color-text-muted)] mt-1.5 pl-1">
+          {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+        </p>
       </div>
     </div>
   );

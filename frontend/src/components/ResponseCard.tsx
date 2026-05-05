@@ -28,10 +28,10 @@ function CopyButton({ text, onCopied }: { text: string; onCopied: () => void }) 
   return (
     <button
       onClick={handleClick}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all duration-200 border ${
+      className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold transition-all duration-200 border ${
         copied
           ? "bg-[var(--color-success)]/10 border-[var(--color-success)]/30 text-[var(--color-success)]"
-          : "bg-[var(--color-surface-card)] border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[var(--color-brand)] hover:text-[var(--color-brand-light)]"
+          : "bg-[var(--color-surface-card)] border-[var(--color-border)] text-white hover:border-[var(--color-brand)] hover:text-white"
       }`}
       title="Copy this variant"
     >
@@ -44,7 +44,7 @@ function CopyButton({ text, onCopied }: { text: string; onCopied: () => void }) 
         </>
       ) : (
         <>
-          <img src={copyIconUrl} alt="" className="w-3.5 h-3.5 opacity-60" />
+          <img src={copyIconUrl} alt="" className="w-3.5 h-3.5" style={{ filter: "brightness(0) invert(1)" }} />
           Copy
         </>
       )}
@@ -69,18 +69,18 @@ export function ResponseCard({ data, prompt }: Props) {
       {data.variants.length > 0 && (
         <div>
           <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-3">
-            ✨ Copy Variants
+            Copy Variants
           </h4>
           <div className="space-y-3">
             {data.variants.map((v, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5 transition-all hover:border-[var(--color-brand)] hover:shadow-[0_0_30px_-10px_rgba(99,102,241,0.3)] glass-effect"
+                className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-5 transition-all duration-500 hover:border-[rgba(63,104,255,0.65)] hover:shadow-[0_0_16px_-6px_rgba(63,104,255,0.08)] glass-effect"
               >
                 {/* Header row */}
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[var(--color-brand)] text-[10px] font-bold text-white shadow-sm">
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[var(--color-brand)] text-[10px] font-bold text-white">
                       {i + 1}
                     </span>
                     <span className="text-[10px] font-medium text-[var(--color-text-muted)] uppercase tracking-wider">
@@ -93,24 +93,22 @@ export function ResponseCard({ data, prompt }: Props) {
                   />
                 </div>
 
-                {/* Headline */}
-                <p className="text-base font-semibold text-[var(--color-text-primary)] mb-3 leading-snug">
-                  {v.headline}
-                </p>
-
-                {/* CTA + Labels */}
-                <div className="flex flex-wrap gap-2">
-                  <span className="inline-flex items-center px-4 py-1.5 rounded-xl bg-gradient-to-r from-[var(--color-brand)] to-[var(--color-brand-dark)] text-white text-xs font-bold shadow-md shadow-indigo-500/10 hover:shadow-indigo-500/20 transition-all cursor-default">
-                    {v.cta}
-                  </span>
-                  {v.labels.map((label, j) => (
-                    <span
-                      key={j}
-                      className="inline-flex items-center px-2.5 py-1 rounded-lg bg-[var(--color-surface-card)]/50 text-[var(--color-text-secondary)] text-[11px] border border-[var(--color-border)] backdrop-blur-sm"
-                    >
-                      {label}
-                    </span>
-                  ))}
+                {/* Structured fields */}
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Headline</p>
+                    <p className="text-sm font-semibold text-[var(--color-text-primary)] leading-snug">{v.headline}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider mb-1">CTA</p>
+                    <p className="text-sm text-[var(--color-text-primary)]">{v.cta}</p>
+                  </div>
+                  {v.labels.length > 0 && (
+                    <div>
+                      <p className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider mb-1">Labels</p>
+                      <p className="text-sm text-[var(--color-text-secondary)]">{v.labels.join(", ")}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -122,7 +120,7 @@ export function ResponseCard({ data, prompt }: Props) {
       {data.reasoning.length > 0 && (
         <div>
           <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-3">
-            💡 Reasoning
+            Reasoning
           </h4>
           <ul className="space-y-1 text-sm text-[var(--color-text-secondary)]">
             {data.reasoning.map((reason, i) => (
@@ -139,31 +137,23 @@ export function ResponseCard({ data, prompt }: Props) {
       {data.fixes.length > 0 && (
         <div>
           <h4 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-3">
-            🔧 Grammar & Style Fixes
+            Grammar & Style Fixes
           </h4>
           <div className="space-y-2">
             {data.fixes.map((fix, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-4 text-sm glass-effect"
+                className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 text-sm"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-surface-card)] text-[var(--color-text-muted)] border border-[var(--color-border)] uppercase tracking-wider">
-                    {fix.rule}
-                  </span>
-                </div>
+                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">{fix.rule}</p>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[var(--color-error)] opacity-60">✕</span>
-                    <p className="text-[var(--color-text-secondary)] line-through decoration-[var(--color-error)]/40">
-                      {fix.original}
-                    </p>
+                    <p className="text-[var(--color-text-secondary)] line-through decoration-[var(--color-error)]/40">{fix.original}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[var(--color-success)]">✓</span>
-                    <p className="text-[var(--color-text-primary)] font-medium">
-                      {fix.corrected}
-                    </p>
+                    <p className="text-[var(--color-text-primary)] font-medium">{fix.corrected}</p>
                   </div>
                 </div>
               </div>
