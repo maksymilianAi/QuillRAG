@@ -1,0 +1,152 @@
+[
+  {
+    "id": "tone-1",
+    "text": "Brand tone: friendly, concise, and professional. Avoid jargon. Write like you're talking to a smart friend.",
+    "category": "tone"
+  },
+  {
+    "id": "tone-2",
+    "text": "Voice should be warm but not overly casual. Use contractions naturally. Avoid exclamation marks in body copy.",
+    "category": "tone"
+  },
+  {
+    "id": "tone-3",
+    "text": "Be direct and honest. Don't hide important information behind positive spin. Transparency builds trust.",
+    "category": "tone"
+  },
+  {
+    "id": "guideline-1",
+    "text": "CTA buttons should be action-driven and clear. Use verb-first format: 'Get started', 'Continue checkout', 'Save changes'.",
+    "category": "guideline"
+  },
+  {
+    "id": "guideline-2",
+    "text": "Headlines should be scannable. Keep them under 8 words. Front-load the most important information.",
+    "category": "guideline"
+  },
+  {
+    "id": "guideline-3",
+    "text": "Error messages must: 1) Say what happened, 2) Explain why, 3) Suggest what to do next. Never blame the user.",
+    "category": "guideline"
+  },
+  {
+    "id": "guideline-4",
+    "text": "Labels should be nouns or short noun phrases. Avoid verbs in form labels. Example: 'Email address' not 'Enter your email'.",
+    "category": "guideline"
+  },
+  {
+    "id": "guideline-5",
+    "text": "Use sentence case for all UI text (headings, buttons, labels). Title Case only for proper nouns and product names.",
+    "category": "guideline"
+  },
+  {
+    "id": "guideline-6",
+    "text": "Empty states should: 1) Explain what will appear here, 2) Guide the user to take action. Keep it encouraging.",
+    "category": "guideline"
+  },
+  {
+    "id": "guideline-7",
+    "text": "Confirmation dialogs must clearly state the consequence. Use specific CTAs like 'Delete project' instead of generic 'OK' or 'Yes'.",
+    "category": "guideline"
+  },
+  {
+    "id": "example-1",
+    "text": "Instead of 'Sign up' use 'Get started' or 'Create free account'. Focus on value, not the action.",
+    "category": "example"
+  },
+  {
+    "id": "example-2",
+    "text": "Instead of 'Submit' use specific actions: 'Place order', 'Send message', 'Save changes'.",
+    "category": "example"
+  },
+  {
+    "id": "example-3",
+    "text": "Instead of 'Error: Invalid input' use 'That doesn't look like an email address. Please check and try again.'",
+    "category": "example"
+  },
+  {
+    "id": "example-4",
+    "text": "Instead of 'Are you sure you want to delete?' use 'Delete \"Project Alpha\"? This can't be undone.'",
+    "category": "example"
+  },
+  {
+    "id": "example-5",
+    "text": "Instead of 'No results found' use 'No results for \"search term\". Try a different search or browse categories.'",
+    "category": "example"
+  },
+  {
+    "id": "example-6",
+    "text": "Instead of 'Loading...' use context-specific messages: 'Preparing your dashboard...', 'Finding the best results...'",
+    "category": "example"
+  },
+  {
+    "id": "imported-1",
+    "text": "Source: https://raw.githubusercontent.com/maksymilianAi/Quill/main/knowledge/existing_copy.md\n\n---\n\nSource: Figma designs. Use these as **structural and tonal reference** — not every example is a gold standard. Anti-patterns are flagged explicitly. Style rules in `system_prompt.md` always win over any example below.\n\n---",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-2",
+    "text": "## Canonical vocabulary\nUse these exact terms. Do not paraphrase or invent alternatives.\n\n| Term | Use | Do not use |\n|---|---|---|\n| HSA | Health Savings Account | \"HSA account\", \"health account\" |\n| HRA | Health Reimbursement Arrangement | \"HRA account\" |\n| FSA / HCFSA | Flexible Spending Account | \"flex account\" |\n| COBRA | as-is | \"COBRA benefits\" |\n| EOB | Explanation of Benefits | \"benefits statement\" |\n| Reimburse Me | the product feature name | \"reimbursement request\", \"reimburse feature\" |\n| Pay a Bill | the product feature name | \"bill payment\", \"pay bills\" |\n| Plan year | the coverage cycle | \"benefit year\", \"annual period\" |\n| Spend period | the active spending window | \"spending window\", \"spending cycle\" |\n| Payroll contributions | employer-routed contributions | \"salary contributions\" |\n| Notional accounts | as-is | \"virtual accounts\" |\n| Forfeitures | unused funds returned to employer | \"lost funds\", \"leftover money\" |\n| Excess contributions | over-limit contributions | \"overpayments\", \"extra money\" |\n| Excess earnings | interest/gains on excess contributions | \"bonus earnings\" |\n| IRS limit | the statutory contribution cap | \"government limit\", \"max limit\" |\n| Plan enrollment | signup to a plan | \"plan registration\" |\n| Participant | end user of the benefit | \"member\", \"beneficiary\" |\n| Benefit card | the physical/virtual payment card | \"debit card\", \"HSA card\" |\n\n---",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-3",
+    "text": "## Anti-patterns — do NOT imitate\nThese appear in production but violate the style rules. Flag them in audits and propose the corrected version.\n\n| ❌ Anti-pattern | Why it's wrong | ✅ Corrected |\n|---|---|---|\n| \"Effortlessly upload files by simply scanning the QR code with your device's camera.\" | \"Effortlessly\" + \"simply\" = filler | \"Scan the QR code with your device's camera to upload files.\" |\n| \"Easily track enrollment details, fund movements and related information\" | \"Easily\" = filler; missing Oxford comma | \"Track enrollment details, fund movements, and related information.\" |\n| \"Great news! Additional accounts have been linked to your login.\" | \"Great news!\" = marketing; exclamation mark | \"Additional accounts linked to your login.\" |\n| \"You're almost there... Finish registration and access your account by simply verifying your email address using the button below\" | Ellipsis; \"simply\" = filler; too long | \"Verify your email to finish registration.\" |\n| \"Don't Forget to Finish Your Account Verification\" | \"Don't forget\" = padding | \"Finish Your Account Verification\" |\n| \"Friendly reminder — you have an uncashed check waiting.\" | \"Friendly reminder\" = padding | \"You have an uncashed check waiting.\" |\n| \"Just a reminder that you have a $[amount] contribution scheduled\" | \"Just a reminder\" = padding | \"A contribution of $[amount] is scheduled\" |\n| \"Congratulations on Your Benefits Enrollment Sponsored by [employer Name]!\" | Exclamation; too long; mixed caps in `[employer Name]` | \"Your Benefits Enrollment Is Confirmed\" |\n| \"Your Statement is Now Available!\" | Exclamation mark | \"Your Statement Is Now Available\" |\n| \"Congratulations! You Have Met Your [trigger Type]!\" | Two exclamations; mixed caps in placeholder | \"You've Met Your [Trigger Type]\" |\n| \"Expense Activity Update - Action Required\" | Hyphen used as separator; should be em-dash or colon | \"Expense Activity Update — Action Required\" |\n| \"Additional accounts added to your login\" (email headline) | Sentence case used for email headline — should be Book Style | \"Additional Accounts Added to Your Login\" |\n| \"Unfortunately, the payment was unable to be processed\" | Passive + filler | \"The payment didn't go through\" |\n| \"This may effect your tax filing\" | \"effect\" should be \"affect\" | \"This may affect your tax filing\" |\n\n---",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-4",
+    "text": "### Invoice Reconciliation\n- **Prefund Invoice** — \"View prefunding invoice details, including plan enrollments, policy election amounts, and funding calculations.\"\n- **Contribution Invoice** — \"Reconcile contribution invoicing and view invoice details. This report is limited to contribution funded accounts.\"\n- **Replenishment Invoice** — \"Replenishment invoices fund payments and reimbursements. Reconcile invoices and view details.\"",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-5",
+    "text": "### Enrollments\n- **Health Plan Enrollment** — \"View employee health plan deductible enrollments, coverage details, and HRA status.\"\n- **Participant Account Activity** — \"View participant account activity, including claims, contributions, fees, balances, and enrollment details.\"",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-6",
+    "text": "### Claims & Funding\n- **Claim Activity** — \"Track participant claims, including submissions, statuses, payments, and plan year data.\"\n- **Payroll Contributions** — \"View payroll contribution details for HSA and notional accounts.\"\n- **End of Year Forfeitures** — ⚠️ current copy is an anti-pattern (\"Easily track…\"). Preferred: \"Track enrollment details, fund movements, and related information.\"\n\n---",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-7",
+    "text": "## Modal copy — Request Excess Contribution Withdraw\n- **Modal title** — \"Request Excess Contribution Withdraw\"\n- **Modal description** — \"Excess contributions are amounts you put into your HSA beyond the IRS annual limit, which must be corrected to avoid taxes and penalties.\"\n- **Excess amount** (field label) — \"Amount entered will be debited from your HSA.\"\n- **Excess earnings** (field label) — \"Excess earnings include any additional earnings due to the excess contributions, including but not limited to interest or investment earnings. Please consult with your tax advisor for additional assistance.\"\n- **Warning section title** — \"Excess contribution correction withdrawal\"\n- **Warning body** — \"By signing this form, I understand that [UMB] will report this distribution to the IRS as an excess contribution. Funds contributed in excess of your contribution limit are subject to penalty and tax unless the excess and earnings are withdrawn by you prior to your tax filing due date, including any extensions, for filing your Federal Income Tax Return.\"\n- **Checkbox** — \"I understand the above rules\"\n\n---",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-8",
+    "text": "## Reimbursement flow — Let's Find Your Receipt\n- **Page title** — \"Let's Find Your Receipt\"\n- **Body** — \"Let's start by adding your documentation. This could be a receipt, bill, or an EOB. We'll be able to pull some details from the document automatically.\"\n- **Contextual link** — \"Have a bill you haven't paid yet? Send your payment directly to the provider here – Pay a Bill.\"\n- **Upload area** — \"Drag or browse a picture of your receipt\"\n- **Tooltip (file type error)** — \"Please convert the image into an approved file type or ask your provider for an updated receipt as a PDF.\"\n- **Tooltip trigger** — \"Receipt not in one of the allowed file types?\"\n- **QR section title** — \"Scan QR Code to Upload File\"\n- **QR section description** — ⚠️ current copy is an anti-pattern (\"Effortlessly upload files by simply scanning…\"). Preferred: \"Scan the QR code with your device's camera to upload files.\"\n\n---",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-9",
+    "text": "## Plan settings — Spend limits (Healthcare FSA)\n- **Setting label** — \"Ignore point in time election changes\"\n- **Setting description** — \"Most recent election amount will be made available for all dates of coverage\"\n- **Setting label** — \"Spend limits\"\n- **Tooltip: Total plan limit** — \"Limits the total amount that can be spent across the plan within the designated spend period, regardless of individual participants.\"\n- **Tooltip: Person spend limit** — \"Limits the amount that can be spent per person within the plan during the designated spend period.\"\n- **Options** — \"Total plan limit\", \"IRS limit\", \"Person spend limit\", \"Spend category spend limit\"\n- **Setting label** — \"Spend period\"\n- **Options** — \"Unlimited\", \"Monthly\", \"Plan year\"\n\n---",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-10",
+    "text": "### Account & onboarding\n- **Benefits enrollment welcome**\n  - Headline: ⚠️ anti-pattern — see glossary. Preferred: \"Your Benefits Enrollment Is Confirmed\"\n  - Body: \"Take full advantage of your benefits with [Partner Name]. Here you can access your [account names].\"\n  - Checklist items: \"View your account balance and manage expenses.\", \"Request payments to your provider or reimburse yourself.\", \"Activate and manage your benefit card.\", \"Access important notifications about your account.\", \"Set up payment options for same-day reimbursements.\"\n  - Button: \"Register\"\n\n- **Account verification reminder**\n  - Headline: \"Finish Your Account Verification\"\n  - Body: \"You'll need the last 4 digits from the benefit card you received to finish setting up your account.\"\n  - Button: \"Register\"\n  - Fallback: \"Button above doesn't work? Try this link:\"\n\n- **Complete registration**\n  - Headline: \"Complete Your Registration\"\n  - Body: \"Verify your email to finish registration and access your account.\"\n  - Button: \"Verify\"\n\n- **Additional accounts linked**\n  - Headline: \"Additional Accounts Added to Your Login\"\n  - Body: \"Additional accounts have been linked to your login. Once in your account, you can switch between accounts to view your balance, transactions, and account history.\"\n  - Button: \"Log In\"\n\n---",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-11",
+    "text": "### Security & account access\n- **Password reset (one-time code)**\n  - Headline: \"Reset Your Password\"\n  - Body: \"We've received a request to reset your password. If you didn't make this request, ignore this message. Otherwise, set a new password using this one-time code:\"\n\n- **Password reset (link)**\n  - Headline: \"Reset Your Password\"\n  - Body: \"We've received a request to reset your password.\"\n  - Warning block: \"Do not share this email with anyone. Customer service representatives will never ask you for this information. Sharing this link allows access to your account, and financial transactions made cannot be recovered.\"\n  - Instructions: \"Click the Reset Password button below. The link expires in 1 hour.\"\n  - Button: \"Reset Password\"\n\n- **Username reminder**\n  - Body: \"Your username is [username]. If you didn't make this request, contact Customer Support at [service phone number] immediately.\"\n\n- **Contact info updated**\n  - Headline: \"Your Contact Information Has Been Updated\"\n  - Body: \"Your {email or phone or address} has been updated {old_value if present} to {new address or phone or email}. If you didn't make this change, contact us immediately.\"\n\n---",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-12",
+    "text": "### Contributions & investments\n- **Contribution processed**\n  - Headline: \"Your Contribution Has Processed\"\n  - Body: \"Your contribution of $[amount] processed on [date]. Funds will be available to spend or invest within [hold days] days. Log in to your account for details.\"\n  - Button: \"Log In\"\n\n- **Upcoming contribution reminder**\n  - Headline: \"Upcoming Contribution to Your Account\"\n  - Body: \"A $[amount] contribution is scheduled to pull from [payment source] into your HSA on [scheduled date]. Log in to change this or any future scheduled contributions.\"\n  - Button: \"Log In\"\n\n- **Problem processing contribution**\n  - Headline: \"Problem Processing Your Contribution\"\n  - Body: \"On [date], we attempted to pull funds for your requested contribution, but the payment didn't go through. To reapply it, create another contribution request with updated banking information.\"\n\n- **Investment purchase initiated**\n  - Headline: \"Investment Purchase Initiated\"\n  - Body: \"An investment purchase of $[amount] has been initiated based on your automatic investment settings. Log in to your HSA to view or modify your investment settings.\"\n  - Button: \"Log In\"\n\n---\n\n- **Expense activity — action required**\n  - Headline: \"Expense Activity Update — Action Required\"\n  - Body: \"Your [Transaction Type] received on [date received] has been updated to a status of [Claim Status]. Log in to view details and available actions to resolve it.\"\n  - Button: \"Log In\"\n\n- **Expense activity — no action required**\n  - Headline: \"Expense Activity Update — No Action Required\"\n  - Body: \"Your [Card Swipe/Reimburse Me/Bill Pay] received on [date received] has been updated to a status of [Claim Status]. Log in to view details.\"\n  - Button: \"Log In\"\n\n- **Claim payment update**\n  - Headline: \"Update on Your Claim Payment Request\"\n  - Body: \"We've received and approved your claim payment for [approved amount]. This payment has been applied to cover your outstanding balance from a previous unapproved claim requiring repayment. Your current payment request will not be fully issued for this reason. Review your claims history online for details.\"\n\n- **Action required — payment problem**\n  - Headline: \"Action Required: Problem Processing Your Payment\"\n  - Body: \"On [date], we attempted to reimburse you through [PayPal/Venmo/Bank Name], but the payment didn't go through. The funds have been returned to their originating account. Log in and confirm your payment details to receive your reimbursement.\"\n  - Button: \"Log In\"\n\n- **Payment method updated**\n  - Headline: \"Payment Method Updated\"\n  - Body: \"Your [debit, Venmo, etc.] payment method for reimbursements has been updated. Your changes are saved for future Reimburse Me requests.\"\n  - Button: \"Log In\"\n\n- **Payment voided**\n  - Headline: \"Notice: Payment Voided\"\n  - Body: \"We received a request to void your payment to {provider name}. The check has been voided and the money returned to your account. If you didn't make this request, reach out to your provider to confirm your payment status.\"\n\n- **Check waiting reminder**\n  - Headline: \"Your Check Is Waiting\"\n  - Body: \"You have an uncashed check waiting. The check was issued to {you/your provider} on {date}. If it isn't cashed by {date}, the check will expire and the money will be returned to your account.\"\n  - Conditional line: \"Since the check was sent to your provider, reach out to them to confirm your payment status.\"\n\n- **Check expired**\n  - Headline: \"Check Expired: Money Returned to Your Account\"\n  - Body: \"A check for [amount] expired on [date]. The money has been returned to your account. Log in for details.\"\n  - Button: \"Log In\"\n\n---\n\n- **Card status update**\n  - Headline: \"Card Is [Active/Locked/Closed/Out for Delivery]\"\n  - Body: \"A card for [cardholder first name] is now [active/locked/closed/out for delivery]. Log in to view details and manage your benefit card.\"\n  - Button: \"Log In\"\n\n- **New bank account added**\n  - Headline: \"New Bank Account Added\"\n  - Verified state: \"Your external bank account has been verified and is linked to your <partner name> account. Any pending payments will process automatically. Log in for transaction details.\"\n  - Pending state: \"Your external bank account was recently updated, but additional details are needed to verify it. Log in to complete the setup.\"\n  - Failed state: \"Your recent attempt to add or update an external bank account didn't verify. Log in to re-enter your bank account details.\"\n  - Button: \"Log In\"\n\n- **Statement available**\n  - Headline: \"Your Statement Is Now Available\"\n  - Body: \"Your [frequency] statement is available to view online. Log in to your HSA for account and claim payment details.\"\n  - Button: \"Log In\"\n\n- **Account deadline alert**\n  - Headline: \"Account Deadline Alert\"\n  - Body: \"Your plan year is coming to an end. Check your account deadlines so you don't lose any money.\"\n  - Bullet items: \"Your <accountname> has <$>.\"\n  - HSA exception: \"Your HSA money never expires. There are no deadlines to use your money.\"\n  - Button: \"Log In\"\n\n- **Account expires soon**\n  - Headline: \"Your Account Expires Soon\"\n  - Body: \"Your account deadline is approaching. Spend your money so you don't lose it.\"\n  - Bullet items: \"Your <accountname> has <$>.\"\n  - HSA exception: \"Your HSA money never expires. There are no deadlines to use your money.\"\n  - Footer note: \"* Balance as of <current date MM/DD/YYYY>\"\n  - Button: \"Log In\"\n\n- **HSA changes due to employment**\n  - Headline: \"Changes to Your HSA\"\n  - Body: \"We received important changes in your employment status with [Employer name]. This change will result in several impacts to your Health Savings Account (HSA). One of the most important features of an HSA is that it's your account and remains with you even when you change your health plan coverage or leave your current employer. The funds in your HSA are still yours to spend, save, or invest.\"\n  - Section title: \"Account Highlights\"\n\n- **HSA closure — verification failed**\n  - Headline: \"Notice of HSA Account Closure\"\n  - Body: \"We were unable to verify your account. Your HSA has been closed. {if returned to employee} Any contributions on the account have been returned to you. This may affect your tax filing; refer to your tax advisor. Log in to view details.\"\n  - Button: \"Log In\"\n\n- **HSA closure — inactivity**\n  - Headline: \"Notice of HSA Account Closure\"\n  - Body: \"Due to inactivity with a $0 balance, your HSA has been closed. You can still log in to:\"\n  - Checklist: \"View account history.\", \"Access tax documentation.\", \"Download statements.\"\n  - Button: \"Log In\"\n\n- **Trigger milestone**\n  - Headline: \"You've Met Your [Trigger Type]\"\n  - Body: \"You've met your [trigger type]. Log in to your account for details on your account or claim payments.\"\n  - Button: \"Log In\"\n\n---",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-13",
+    "text": "## Email copy patterns\n- Headlines: Book Style Capitalization, subject-verb or noun phrase structure, 4–6 words (up to 8 when carrying required context).\n- No exclamation marks in headlines or body.\n- Body: 2–3 sentences per paragraph, direct and informative.\n- HSA exceptions always called out separately from other account types.\n- One CTA button per email, Book Style: \"Log In\", \"Register\", \"Verify\", \"Reset Password\".\n- Sign-off always: \"The {partner name} Team\".\n- Fallback link always: \"Button above doesn't work? Try this link:\".\n- Footer disclaimers use asterisk: \"* Balance as of...\".\n- Bullet/checklist items end with a period.\n- Conditional content uses inline labels: \"{if returned to employee}\", \"<only show if provider payment>\".\n\n---",
+    "category": "github-import"
+  },
+  {
+    "id": "imported-14",
+    "text": "## Patterns to follow\n- Verb-first in actions: View / Track / Manage / Reconcile / Submit / Review / Scan / Finish.\n- Lists use \"including\": \"including claims, contributions, and fees\".\n- Oxford comma in lists.\n- No period unless 2+ sentences.\n- Technical terms used as-is: HSA, HRA, notional accounts, forfeitures, COBRA.\n- Em-dash (—) for separating clauses; never hyphen (-).",
+    "category": "github-import"
+  }
+]
