@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { GenerateCopyResponse, CopyVariant } from "../types";
 import { sendCopyFeedback } from "../api";
 import copyIconUrl from "../assets/copy-icon.svg";
+import checkIconUrl from "../assets/check-icon.svg";
+import crossIconUrl from "../assets/cross-icon.svg";
 
 interface Props {
   data: GenerateCopyResponse;
@@ -148,11 +150,11 @@ export function ResponseCard({ data, prompt }: Props) {
                 <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">{fix.rule}</p>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[var(--color-error)] opacity-60">✕</span>
+                    <img src={crossIconUrl} alt="" className="w-4 h-4 shrink-0" />
                     <p className="text-[var(--color-text-secondary)] line-through decoration-[var(--color-error)]/40">{fix.original}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[var(--color-success)]">✓</span>
+                    <img src={checkIconUrl} alt="" className="w-4 h-4 shrink-0" />
                     <p className="text-[var(--color-text-primary)] font-medium">{fix.corrected}</p>
                   </div>
                 </div>
