@@ -194,18 +194,18 @@ export function IDEChat({
                           <div key={i} className="px-3 py-2 rounded-xl bg-[var(--color-surface-elevated)] border border-[var(--color-brand)]/20">
                             <p className="text-[10px] font-bold text-[var(--color-brand-light)] uppercase mb-1">Variant {i + 1}</p>
                             <p className="text-[11px] text-[var(--color-text-primary)] font-semibold">{variant.headline}</p>
-                            {variant.cta && <p className="text-[10px] text-[var(--color-text-secondary)] mt-0.5">CTA: {variant.cta}</p>}
+                            {variant.ctas.length > 0 && <p className="text-[10px] text-[var(--color-text-secondary)] mt-0.5">CTA: {variant.ctas.join(" · ")}</p>}
                           </div>
                         ))}
                       </div>
                     )}
                     {/* Reasoning */}
-                    {msg.data.reasoning.length > 0 && (
+                    {(msg.data.reasoning.headline || msg.data.reasoning.body || msg.data.reasoning.ctas) && (
                       <div className="px-3 py-2 rounded-xl bg-[var(--color-surface-elevated)]/50 border border-[var(--color-border)]/50">
-                        <p className="text-[9px] font-bold text-[var(--color-text-muted)] uppercase mb-1">💡 Why</p>
-                        {msg.data.reasoning.map((r, i) => (
-                          <p key={i} className="text-[10px] text-[var(--color-text-muted)]">• {r}</p>
-                        ))}
+                        <p className="text-[9px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Why</p>
+                        {msg.data.reasoning.headline && <p className="text-[10px] text-[var(--color-text-muted)]">• {msg.data.reasoning.headline}</p>}
+                        {msg.data.reasoning.body && <p className="text-[10px] text-[var(--color-text-muted)]">• {msg.data.reasoning.body}</p>}
+                        {msg.data.reasoning.ctas && <p className="text-[10px] text-[var(--color-text-muted)]">• {msg.data.reasoning.ctas}</p>}
                       </div>
                     )}
                   </div>

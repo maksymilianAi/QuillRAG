@@ -1,6 +1,5 @@
 import { useState } from "react";
-import type { GenerateCopyResponse, CopyVariant, SectionReasoning } from "../types";
-import { sendCopyFeedback } from "../api";
+import type { GenerateCopyResponse, SectionReasoning } from "../types";
 import copyIconUrl from "../assets/copy-icon.svg";
 import checkIconUrl from "../assets/check-icon.svg";
 import crossIconUrl from "../assets/cross-icon.svg";
@@ -10,12 +9,6 @@ interface Props {
   prompt?: string;
 }
 
-function formatVariantText(v: CopyVariant): string {
-  const lines = [v.headline];
-  if (v.body) lines.push(v.body);
-  if (v.ctas.length > 0) lines.push(v.ctas.join(" · "));
-  return lines.join("\n");
-}
 
 function InlineCopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -86,17 +79,7 @@ function SectionNote({ text }: { text: string }) {
   );
 }
 
-export function ResponseCard({ data, prompt }: Props) {
-  const handleVariantCopied = (variantIndex: number, variant: CopyVariant) => {
-    sendCopyFeedback({
-      prompt: prompt ?? "",
-      variantIndex,
-      variant,
-      action: "copy",
-      timestamp: new Date().toISOString(),
-    });
-  };
-
+export function ResponseCard({ data }: Props) {
   const hasBody = data.variants.some((v) => v.body);
   const hasCtas = data.variants.some((v) => v.ctas.length > 0);
   const reasoning: SectionReasoning = data.reasoning ?? {};
