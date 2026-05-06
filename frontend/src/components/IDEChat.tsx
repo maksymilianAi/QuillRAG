@@ -129,7 +129,7 @@ export function IDEChat({
       <div className="shrink-0 px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-surface-elevated)]/50">
         <div className="flex items-center gap-3">
           <span className="text-lg">💬</span>
-          <h3 className="text-sm font-bold text-[var(--color-text-primary)] font-outfit">
+          <h3 className="text-sm font-bold text-[var(--color-text-primary)]">
             Quill Chat
           </h3>
         </div>
@@ -139,7 +139,7 @@ export function IDEChat({
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.length === 0 && (
           <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-brand)] to-purple-600 flex items-center justify-center mb-4 shadow-lg">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-brand-dark)] flex items-center justify-center mb-4 shadow-lg">
               <span className="text-2xl">✏️</span>
             </div>
             <p className="text-xs text-[var(--color-text-muted)] max-w-[200px]">

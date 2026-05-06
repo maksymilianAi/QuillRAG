@@ -17,8 +17,83 @@ interface ClassicChatProps {
   onToggleSidebar: () => void;
 }
 
+const MOCK_MESSAGES: ChatMessageType[] = [
+  {
+    id: "mock-1",
+    role: "user",
+    content: "Rewrite the copy for our checkout confirmation modal",
+    timestamp: new Date(Date.now() - 1000 * 60 * 4),
+  },
+  {
+    id: "mock-2",
+    role: "assistant",
+    content: "",
+    prompt: "Rewrite the copy for our checkout confirmation modal",
+    timestamp: new Date(Date.now() - 1000 * 60 * 3),
+    data: {
+      variants: [
+        {
+          headline: "Your Order Is Confirmed",
+          cta: "View Order Details",
+          labels: ["Order summary", "Estimated delivery", "Payment method"],
+        },
+        {
+          headline: "Order Placed Successfully",
+          cta: "Track Your Order",
+          labels: ["Order number", "Delivery address", "Total amount"],
+        },
+      ],
+      fixes: [
+        {
+          original: "Congratulations! Your order has been successfully placed!",
+          corrected: "Your order is confirmed.",
+          rule: "No exclamation marks in functional copy",
+        },
+      ],
+      reasoning: [
+        "Used Book Style for modal title — matches capitalization rules for modal/dialog titles.",
+        "'View Order Details' is action-verb first, specific — follows button copy pattern.",
+        "Labels use sentence style and are concise noun phrases.",
+      ],
+    },
+  },
+  {
+    id: "mock-3",
+    role: "user",
+    content: "Write copy for an empty state when there are no claims yet",
+    timestamp: new Date(Date.now() - 1000 * 60 * 1),
+  },
+  {
+    id: "mock-4",
+    role: "assistant",
+    content: "",
+    prompt: "Write copy for an empty state when there are no claims yet",
+    timestamp: new Date(Date.now() - 1000 * 55),
+    data: {
+      variants: [
+        {
+          headline: "No Claims Yet",
+          cta: "Submit a Claim",
+          labels: ["Claims appear here once submitted", "Track status and payment details"],
+        },
+        {
+          headline: "Your Claims Will Appear Here",
+          cta: "Submit Your First Claim",
+          labels: ["Submitted claims", "Payment status", "Supporting documents"],
+        },
+      ],
+      fixes: [],
+      reasoning: [
+        "Empty state headline explains what will appear here — direct and informative.",
+        "CTA is verb-first and specific: 'Submit a Claim' follows the action-driven button pattern.",
+        "Support labels set expectations without over-explaining.",
+      ],
+    },
+  },
+];
+
 export function ClassicChat({ settings, isSidebarOpen: _isSidebarOpen, onToggleSidebar }: ClassicChatProps) {
-  const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const [messages, setMessages] = useState<ChatMessageType[]>(MOCK_MESSAGES);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -57,6 +132,7 @@ export function ClassicChat({ settings, isSidebarOpen: _isSidebarOpen, onToggleS
         role: "assistant",
         content: "",
         data: response,
+        prompt: content,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, assistantMessage]);
@@ -74,49 +150,36 @@ export function ClassicChat({ settings, isSidebarOpen: _isSidebarOpen, onToggleS
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full min-w-0">
-      {/* Header */}
-      <header className="shrink-0 flex items-center justify-center border-b border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur-md z-20">
-        <div className="max-w-5xl w-full flex items-center gap-4 px-6 py-5">
-          <button 
-            onClick={onToggleSidebar}
-            className="p-2 -ml-2 rounded-xl hover:bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-all"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-              <path fillRule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm2.25 5.25a.75.75 0 0 1 .75-.75h12a.75.75 0 0 1 0 1.5H5.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
-            </svg>
-          </button>
-          <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-brand-dark)] shadow-lg shadow-indigo-500/20">
-            <span className="text-2xl">✍️</span>
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-lg font-bold text-[var(--color-text-primary)] font-outfit tracking-tight leading-none">
-              CopywrightRAG
-            </h1>
-            <p className="text-[11px] text-[var(--color-text-muted)] font-bold uppercase tracking-[0.15em] mt-1.5">
-              AI UX Copywriting
-            </p>
-          </div>
-          <div className="ml-auto flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-[var(--color-surface-elevated)] border border-[var(--color-border)] shadow-sm">
-            <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-success)] animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-            <span className="text-[11px] font-bold text-[var(--color-text-secondary)] uppercase tracking-widest">Active</span>
-          </div>
-        </div>
-      </header>
+    <div className="flex-1 flex flex-col h-full min-w-0 relative">
+      {/* Floating open-sidebar button — visible only when sidebar is collapsed */}
+      {!_isSidebarOpen && (
+        <button
+          onClick={onToggleSidebar}
+          className="absolute top-4 left-4 z-20 p-2 rounded-xl bg-[var(--color-surface-elevated)] border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-brand)] transition-all shadow-sm"
+          title="Open sidebar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+            <path fillRule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm2.25 5.25a.75.75 0 0 1 .75-.75h12a.75.75 0 0 1 0 1.5H5.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
+          </svg>
+        </button>
+      )}
 
       {/* Messages */}
       <main className="flex-1 overflow-y-auto overflow-x-hidden relative flex flex-col items-center">
         <div className="max-w-3xl w-full px-4 md:px-6 py-8 space-y-6 flex-1 flex flex-col">
           {messages.length === 0 && (
             <div className="flex-1 flex flex-col items-center justify-center text-center animate-slide-up py-12">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[var(--color-brand)] to-purple-600 flex items-center justify-center mb-6 shadow-2xl shadow-indigo-500/30 rotate-3">
-                <span className="text-4xl">🧠</span>
-              </div>
-              <h2 className="text-3xl font-extrabold text-[var(--color-text-primary)] mb-3 font-outfit tracking-tight">
-                Design-Driven Copy
+              <img
+                src="/quill-logo.png"
+                alt="Quill"
+                className="w-20 h-20 mb-7"
+                style={{ borderRadius: "20px" }}
+              />
+              <h2 className="text-4xl font-extrabold text-[var(--color-text-primary)] mb-3 tracking-tight">
+                Quill
               </h2>
-              <p className="text-sm text-[var(--color-text-secondary)] max-w-sm mb-10 leading-relaxed">
-                Professional UX writing suggestions based on your Figma context and brand guidelines.
+              <p className="text-base text-[var(--color-text-muted)] mb-10">
+                Your Copywriting Assistant
               </p>
               
               <div className="w-full max-w-md space-y-3">

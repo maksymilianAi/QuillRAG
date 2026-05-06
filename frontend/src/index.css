@@ -1,26 +1,27 @@
 @import "tailwindcss";
 
-/* ── Custom design tokens ── */
+/* ── Design system tokens (Eleveit) ── */
 :root {
-  --color-brand: #6366f1;
-  --color-brand-light: #818cf8;
-  --color-brand-dark: #4f46e5;
-  --color-surface: #0b0d12;
-  --color-surface-elevated: #151825;
-  --color-surface-card: #1c2136;
-  --color-border: #242942;
-  --color-border-bright: #3a4165;
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #94a3b8;
-  --color-text-muted: #64748b;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  
+  --color-brand: #3f68ff;
+  --color-brand-light: #6c9ee8;
+  --color-brand-dark: #1052c8;
+  --color-surface: #0c1116;
+  --color-surface-elevated: #142641;
+  --color-surface-card: #22334c;
+  --color-nav-bg: #142641;
+  --color-border: #2d3c52;
+  --color-border-bright: #334766;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #aab1c0;
+  --color-text-muted: #9ba3b3;
+  --color-success: #19b269;
+  --color-warning: #f9c134;
+  --color-error: #e72626;
+
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-brand: 0 10px 15px -3px rgba(99, 102, 241, 0.2);
+  --shadow-brand: 0 10px 15px -3px rgba(63, 104, 255, 0.2);
 }
 
 /* ── Base styles ── */
@@ -28,8 +29,12 @@
   box-sizing: border-box;
 }
 
+button {
+  border-radius: 8px;
+}
+
 body {
-  font-family: 'Inter', 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--color-surface);
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;

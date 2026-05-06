@@ -74,7 +74,20 @@ Contrast examples:
 - Use em-dash (—), not hyphen (-), when separating clauses.
 
 ## Domain terminology (use without explanation)
-HSA, HRA, FSA, HCFSA, COBRA, EOB, notional accounts, forfeitures, reimbursements, contributions, payroll contributions, plan year, spend period, enrollment, deductible, IRS limit, excess contributions, excess earnings.`;
+HSA, HRA, FSA, HCFSA, COBRA, EOB, notional accounts, forfeitures, reimbursements, contributions, payroll contributions, plan year, spend period, enrollment, deductible, IRS limit, excess contributions, excess earnings.
+
+## Source of truth (tiebreak order)
+When sources conflict, apply in this order:
+1. Style rules in this prompt — always win.
+2. Canonical vocabulary (brand glossary) — for product-specific naming.
+3. Existing copy examples — structural reference only. Anti-patterns must never be imitated; flag them and propose the corrected version.
+
+## What you never do
+- Suggest copy without first reviewing the surrounding context and UI element types.
+- Invent terminology that doesn't exist in the product domain or canonical glossary.
+- Let capitalization or voice errors slide without flagging them.
+- Copy phrasing from known anti-patterns — they exist to be fixed, not imitated.
+- Use passive voice, exclamation marks, ellipses, or filler marketing language.`;
 }
 
 /**
@@ -104,14 +117,14 @@ export function buildUserPrompt(parts: PromptParts): string {
   // Instructions
   const instructions: string[] = [
     `1. Identify exactly which element(s) the user wants to update from the "Current UI Text" list.`,
-    `2. If the task requires rewriting the entire screen or generating a new layout, provide exactly ${parts.variantCount} full copy variant(s) in the 'variants' array.`,
+    `2. If the task requires rewriting the entire screen or generating a new layout, provide exactly ${parts.variantCount} full copy variant(s) in the 'variants' array. This is the primary output.`,
     `3. If the task is just to fix or update a specific text element (like a description, error message, or label), DO NOT return variants (leave the 'variants' array empty). Instead, return the changes in the 'fixes' array.`,
   ];
-  if (parts.fixGrammar) {
-    instructions.push("4. Fix any grammar or spelling issues in the original copy, returning them in the 'fixes' array.");
-  }
   if (parts.includeReasoning) {
-    instructions.push("5. Explain your decisions briefly in the 'reasoning' array.");
+    instructions.push("4. Explain your decisions briefly in the 'reasoning' array, citing specific style rules or canonical vocabulary where relevant.");
+  }
+  if (parts.fixGrammar) {
+    instructions.push("5. After delivering the copy variants, audit the existing copy for issues: wrong capitalization style, passive voice, filler/marketing language, invented terminology (vs. canonical glossary), punctuation errors (hyphens used as em-dashes), and known anti-patterns. Return each issue in the 'fixes' array as { original, corrected, rule }. This is secondary — the copy variants come first.");
   }
   sections.push(`## Instructions\n${instructions.join("\n")}`);
 

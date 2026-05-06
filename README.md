@@ -1,83 +1,80 @@
-<p align="center">
-  <img src="docs/hero.png" alt="CopywrightRAG — AI-Powered UX Copywriting Tool" width="100%" />
-</p>
+<div align="center">
 
-<p align="center">
-  <strong>AI-powered UX copywriting tool with Figma integration, RAG knowledge base, and pluggable LLM support.</strong>
-</p>
+<img src="frontend/public/quill-logo.png" width="96" alt="Quill" style="border-radius: 20px" />
 
-<p align="center">
-  <a href="#-features">Features</a> •
-  <a href="#-quick-start">Quick Start</a> •
-  <a href="#-architecture">Architecture</a> •
-  <a href="#-deployment">Deployment</a> •
-  <a href="#-configuration">Configuration</a>
-</p>
+# Quill
+
+**AI-powered UX copywriting assistant with Figma integration and RAG knowledge base.**
+
+</div>
 
 ---
 
-## ✨ Features
+Quill helps product teams write better UI copy — faster. Paste a Figma link or describe what you need, and Quill returns structured copy variants, grammar fixes, and reasoning grounded in your brand's style guide.
 
-### 🎨 Visual IDE Mode
-Connect your Figma design directly — CopywrightRAG renders a pixel-perfect preview of your component with clickable text overlays. Select any text element and rewrite it with AI in one click.
+## What it does
 
-### 💬 Classic Chat Mode
-A conversational interface where you paste a Figma URL and describe what you want to change. The AI analyzes all text nodes in context and returns structured fixes and variants.
+**Visual IDE Mode** — Connect a Figma frame directly. Quill renders a preview with clickable text overlays — select any element and rewrite it with AI in one click.
 
-### 🧠 RAG Knowledge Base
-Built-in Retrieval-Augmented Generation (RAG) ensures that every suggestion follows your brand's **voice & tone guidelines**, capitalization rules, and UX writing best practices.
+**Classic Chat Mode** — Describe what you need in plain language. Quill returns structured variants, grammar fixes, and reasoning for every suggestion.
 
-### 🔌 Pluggable LLM Providers
-Choose between **OpenAI**, **Google Gemini**, **Anthropic Claude**, or connect your own **local/custom model** via any OpenAI-compatible endpoint (Ollama, LM Studio, Groq, Together AI, etc.).
+**Brand-aware** — Every suggestion follows your team's voice & tone guidelines, capitalization rules, and UX writing patterns — not generic AI copy.
 
-### 🔒 Privacy-First
-All API keys are stored in your browser's `localStorage` — never on the server. Run entirely local with Ollama for full data privacy.
+**Your choice of AI** — Works with OpenAI, Google Gemini, Anthropic Claude, or any local model (Ollama, LM Studio, etc.).
+
+**Private by default** — API keys stay in your browser. Run fully local with Ollama for complete data privacy.
 
 ---
 
-## 🚀 Quick Start
+## Getting started
 
-### Prerequisites
-- **Node.js** v20+
-- **npm** v9+
-- (Optional) [Ollama](https://ollama.ai/) for local LLM inference
+1. Open the app and select your AI provider in the sidebar
+2. Add your API key (stored locally in your browser — never on the server)
+3. (Optional) Add a Figma Personal Access Token to use Visual IDE mode
+4. Type a request or paste a Figma link and press Enter
 
-### Installation
+> **Tip:** For best results, use Anthropic Claude — it handles structured copy output most reliably.
+
+---
+
+## For developers
+
+<details>
+<summary>Quick start</summary>
+
+<br>
+
+**Prerequisites:** Node.js v20+, npm v9+
 
 ```bash
-# Clone the repository
-git clone https://github.com/YOUR_USERNAME/copywrightRAG.git
-cd copywrightRAG
+git clone https://github.com/maksymilianAi/QuillRAG.git
+cd QuillRAG
 
-# Install backend dependencies
 npm install
-
-# Install frontend dependencies
 cd frontend && npm install && cd ..
 
-# (Optional) Set up environment variables
 cp .env.example .env
-# Edit .env with your API keys
 ```
 
-### Running Locally
-
 ```bash
-# Terminal 1 — Start the backend
+# Terminal 1 — backend
 npm run dev
 
-# Terminal 2 — Start the frontend
+# Terminal 2 — frontend
 cd frontend && npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+Open [http://localhost:5173](http://localhost:5173).
 
----
+</details>
 
-## 🏗 Architecture
+<details>
+<summary>Architecture</summary>
+
+<br>
 
 ```
-copywrightRAG/
+QuillRAG/
 ├── api/                    # Vercel serverless functions
 │   ├── _app.ts             # Shared Express app factory
 │   └── [...path].ts        # Catch-all API handler
@@ -107,7 +104,7 @@ copywrightRAG/
 └── package.json
 ```
 
-### Data Flow
+**Data flow:**
 
 ```mermaid
 graph TB
@@ -129,34 +126,36 @@ graph TB
     BE -->|Fixes / Variants| FE
 ```
 
----
+</details>
 
-## 🌐 Deployment
+<details>
+<summary>Deployment</summary>
 
-### Vercel (Recommended)
+<br>
 
-The project is pre-configured for **one-click Vercel deployment**:
+**Vercel (Recommended)**
 
-1. Push your code to GitHub
+The project is pre-configured for one-click Vercel deployment:
+
+1. Push to GitHub
 2. Go to [vercel.com](https://vercel.com) → **Import Project**
-3. Select your repository
-4. Vercel will auto-detect `vercel.json` and deploy both frontend and API
+3. Select your repository — Vercel auto-detects `vercel.json` and deploys frontend + API
 
-> **Environment Variables (optional):** If you want server-side fallback keys, add them in Vercel Dashboard → Settings → Environment Variables. Users can always override with their own keys via the UI.
+> Add server-side fallback keys in Vercel Dashboard → Settings → Environment Variables. Users can override with their own keys via the UI.
 
-### Local Development
+**Local Development**
 
-The dev setup uses two servers:
-- **Backend** (`npm run dev`) — Express on `http://localhost:3001`
-- **Frontend** (`cd frontend && npm run dev`) — Vite on `http://localhost:5173` (proxies `/api` to backend)
+- Backend (`npm run dev`) — Express on `http://localhost:3001`
+- Frontend (`cd frontend && npm run dev`) — Vite on `http://localhost:5173`, proxies `/api` to backend
 
----
+</details>
 
-## ⚙️ Configuration
+<details>
+<summary>Configuration</summary>
 
-### LLM Providers
+<br>
 
-All provider settings are configured via the **Sidebar** in the UI:
+**LLM Providers**
 
 | Provider | What you need |
 |----------|---------------|
@@ -165,62 +164,68 @@ All provider settings are configured via the **Sidebar** in the UI:
 | **Anthropic Claude** | API Key (`sk-ant-...`) |
 | **Local / Custom** | Base URL + Model Name (+ optional API Key) |
 
-#### Local LLM Examples
+Local LLM examples:
 
-| Setup | Base URL | Model | API Key |
-|-------|----------|-------|---------|
-| 🟢 **Ollama** | `http://localhost:11434/v1` | `llama3.2` | *(blank)* |
-| 🟣 **LM Studio** | `http://localhost:1234/v1` | `local-model` | *(blank)* |
-| ⚡ **Groq** | `https://api.groq.com/openai/v1` | `llama3-8b-8192` | `gsk_...` |
+| Setup | Base URL | Model |
+|-------|----------|-------|
+| **Ollama** | `http://localhost:11434/v1` | `llama3.2` |
+| **LM Studio** | `http://localhost:1234/v1` | `local-model` |
+| **Groq** | `https://api.groq.com/openai/v1` | `llama3-8b-8192` |
 
-### Figma Integration
+**Figma Integration**
 
-1. Go to **Figma** → Account Settings → Personal Access Tokens
-2. Create a new token
-3. Paste it in the **Figma Token** field in the Sidebar
+1. Figma → Account Settings → Personal Access Tokens → Create token
+2. Paste it in the **Figma Token** field in the Sidebar
 
-### Environment Variables (`.env`)
-
-For server-side defaults (optional):
+**Environment Variables (`.env`)**
 
 ```env
 LLM_PROVIDER=openai          # Default provider: openai | claude | gemini
-OPENAI_API_KEY=sk-...         # OpenAI API key
-ANTHROPIC_API_KEY=sk-ant-...  # Anthropic API key
-GOOGLE_API_KEY=...            # Google Gemini API key
-FIGMA_ACCESS_TOKEN=figd_...   # Figma personal access token
-PORT=3001                     # Server port (default: 3001)
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GOOGLE_API_KEY=...
+FIGMA_ACCESS_TOKEN=figd_...
+PORT=3001
 ```
 
----
+</details>
 
-## 🧩 How It Works
+<details>
+<summary>How it works</summary>
 
-### Visual IDE Mode
+<br>
 
-1. **Extract** — Paste a Figma URL. The backend fetches the node tree (text positions) and renders a PNG screenshot via Figma's Image Export API.
-2. **Context** — The Context Agent analyzes all text labels and generates a 1-2 sentence description (e.g., *"A modal for selecting eligible HSA services during claim submission"*).
-3. **Select** — Click any text element on the canvas. The overlay highlights it and shows its name.
-4. **Rewrite** — Type your instruction in the chat panel (e.g., *"Make this more concise"*). The system sends **only** the selected text + context to the LLM — not the entire design.
-5. **Apply** — The canvas updates automatically with the AI's suggestion.
+**Visual IDE Mode**
 
-### Classic Chat Mode
+1. Paste a Figma URL — backend fetches the node tree and renders a PNG via Figma's Image Export API
+2. Context Agent analyzes all text labels and generates a 1–2 sentence component description
+3. Click any text element on the canvas — overlay highlights it and shows its name
+4. Type your instruction — system sends only the selected text + context to the LLM
+5. Canvas updates automatically with the suggestion
 
-1. Paste a Figma URL in the chat along with your instruction.
-2. The agent extracts all text nodes, retrieves relevant style guidelines from the RAG knowledge base, and builds a comprehensive prompt.
-3. The LLM returns structured JSON with `variants`, `fixes`, and `reasoning`.
+**Classic Chat Mode**
 
----
+1. Paste a Figma URL with your instruction
+2. Agent extracts all text nodes, retrieves relevant style guidelines from the RAG knowledge base, builds a prompt
+3. LLM returns structured JSON with `variants`, `fixes`, and `reasoning`
 
-## 📝 RAG Knowledge Base
+</details>
 
-The file `data/knowledge.json` contains the brand's UX writing guidelines. These are embedded using Google's `text-embedding-004` model and retrieved on each request to ground the AI's suggestions in your actual style rules.
+<details>
+<summary>RAG Knowledge Base</summary>
 
-To update the knowledge base, edit `data/knowledge.json` and restart the server. Embeddings are generated lazily on the first request.
+<br>
 
----
+`data/knowledge.json` contains the brand's UX writing guidelines. These are embedded using Google's `text-embedding-004` model and retrieved on each request to ground suggestions in your actual style rules.
 
-## 🛠 Tech Stack
+To update: edit `data/knowledge.json` and restart the server. Embeddings are generated lazily on the first request.
+
+</details>
+
+<details>
+<summary>Tech stack</summary>
+
+<br>
 
 | Layer | Technology |
 |-------|-----------|
@@ -231,8 +236,10 @@ To update the knowledge base, edit `data/knowledge.json` and restart the server.
 | **Figma** | Figma REST API (files, nodes, images) |
 | **Deployment** | Vercel (serverless functions + static) |
 
+</details>
+
 ---
 
-## 📄 License
+## License
 
 MIT
