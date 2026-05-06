@@ -12,13 +12,13 @@ export const config = {
   openaiApiKey: process.env.OPENAI_API_KEY || "",
 
   /** Anthropic (Claude) API key */
-  anthropicApiKey: process.env.ANTHROPIC_API_KEY || "",
+  anthropicApiKey: process.env.ANTHROPIC_API_KEY || process.env.Claude_API || "",
 
   /** Google (Gemini) API key */
   googleApiKey: process.env.GOOGLE_API_KEY || "",
 
   /** Figma personal access token */
-  figmaAccessToken: process.env.FIGMA_ACCESS_TOKEN || "",
+  figmaAccessToken: process.env.FIGMA_ACCESS_TOKEN || process.env.Figma_Token || "",
 
   /** Server port */
   port: parseInt(process.env.PORT || "3001", 10),

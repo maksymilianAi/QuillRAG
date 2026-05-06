@@ -18,7 +18,7 @@ export function getApp(): Express {
     const provider = process.env.LLM_PROVIDER || "openai";
     const apiKey =
       provider === "claude" || provider === "anthropic"
-        ? process.env.ANTHROPIC_API_KEY
+        ? (process.env.ANTHROPIC_API_KEY || process.env.Claude_API)
         : provider === "openai"
         ? process.env.OPENAI_API_KEY
         : provider === "gemini" || provider === "google"
