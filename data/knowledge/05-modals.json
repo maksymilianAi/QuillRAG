@@ -1,0 +1,27 @@
+[
+  {
+    "id": "modal-1",
+    "text": "Modal copy structure: Title (Book Style, ≤5 words, noun phrase) → Body (sentence style, 1–3 sentences, user-centered) → Optional warning/notice → CTAs (Book Style, primary first). Body must start from the user's perspective, not system state: 'You've made changes that can be applied…' not 'We detected updates to properties…'.",
+    "category": "element-modals"
+  },
+  {
+    "id": "modal-2",
+    "text": "Confirmation modal patterns: Title describes the completed action in Book Style. Body provides next steps or what the user should know. CTA is contextual ('Got it' is acceptable here). Checkboxes use sentence style, no period: 'I understand the above rules'. Warning blocks use sentence style with period.",
+    "category": "element-modals"
+  },
+  {
+    "id": "modal-3",
+    "text": "Modal — Sync Updates Across Organizations: Anti-pattern title: 'Select updates to push to lower-level organizations' → Correct: 'Sync Updates Across Organizations'. Body: 'You've made changes that can be applied to lower-level organizations. Select which updates you'd like to apply across all lower-level organizations.' Conditional note: 'If no updates are selected, changes will only apply to this organization and any future lower-level organizations.' CTA with step context: 'Skip Sync (2/3)'.",
+    "category": "element-modals"
+  },
+  {
+    "id": "modal-4",
+    "text": "Modal — Request Excess Contribution Withdraw: Title: 'Request Excess Contribution Withdraw' | Description: 'Excess contributions are amounts you put into your HSA beyond the IRS annual limit, which must be corrected to avoid taxes and penalties.' | Label: 'Amount entered will be debited from your HSA.' | Warning title: 'Excess contribution correction withdrawal' | Checkbox: 'I understand the above rules'.",
+    "category": "element-modals"
+  },
+  {
+    "id": "modal-5",
+    "text": "Modal — ER Reactivation (in-progress action): Use present progressive for actions in progress. 'Reactivating [Employer 1]' (not '[ER] has been reactivated'). Body: '[Employer 1] and any selected plans are being reactivated using their previous settings.' Numbered step headings have no period — only description body beneath each step does. Do not embed inline navigation links inside step description text.",
+    "category": "element-modals"
+  }
+]

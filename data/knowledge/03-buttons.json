@@ -1,0 +1,22 @@
+[
+  {
+    "id": "btn-1",
+    "text": "Button copy rules: Always Book Style (title case). Structure: action verb + noun — 'Submit Request', 'Change Refund Method', 'Log In', 'Reset Password', 'View Order Details'. Never use verb-only labels like 'Submit', 'Continue', 'OK' — always pair with a noun that tells the user what they're acting on.",
+    "category": "element-buttons"
+  },
+  {
+    "id": "btn-2",
+    "text": "Primary CTA rules: Only one primary CTA per screen or email. Must be unique — if the page already has 'Submit Claim', the next primary action cannot also be generic. Preferred verbs: View, Track, Submit, Manage, Upload, Verify, Reset, Register, Log In, Finish, Apply, Add, Remove, Confirm.",
+    "category": "element-buttons"
+  },
+  {
+    "id": "btn-3",
+    "text": "Button copy examples from the product: 'Log In' | 'Register' | 'Verify' | 'Reset Password' | 'Submit Request' | 'Submit Claim' | 'Upload a New Document' | 'View Order Details' | 'Track Your Order' | 'Go to Payout Definitions' | 'Go to Services' | 'Got it' (acceptable in modal confirmation only) | 'Skip Sync (2/3)' (step progress in multi-step flow) | 'Apply Changes' | 'Add Bank Account' | 'Remove Card'.",
+    "category": "element-buttons"
+  },
+  {
+    "id": "btn-4",
+    "text": "Secondary and destructive buttons: Secondary CTA uses outline or ghost style, still Book Style, noun-paired: 'Go to Services', 'View Details', 'Cancel Request'. Destructive actions must be explicit: 'Remove Card', 'Delete Account', 'Cancel Enrollment' — never just 'Remove' or 'Delete'.",
+    "category": "element-buttons"
+  }
+]

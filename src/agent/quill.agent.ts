@@ -14,11 +14,13 @@ import type { GenerateCopyInput, AgentResponse } from "./agent.types.js";
 
 /** Zod schema for structured LLM output */
 const agentResponseSchema = z.object({
+  original: z.string().optional().describe("Original copy text from the design context, as plain text. Omit if no original context is available."),
+  recommended: z.number().int().min(0).describe("Zero-based index of the recommended variant"),
   variants: z.array(
     z.object({
-      headline: z.string().describe("Improved headline text"),
-      cta: z.string().describe("Call-to-action button text"),
-      labels: z.array(z.string()).describe("UI labels and microcopy"),
+      headline: z.string().describe("Title or heading text (Book Style)"),
+      body: z.string().optional().describe("Supporting/descriptive body text, if applicable"),
+      ctas: z.array(z.string()).describe("Button labels — primary first, secondary second (Book Style)"),
     })
   ),
   fixes: z.array(
@@ -28,9 +30,11 @@ const agentResponseSchema = z.object({
       rule: z.string().describe("Grammar/style rule applied"),
     })
   ),
-  reasoning: z
-    .array(z.string())
-    .describe("Brief explanations of copywriting decisions"),
+  reasoning: z.object({
+    headline: z.string().optional().describe("Why this headline approach was chosen"),
+    body: z.string().optional().describe("Why this body text approach was chosen"),
+    ctas: z.string().optional().describe("Why these CTA labels were chosen"),
+  }).describe("Per-section reasoning for copywriting decisions"),
 });
 
 export class QuillAgent {

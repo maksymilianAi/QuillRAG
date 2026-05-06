@@ -1,0 +1,37 @@
+[
+  {
+    "id": "email-1",
+    "text": "Email structure rules: Headlines use Book Style, 4–6 words (up to 8 when context requires). No exclamation marks. One CTA button per email. Sign-off always: 'The {partner name} Team'. Fallback link always: 'Button above doesn't work? Try this link:'. Footer asterisk for balance dates: '* Balance as of MM/DD/YYYY'. Checklist items end with period. HSA exceptions always called out separately.",
+    "category": "element-emails"
+  },
+  {
+    "id": "email-2",
+    "text": "Email CTA buttons: Book Style, verb-first: 'Log In', 'Register', 'Verify', 'Reset Password'. Body paragraphs: 2–3 sentences max, direct and informative, no marketing language.",
+    "category": "element-emails"
+  },
+  {
+    "id": "email-3",
+    "text": "Email headlines — Account & onboarding: 'Your Benefits Enrollment Is Confirmed' | 'Finish Your Account Verification' | 'Complete Your Registration' | 'Additional Accounts Added to Your Login'. Welcome body: 'Take full advantage of your benefits with [Partner Name]. Here you can access your [account names].'",
+    "category": "element-emails"
+  },
+  {
+    "id": "email-4",
+    "text": "Email headlines — Security & access: 'Reset Your Password' | 'Your Contact Information Has Been Updated'. Warning block: 'Do not share this email with anyone. Customer service representatives will never ask you for this information.' Body pattern for changes: 'Your {field} has been updated to {new value}. If you didn't make this change, contact us immediately.'",
+    "category": "element-emails"
+  },
+  {
+    "id": "email-5",
+    "text": "Email headlines — Contributions & investments: 'Your Contribution Has Processed' | 'Upcoming Contribution to Your Account' | 'Problem Processing Your Contribution' | 'Investment Purchase Initiated'. Body for problem: 'The payment didn't go through. To reapply it, create another contribution request with updated banking information.'",
+    "category": "element-emails"
+  },
+  {
+    "id": "email-6",
+    "text": "Email headlines — Claims & payments: 'Expense Activity Update — Action Required' (em-dash) | 'Expense Activity Update — No Action Required' | 'Action Required: Problem Processing Your Payment' | 'Payment Method Updated' | 'Your Check Is Waiting' | 'Check Expired: Money Returned to Your Account'. Body for payment method: 'Your changes are saved for future Reimburse Me requests.'",
+    "category": "element-emails"
+  },
+  {
+    "id": "email-7",
+    "text": "Email headlines — Account status & alerts: 'Card Is [Active/Locked/Closed/Out for Delivery]' | 'New Bank Account Added' | 'Your Statement Is Now Available' | 'Account Deadline Alert' | 'Your Account Expires Soon' | 'You've Met Your [Trigger Type]'. Body for deadline: 'Your plan year is coming to an end. Check your account deadlines so you don't lose any money.' HSA exception: 'Your HSA money never expires. There are no deadlines to use your money.'",
+    "category": "element-emails"
+  }
+]

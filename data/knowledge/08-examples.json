@@ -1,0 +1,32 @@
+[
+  {
+    "id": "ex-1",
+    "text": "Reports section card descriptions: Prefund Invoice — 'View prefunding invoice details, including plan enrollments, policy election amounts, and funding calculations.' | Contribution Invoice — 'Reconcile contribution invoicing and view invoice details. This report is limited to contribution funded accounts.' | Replenishment Invoice — 'Replenishment invoices fund payments and reimbursements. Reconcile invoices and view details.' | Health Plan Enrollment — 'View employee health plan deductible enrollments, coverage details, and HRA status.' | Participant Account Activity — 'View participant account activity, including claims, contributions, fees, balances, and enrollment details.' | Claim Activity — 'Track participant claims, including submissions, statuses, payments, and plan year data.' | Payroll Contributions — 'View payroll contribution details for HSA and notional accounts.'",
+    "category": "example"
+  },
+  {
+    "id": "ex-2",
+    "text": "Page copy — Reimbursement flow (Let's Find Your Receipt): Page title: 'Let's Find Your Receipt' | Body: 'Let's start by adding your documentation. This could be a receipt, bill, or an EOB. We'll be able to pull some details from the document automatically.' | Contextual link: 'Have a bill you haven't paid yet? Send your payment directly to the provider here – Pay a Bill.' | Upload area: 'Drag or browse a picture of your receipt' | QR description: 'Scan the QR code with your device's camera to upload files.' (not 'Effortlessly upload files by simply scanning…').",
+    "category": "example"
+  },
+  {
+    "id": "ex-3",
+    "text": "Plan settings — Spend limits (Healthcare FSA) tooltips: Total plan limit: 'Limits the total amount that can be spent across the plan within the designated spend period, regardless of individual participants.' Person spend limit: 'Limits the amount that can be spent per person within the plan during the designated spend period.' Dropdown options: 'Total plan limit', 'IRS limit', 'Person spend limit', 'Spend category spend limit', 'Unlimited', 'Monthly', 'Plan year'.",
+    "category": "example"
+  },
+  {
+    "id": "ex-4",
+    "text": "Page copy — Claim Summary (Reimburse Myself flow): Page title: 'Claim Summary' (not 'Expense Details' — use canonical term). Body: 'Review the details we pulled from your document, add any missing details, and choose your payment preferences before submitting.' Warning lead: 'To receive your money faster, upload a clearer photo or a different document including the missing details.' Inline alert heading: 'Are the missing details on your document?' Fallback body: 'If you do not have another document, you can add the missing details below.' CTAs: 'Upload a New Document', 'Why Does It Matter?' Field labels: 'Service For', 'Service Description'.",
+    "category": "example"
+  },
+  {
+    "id": "ex-5",
+    "text": "Modal copy — ER Reactivation next steps: 1. Review employer and plan settings — 'All previously saved settings have been saved. Verify these settings and add any additional plans being offered.' 2. Load updated census — 'Employment statuses may have been updated during the termination process and will not be automatically reverted.' 3. Load enrollment — 'Previous enrollment will not be automatically reactivated even if the plan was reactivated. Employees must be re-enrolled into each account.' 4. Add or reactivate admin contacts — 'Previous admin access was removed at the time of termination.' 5. Review payroll calendars — 'If your plans support scheduled contributions, review any supported payroll calendars.'",
+    "category": "example"
+  },
+  {
+    "id": "ex-6",
+    "text": "Onboarding email checklist items (all end with period): 'View your account balance and manage expenses.' | 'Request payments to your provider or reimburse yourself.' | 'Activate and manage your benefit card.' | Pattern: verb-first, concise, 1 action per item, Oxford comma in list context.",
+    "category": "example"
+  }
+]

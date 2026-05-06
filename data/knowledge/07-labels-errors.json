@@ -1,0 +1,47 @@
+[
+  {
+    "id": "label-1",
+    "text": "Field labels: Sentence style, 1–3 words, no punctuation. Noun-first: 'First name', 'Account number', 'Plan year', 'Service date'. Never verb-first for labels. No colons after labels.",
+    "category": "element-labels"
+  },
+  {
+    "id": "label-2",
+    "text": "Support text (helper text under fields): Sentence style, noun-first or verb-first, no period unless 2 sentences. 'Amount entered will be debited from your HSA.' | 'Must match the name on your bank account.' | 'Your employer may cover part of this cost.'",
+    "category": "element-labels"
+  },
+  {
+    "id": "label-3",
+    "text": "Tooltips: Sentence style, full sentences, period at end, factual and neutral. Pattern: 'Limits the [what] that can be [action] [scope].' Examples: 'Limits the total amount that can be spent across the plan within the designated spend period, regardless of individual participants.' | 'Limits the amount that can be spent per person within the plan during the designated spend period.'",
+    "category": "element-labels"
+  },
+  {
+    "id": "label-4",
+    "text": "Dropdown options: Sentence style, noun phrases, parallel structure within the same dropdown. Examples from plan settings: 'Total plan limit', 'IRS limit', 'Person spend limit', 'Spend category spend limit', 'Unlimited', 'Monthly', 'Plan year'.",
+    "category": "element-labels"
+  },
+  {
+    "id": "label-5",
+    "text": "Error messages: Sentence style, period at end, action-oriented — tell the user what to do, not just what went wrong. Avoid blame ('You entered' → 'Enter'). Examples: 'Enter a valid email address.' | 'The payment didn't go through. Create another contribution request with updated banking information.' | 'This field is required.' (not 'You forgot to fill this in.')",
+    "category": "element-labels"
+  },
+  {
+    "id": "label-6",
+    "text": "Warning and inline alert messages: Sentence style, period at end. Lead with user benefit or consequence before the action. 'To receive your money faster, upload a clearer photo or a different document including the missing details.' Not: 'A clearer photo will let us try again to find the information.' Inline alert heading can use question format: 'Are the missing details on your document?'",
+    "category": "element-labels"
+  },
+  {
+    "id": "label-7",
+    "text": "Notification copy (pop-ups, toasts): Sentence style, brief, factual. 'Additional accounts linked to your login.' | 'Your payment method has been updated.' | 'Claim submitted.' No exclamation marks, no 'Great news!', no 'Done!'.",
+    "category": "element-labels"
+  },
+  {
+    "id": "label-8",
+    "text": "Checkbox confirmations: Sentence style, short, no period. 'I understand the above rules' | 'I agree to the terms and conditions' | 'Send me account updates by email'. Never title case for checkboxes.",
+    "category": "element-labels"
+  },
+  {
+    "id": "label-9",
+    "text": "Contextual links: Sentence style, question or conditional format. 'Have a bill you haven't paid yet? Send your payment directly to the provider here – Pay a Bill.' | 'Why Does It Matter?' (Book Style when used as standalone CTA link).",
+    "category": "element-labels"
+  }
+]

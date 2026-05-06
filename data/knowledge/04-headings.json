@@ -1,0 +1,27 @@
+[
+  {
+    "id": "hdg-1",
+    "text": "Page titles: Book Style, descriptive noun phrase, 2–6 words. No generic labels like 'Settings', 'Details', 'Overview'. Must identify what the page is, not just that it exists. Examples: 'Claim Summary' (not 'Expense Details'), 'Payroll Contributions', 'Health Plan Enrollment', 'Account Deadline Alert'.",
+    "category": "element-headings"
+  },
+  {
+    "id": "hdg-2",
+    "text": "Modal and dialog titles: Book Style, concise noun phrase, max 5 words. Must describe the action or content, not the UI pattern. 'Request Excess Contribution Withdraw' ✓ | 'Sync Updates Across Organizations' ✓ | 'Confirm' ✗ (too generic) | 'Are You Sure?' ✗ (question format, too conversational for modal title).",
+    "category": "element-headings"
+  },
+  {
+    "id": "hdg-3",
+    "text": "Section headings: Book Style, 2–5 words, noun phrase or verb-noun. 'LLM Settings', 'Copy Variants', 'Grammar & Style Fixes', 'Account Activity', 'Plan Enrollment Details'. No punctuation at end of headings.",
+    "category": "element-headings"
+  },
+  {
+    "id": "hdg-4",
+    "text": "Empty state headings: Sentence style, explain what will appear here or what the user can do. 'No claims yet' | 'Your claims will appear here' | 'No transactions this period'. Paired with a verb-first CTA: 'Submit a Claim', 'Add a Bank Account'. Never just 'Nothing here' or 'Empty'.",
+    "category": "element-headings"
+  },
+  {
+    "id": "hdg-5",
+    "text": "Status and confirmation headings: Book Style, past tense for completed actions, present for active states. 'Mental Health Service Created' ✓ | 'Your Benefits Enrollment Is Confirmed' ✓ | 'Payment Processed' ✓ | 'Mental Health service created!' ✗ (sentence case + exclamation mark).",
+    "category": "element-headings"
+  }
+]

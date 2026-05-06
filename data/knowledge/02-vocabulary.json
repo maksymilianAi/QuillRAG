@@ -1,0 +1,17 @@
+[
+  {
+    "id": "vocab-1",
+    "text": "Canonical vocabulary — use these exact terms: HSA (not 'HSA account'), HRA (not 'HRA account'), FSA / HCFSA (not 'flex account'), COBRA as-is, EOB (not 'benefits statement'), Reimburse Me (product feature name), Pay a Bill (product feature name), Plan year (not 'benefit year'), Spend period (not 'spending window'), Payroll contributions (not 'salary contributions'), Notional accounts as-is, Forfeitures (not 'lost funds'), Excess contributions (not 'overpayments'), Excess earnings (not 'bonus earnings'), IRS limit (not 'government limit'), Plan enrollment (not 'plan registration'), Participant (not 'member' or 'beneficiary'), Benefit card (not 'debit card' or 'HSA card').",
+    "category": "vocabulary"
+  },
+  {
+    "id": "vocab-2",
+    "text": "Anti-patterns — flag and correct: 'Effortlessly upload files by simply scanning' → 'Scan the QR code to upload files.' | 'Easily track enrollment details' → 'Track enrollment details, fund movements, and related information.' | 'Great news! Additional accounts have been linked' → 'Additional accounts linked to your login.' | 'You're almost there... Finish registration' → 'Verify your email to finish registration.' | 'Don't Forget to Finish Your Account Verification' → 'Finish Your Account Verification' | 'Friendly reminder — you have an uncashed check' → 'You have an uncashed check waiting.' | 'Just a reminder that you have a contribution scheduled' → 'A contribution of $[amount] is scheduled'.",
+    "category": "vocabulary"
+  },
+  {
+    "id": "vocab-3",
+    "text": "More anti-patterns: 'Congratulations on Your Benefits Enrollment!' → 'Your Benefits Enrollment Is Confirmed' | 'Your Statement is Now Available!' → 'Your Statement Is Now Available' | 'Expense Activity Update - Action Required' → 'Expense Activity Update — Action Required' (em-dash not hyphen) | 'Unfortunately, the payment was unable to be processed' → 'The payment didn't go through' | 'This may effect your tax filing' → 'This may affect your tax filing' | Never use 'members' or 'beneficiaries' — always 'participants'.",
+    "category": "vocabulary"
+  }
+]

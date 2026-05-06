@@ -4,8 +4,8 @@
 
 export interface CopyVariant {
   headline: string;
-  cta: string;
-  labels: string[];
+  body?: string;
+  ctas: string[];
 }
 
 export interface GrammarFix {
@@ -29,16 +29,24 @@ export interface GenerateCopyRequest {
   };
 }
 
+export interface SectionReasoning {
+  headline?: string;
+  body?: string;
+  ctas?: string;
+}
+
 export interface GenerateCopyResponse {
+  original?: string;
+  recommended: number;
   variants: CopyVariant[];
   fixes: GrammarFix[];
-  reasoning: string[];
+  reasoning: SectionReasoning;
 }
 
 export interface CopyFeedback {
   prompt: string;
   variantIndex: number;
-  variant: CopyVariant;
+  variant: Pick<CopyVariant, "headline" | "body" | "ctas">;
   action: "copy";
   timestamp: string;
 }

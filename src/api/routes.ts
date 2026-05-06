@@ -138,8 +138,8 @@ export function createRoutes(agent: QuillAgent): Router {
     variantIndex: z.number().int().min(0),
     variant: z.object({
       headline: z.string(),
-      cta: z.string(),
-      labels: z.array(z.string()),
+      body: z.string().optional(),
+      ctas: z.array(z.string()),
     }),
     action: z.literal("copy"),
     timestamp: z.string(),
@@ -154,7 +154,7 @@ export function createRoutes(agent: QuillAgent): Router {
     const { prompt, variantIndex, variant, timestamp } = parsed.data;
     console.log(`[Feedback] copy variant #${variantIndex + 1} at ${timestamp}`);
     console.log(`[Feedback] prompt: "${prompt}"`);
-    console.log(`[Feedback] variant: "${variant.headline}" / "${variant.cta}"`);
+    console.log(`[Feedback] variant: "${variant.headline}" / "${variant.ctas.join(", ")}"`);
     res.json({ ok: true });
   });
 

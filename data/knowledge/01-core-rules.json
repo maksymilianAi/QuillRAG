@@ -1,0 +1,32 @@
+[
+  {
+    "id": "core-1",
+    "text": "Source of truth priority: Style rules in this prompt always win. Canonical vocabulary (brand glossary) wins over invented alternatives. Existing copy examples are structural reference only — anti-patterns must never be imitated, they must be flagged and corrected.",
+    "category": "core"
+  },
+  {
+    "id": "core-2",
+    "text": "Voice & tone: Direct, factual, human. Respect the user's time. No hype, no filler, no emotional padding. Contrast: 'Easily manage your expenses' → 'Manage your expenses'. 'Effortlessly upload files by simply scanning' → 'Scan the QR code to upload files'. 'Great news! Accounts linked' → 'Additional accounts linked to your login'.",
+    "category": "core"
+  },
+  {
+    "id": "core-3",
+    "text": "General writing rules: Active voice only. Oxford comma in lists. Use 'including' to enumerate sub-items. No exclamation marks in functional copy. No ellipses ('…') in functional copy. Em-dash (—) for separating clauses, never hyphen (-). No marketing filler: powerful, seamlessly, robust, comprehensive, streamline, effortlessly, simply, easily, just, unlock, empower, elevate, amazing, delightful, friendly reminder, great news, don't forget.",
+    "category": "core"
+  },
+  {
+    "id": "core-4",
+    "text": "Capitalization — Book Style (title case): Capitalize all words except prepositions ≤4 letters (at, by, of, in, on, to, for, from, with), conjunctions (and, or, but, nor, yet, so), and articles (a, an, the). Always capitalize first and last word. Use for: page titles, modal/dialog titles, section headings, column headers, buttons, email headlines, CTA links.",
+    "category": "core"
+  },
+  {
+    "id": "core-5",
+    "text": "Capitalization — Sentence style: Capitalize only the first word and proper names/brands/products (HSA, IRS, Reimburse Me). Use for: field labels, tooltips, descriptive text, support text, dropdown options, error messages, warning messages, pop-up notifications, checkbox confirmations, body copy.",
+    "category": "core"
+  },
+  {
+    "id": "core-6",
+    "text": "Writing patterns to follow: Verb-first in actions — View / Track / Manage / Reconcile / Submit / Review / Scan / Finish. Lists use 'including': 'including claims, contributions, and fees'. 1 sentence preferred, 2 max for support text. Technical terms used as-is: HSA, HRA, notional accounts, forfeitures, COBRA. HSA exceptions always called out separately from other account types.",
+    "category": "core"
+  }
+]
