@@ -8,16 +8,14 @@ import { useState } from "react";
 import { FigmaCanvas } from "./FigmaCanvas";
 import { IDEChat } from "./IDEChat";
 import { extractFigma } from "../api";
-import type { AppSettings } from "./Sidebar";
+import type { AppSettings } from "../App";
 import type { FigmaTextNode, FigmaExtractionResponse, GenerateCopyResponse } from "../types";
 
 interface VisualIDEProps {
   settings: AppSettings;
-  isSidebarOpen: boolean;
-  onToggleSidebar: () => void;
 }
 
-export function VisualIDE({ settings, isSidebarOpen: _isSidebarOpen, onToggleSidebar }: VisualIDEProps) {
+export function VisualIDE({ settings }: VisualIDEProps) {
   const [figmaUrl, setFigmaUrl] = useState("");
   const [figmaData, setFigmaData] = useState<FigmaExtractionResponse | null>(null);
   const [selectedNode, setSelectedNode] = useState<FigmaTextNode | null>(null);
@@ -71,14 +69,6 @@ export function VisualIDE({ settings, isSidebarOpen: _isSidebarOpen, onToggleSid
       {/* Header */}
       <header className="shrink-0 flex items-center border-b border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur-md z-20">
         <div className="flex items-center gap-4 px-6 py-4 w-full">
-          <button
-            onClick={onToggleSidebar}
-            className="p-2 -ml-2 rounded-xl hover:bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-all"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-              <path fillRule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm2.25 5.25a.75.75 0 0 1 .75-.75h12a.75.75 0 0 1 0 1.5H5.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
-            </svg>
-          </button>
           <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-brand-dark)] shadow-lg shadow-[var(--color-brand)]/20">
             <span className="text-lg">🎨</span>
           </div>

@@ -8,17 +8,15 @@ import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { TypingIndicator } from "./TypingIndicator";
 import { generateCopy } from "../api";
-import type { AppSettings } from "./Sidebar";
+import type { AppSettings } from "../App";
 import type { ChatMessage as ChatMessageType } from "../types";
 
 interface ClassicChatProps {
   settings: AppSettings;
-  isSidebarOpen: boolean;
-  onToggleSidebar: () => void;
 }
 
 
-export function ClassicChat({ settings, isSidebarOpen: _isSidebarOpen, onToggleSidebar }: ClassicChatProps) {
+export function ClassicChat({ settings }: ClassicChatProps) {
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -77,19 +75,6 @@ export function ClassicChat({ settings, isSidebarOpen: _isSidebarOpen, onToggleS
 
   return (
     <div className="flex-1 flex flex-col h-full min-w-0 relative">
-      {/* Floating open-sidebar button — visible only when sidebar is collapsed */}
-      {!_isSidebarOpen && (
-        <button
-          onClick={onToggleSidebar}
-          className="absolute top-4 left-4 z-20 p-2 rounded-xl bg-[var(--color-surface-elevated)] border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-brand)] transition-all shadow-sm"
-          title="Open sidebar"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-            <path fillRule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75ZM2 10a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm2.25 5.25a.75.75 0 0 1 .75-.75h12a.75.75 0 0 1 0 1.5H5.5a.75.75 0 0 1-.75-.75Z" clipRule="evenodd" />
-          </svg>
-        </button>
-      )}
-
       {/* Messages */}
       <main className="flex-1 overflow-y-auto overflow-x-hidden relative flex flex-col items-center">
         <div className="max-w-3xl w-full px-4 md:px-6 py-8 space-y-6 flex-1 flex flex-col">

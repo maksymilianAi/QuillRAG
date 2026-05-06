@@ -1,11 +1,24 @@
 import { useState } from "react";
-import { Sidebar, type AppSettings } from "./components/Sidebar";
+import { Header } from "./components/Header";
 import { ClassicChat } from "./components/ClassicChat";
 import { VisualIDE } from "./components/VisualIDE";
 
+export interface AppSettings {
+  provider: string;
+  apiKey: string;
+  figmaToken: string;
+  localUrl?: string;
+  localModel?: string;
+  localApiKey?: string;
+}
+
+const DEFAULT_SETTINGS: AppSettings = {
+  provider: "claude",
+  apiKey: "",
+  figmaToken: "",
+};
+
 function App() {
-  const [settings, setSettings] = useState<AppSettings>({ provider: "openai", apiKey: "", figmaToken: "" });
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [activeView, setActiveView] = useState<"classic" | "ide">(
     () => (localStorage.getItem("copy_active_view") as "classic" | "ide") || "classic"
   );
@@ -16,30 +29,13 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen bg-[var(--color-surface)] selection:bg-[var(--color-brand)]/30 overflow-hidden font-inter">
-      {/* Sidebar */}
-      {isSidebarOpen && (
-        <Sidebar
-          onSettingsChange={setSettings}
-          activeView={activeView}
-          onViewChange={handleViewChange}
-          onToggle={() => setIsSidebarOpen(false)}
-        />
-      )}
+    <div className="flex flex-col h-screen bg-[var(--color-surface)] selection:bg-[var(--color-brand)]/30 overflow-hidden">
+      <Header activeView={activeView} onViewChange={handleViewChange} />
 
-      {/* Main Content Area */}
       {activeView === "classic" ? (
-        <ClassicChat
-          settings={settings}
-          isSidebarOpen={isSidebarOpen}
-          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-        />
+        <ClassicChat settings={DEFAULT_SETTINGS} />
       ) : (
-        <VisualIDE
-          settings={settings}
-          isSidebarOpen={isSidebarOpen}
-          onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-        />
+        <VisualIDE settings={DEFAULT_SETTINGS} />
       )}
     </div>
   );
