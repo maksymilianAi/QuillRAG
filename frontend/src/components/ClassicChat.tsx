@@ -8,15 +8,9 @@ import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { TypingIndicator } from "./TypingIndicator";
 import { generateCopy } from "../api";
-import type { AppSettings } from "../App";
 import type { ChatMessage as ChatMessageType } from "../types";
 
-interface ClassicChatProps {
-  settings: AppSettings;
-}
-
-
-export function ClassicChat({ settings }: ClassicChatProps) {
+export function ClassicChat() {
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -38,12 +32,6 @@ export function ClassicChat({ settings }: ClassicChatProps) {
     try {
       const response = await generateCopy({
         prompt: content,
-        provider: settings.provider,
-        apiKey: settings.apiKey,
-        figmaToken: settings.figmaToken,
-        localUrl: settings.localUrl,
-        localModel: settings.localModel,
-        localApiKey: settings.localApiKey,
         options: {
           variantCount: 2,
           fixGrammar: true,

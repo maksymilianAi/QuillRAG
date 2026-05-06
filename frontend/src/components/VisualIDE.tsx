@@ -8,14 +8,9 @@ import { useState } from "react";
 import { FigmaCanvas } from "./FigmaCanvas";
 import { IDEChat } from "./IDEChat";
 import { extractFigma } from "../api";
-import type { AppSettings } from "../App";
 import type { FigmaTextNode, FigmaExtractionResponse, GenerateCopyResponse } from "../types";
 
-interface VisualIDEProps {
-  settings: AppSettings;
-}
-
-export function VisualIDE({ settings }: VisualIDEProps) {
+export function VisualIDE() {
   const [figmaUrl, setFigmaUrl] = useState("");
   const [figmaData, setFigmaData] = useState<FigmaExtractionResponse | null>(null);
   const [selectedNode, setSelectedNode] = useState<FigmaTextNode | null>(null);
@@ -32,12 +27,6 @@ export function VisualIDE({ settings }: VisualIDEProps) {
     try {
       const result = await extractFigma({
         figmaUrl: figmaUrl.trim(),
-        figmaToken: settings.figmaToken,
-        provider: settings.provider,
-        apiKey: settings.apiKey,
-        localUrl: settings.localUrl,
-        localModel: settings.localModel,
-        localApiKey: settings.localApiKey,
       });
       setFigmaData(result);
     } catch (err) {
@@ -180,7 +169,6 @@ export function VisualIDE({ settings }: VisualIDEProps) {
             {/* Right: Chat Panel */}
             <div className="w-[340px] shrink-0 border-l border-[var(--color-border)] bg-[var(--color-surface)]">
               <IDEChat
-                settings={settings}
                 selectedNode={selectedNode}
                 contextualDescription={figmaData.contextualDescription}
                 onCopyGenerated={handleCopyGenerated}

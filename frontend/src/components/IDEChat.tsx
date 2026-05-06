@@ -5,11 +5,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { generateCopy } from "../api";
-import type { AppSettings } from "./Sidebar";
 import type { FigmaTextNode, GenerateCopyResponse } from "../types";
 
 interface IDEChatProps {
-  settings: AppSettings;
   selectedNode: FigmaTextNode | null;
   contextualDescription: string;
   onCopyGenerated: (nodeId: string, response: GenerateCopyResponse) => void;
@@ -24,7 +22,6 @@ interface IDEMessage {
 }
 
 export function IDEChat({
-  settings,
   selectedNode,
   contextualDescription,
   onCopyGenerated,
@@ -88,12 +85,6 @@ export function IDEChat({
 
       const response = await generateCopy({
         prompt: targetedPrompt,
-        provider: settings.provider,
-        apiKey: settings.apiKey,
-        figmaToken: settings.figmaToken,
-        localUrl: settings.localUrl,
-        localModel: settings.localModel,
-        localApiKey: settings.localApiKey,
         options: {
           variantCount: 1,
           fixGrammar: true,

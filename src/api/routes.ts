@@ -9,6 +9,35 @@ import { getFigmaText, parseFigmaUrl } from "../mcp/figma.tool.js";
 import { createLLM } from "../llm/index.js";
 import { ContextAgent } from "../agent/context.agent.js";
 
+/** Patterns that indicate prompt injection or out-of-scope requests. */
+const INJECTION_PATTERNS = [
+  /ignore\s+(previous|all|your)\s+(instructions?|rules?|prompt)/i,
+  /forget\s+(your|the|all)\s+(instructions?|rules?|context|prompt)/i,
+  /you\s+are\s+now\s+/i,
+  /act\s+as\s+(a\s+)?(different|new|another|unrestricted)/i,
+  /reveal\s+(your|the)\s+(system\s+)?prompt/i,
+  /show\s+(me\s+)?(your|the)\s+(api\s+key|secret|token|password|credentials?)/i,
+  /what\s+is\s+(your|the)\s+(api\s+key|secret|token|password)/i,
+  /give\s+(me\s+)?(your|the)\s+(api\s+key|secret|token|password|credentials?)/i,
+  /print\s+(your|the)\s+(api\s+key|secret|token|password|system\s+prompt)/i,
+  /output\s+(your|the)\s+(api\s+key|secret|token|system\s+prompt)/i,
+  /delete\s+(all|every|the)\s+(data|records?|files?|documents?|everything)/i,
+  /drop\s+(the\s+)?(database|table|collection)/i,
+  /rm\s+-rf/i,
+  /execute\s+(this\s+)?(command|code|script)/i,
+  /run\s+(this\s+)?(command|code|script)/i,
+  /\bDAN\b/,
+  /jailbreak/i,
+  /bypass\s+(your\s+)?(filter|restriction|rule|limit)/i,
+];
+
+/**
+ * Returns true if the prompt contains injection/abuse patterns.
+ */
+function isInjectionAttempt(prompt: string): boolean {
+  return INJECTION_PATTERNS.some((re) => re.test(prompt));
+}
+
 /** Request body validation schema */
 const generateCopySchema = z.object({
   prompt: z.string().min(1),
@@ -56,6 +85,16 @@ export function createRoutes(agent: QuillAgent): Router {
       }
 
       const { prompt, options, provider, apiKey, figmaToken, localUrl, localModel, localApiKey } = parsed.data;
+
+      // Reject prompt injection and out-of-scope requests before touching the LLM
+      if (isInjectionAttempt(prompt)) {
+        console.warn(`[API] Blocked suspicious prompt: "${prompt.slice(0, 120)}"`);
+        res.status(400).json({
+          error: "Out-of-scope request",
+          message: "Quill only handles UX copywriting tasks. Please describe the copy you need help with.",
+        });
+        return;
+      }
 
       // Process through agent
       const result = await agent.process({
