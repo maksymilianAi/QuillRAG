@@ -239,6 +239,9 @@ To update: edit `data/knowledge.json` and restart the server. Embeddings are gen
 </details>
 
 ---
+## Author
+
+Incredible credit goes to Maksymilian Ai for this project.
 
 ## License
 
