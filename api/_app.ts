@@ -14,12 +14,25 @@ let app: Express | null = null;
 export function getApp(): Express {
   if (!app) {
     console.log("[Vercel] Cold start — initializing app...");
+
+    const provider = process.env.LLM_PROVIDER || "openai";
+    const apiKey =
+      provider === "claude" || provider === "anthropic"
+        ? process.env.ANTHROPIC_API_KEY
+        : provider === "openai"
+        ? process.env.OPENAI_API_KEY
+        : provider === "gemini" || provider === "google"
+        ? process.env.GOOGLE_API_KEY
+        : undefined;
+
+    console.log(`[Vercel] Provider: ${provider}, key present: ${!!apiKey}`);
+
     let llm = null;
     try {
-      llm = createLLM(process.env.LLM_PROVIDER || "openai");
-      console.log("[Vercel] Default LLM created:", process.env.LLM_PROVIDER || "openai");
+      llm = createLLM(provider, apiKey);
+      console.log("[Vercel] Default LLM created:", provider);
     } catch (e) {
-      console.log("[Vercel] Default LLM skipped (expected):", e instanceof Error ? e.message : e);
+      console.log("[Vercel] Default LLM failed:", e instanceof Error ? e.message : e);
     }
 
     const rag = new RAGService();
