@@ -17,83 +17,9 @@ interface ClassicChatProps {
   onToggleSidebar: () => void;
 }
 
-const MOCK_MESSAGES: ChatMessageType[] = [
-  {
-    id: "mock-1",
-    role: "user",
-    content: "Rewrite the copy for our checkout confirmation modal",
-    timestamp: new Date(Date.now() - 1000 * 60 * 4),
-  },
-  {
-    id: "mock-2",
-    role: "assistant",
-    content: "",
-    prompt: "Rewrite the copy for our checkout confirmation modal",
-    timestamp: new Date(Date.now() - 1000 * 60 * 3),
-    data: {
-      variants: [
-        {
-          headline: "Your Order Is Confirmed",
-          cta: "View Order Details",
-          labels: ["Order summary", "Estimated delivery", "Payment method"],
-        },
-        {
-          headline: "Order Placed Successfully",
-          cta: "Track Your Order",
-          labels: ["Order number", "Delivery address", "Total amount"],
-        },
-      ],
-      fixes: [
-        {
-          original: "Congratulations! Your order has been successfully placed!",
-          corrected: "Your order is confirmed.",
-          rule: "No exclamation marks in functional copy",
-        },
-      ],
-      reasoning: [
-        "Used Book Style for modal title — matches capitalization rules for modal/dialog titles.",
-        "'View Order Details' is action-verb first, specific — follows button copy pattern.",
-        "Labels use sentence style and are concise noun phrases.",
-      ],
-    },
-  },
-  {
-    id: "mock-3",
-    role: "user",
-    content: "Write copy for an empty state when there are no claims yet",
-    timestamp: new Date(Date.now() - 1000 * 60 * 1),
-  },
-  {
-    id: "mock-4",
-    role: "assistant",
-    content: "",
-    prompt: "Write copy for an empty state when there are no claims yet",
-    timestamp: new Date(Date.now() - 1000 * 55),
-    data: {
-      variants: [
-        {
-          headline: "No Claims Yet",
-          cta: "Submit a Claim",
-          labels: ["Claims appear here once submitted", "Track status and payment details"],
-        },
-        {
-          headline: "Your Claims Will Appear Here",
-          cta: "Submit Your First Claim",
-          labels: ["Submitted claims", "Payment status", "Supporting documents"],
-        },
-      ],
-      fixes: [],
-      reasoning: [
-        "Empty state headline explains what will appear here — direct and informative.",
-        "CTA is verb-first and specific: 'Submit a Claim' follows the action-driven button pattern.",
-        "Support labels set expectations without over-explaining.",
-      ],
-    },
-  },
-];
 
 export function ClassicChat({ settings, isSidebarOpen: _isSidebarOpen, onToggleSidebar }: ClassicChatProps) {
-  const [messages, setMessages] = useState<ChatMessageType[]>(MOCK_MESSAGES);
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
