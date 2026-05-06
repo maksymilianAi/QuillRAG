@@ -37,7 +37,7 @@ export function ChatInput({ onSend, disabled }: Props) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Write your copy request..."
+          placeholder="Write your request or paste a Figma link..."
           disabled={disabled}
           rows={1}
           className="flex-1 resize-none bg-transparent px-4 py-5 text-[16px] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] outline-none disabled:opacity-300 leading-normal"
