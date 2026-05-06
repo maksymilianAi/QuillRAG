@@ -74,8 +74,13 @@ function VariantRow({ index, isRecommended, children, copyText }: VariantRowProp
 }
 
 function SectionNote({ text }: { text: string }) {
+  const sentences = text.split(/(?<=\.)\s+/).filter(Boolean);
   return (
-    <p className="text-[11px] text-[var(--color-text-muted)] leading-relaxed px-1 mt-1">{text}</p>
+    <div className="mt-2 pl-3 border-l border-[var(--color-border)] space-y-1">
+      {sentences.map((s, i) => (
+        <p key={i} className="text-[11px] text-[var(--color-text-muted)] leading-relaxed">{s}</p>
+      ))}
+    </div>
   );
 }
 
