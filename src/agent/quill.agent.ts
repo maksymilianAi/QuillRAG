@@ -52,10 +52,9 @@ export class QuillAgent {
   async process(input: GenerateCopyInput): Promise<AgentResponse> {
     // 1. Resolve LLM provider (use request-specific if provided)
     let activeLlm = this.llm;
-    if (input.provider) {
-      // If provider is 'local', pass the localApiKey as the apiKey parameter
-      const keyToUse = input.provider === "local" ? input.localApiKey : input.apiKey;
-      activeLlm = createLLM(input.provider, keyToUse, input.localUrl, input.localModel);
+    const userKey = input.provider === "local" ? input.localApiKey : input.apiKey;
+    if (input.provider && userKey) {
+      activeLlm = createLLM(input.provider, userKey, input.localUrl, input.localModel);
     }
 
     if (!activeLlm) {
