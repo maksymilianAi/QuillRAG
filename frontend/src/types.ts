@@ -2,8 +2,10 @@
  * Frontend types matching the backend API contract.
  */
 
+export type CopyFormat = "full" | "tooltip" | "error" | "warning" | "info" | "label" | "button" | "status";
+
 export interface CopyVariant {
-  headline: string;
+  headline?: string;
   body?: string;
   ctas: string[];
 }
@@ -36,6 +38,8 @@ export interface SectionReasoning {
 }
 
 export interface GenerateCopyResponse {
+  format: CopyFormat;
+  formatNote?: string;
   original?: string;
   recommended: number;
   variants: CopyVariant[];

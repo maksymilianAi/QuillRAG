@@ -124,16 +124,28 @@ export function buildUserPrompt(parts: PromptParts): string {
 
   // Instructions
   const instructions: string[] = [
-    `1. Identify exactly which element(s) the user wants to update from the "Current UI Text" list.`,
-    `2. If original copy exists in the context (from Figma nodes or the user's message), consolidate it into the 'original' field as plain text — e.g. "Mental Health service created!\nDon't forget to update payout definitions...\nGo to Services · Go to Payout Definition". Omit 'original' if there is no source copy.`,
-    `3. Provide exactly ${parts.variantCount} copy variant(s) in the 'variants' array. Each variant has: 'headline' (title/heading, Book Style), optional 'body' (supporting text, sentence style), and 'ctas' array (button labels, primary first). Use 'ctas' for all button text — never put buttons in 'body'.`,
-    `4. Set 'recommended' to the zero-based index of the variant you consider best. If only one variant, set it to 0.`,
+    `1. Determine the copy format by analyzing BOTH the user's request AND the actual tone and content of the text they provide.
+   Do not trust the user's label alone — if they say "info message" but the text describes a failure, missing configuration, or a required action with consequences, classify it as "error" or "warning". If the detected format differs from what the user called it, set 'formatNote' to explain the mismatch in one sentence (e.g. "This reads as a warning, not an info message — it describes a required action that affects payments.").
+
+   Format definitions:
+   - "tooltip" — neutral informational hover/helper text. One sentence, factual, no urgency. Populate 'body' only.
+   - "info" — neutral inline message providing context or guidance, no urgency, no required action. Populate 'body' only.
+   - "warning" — advisory: action is needed but the system still works. The user should fix something. Populate 'body' only.
+   - "error" — something failed or is blocked. Describes a broken state or invalid input. Verb-first, action-oriented. Populate 'body' only.
+   - "label" — field label, column header, section title, nav item, tab. 1–3 words, no punctuation. Populate 'headline' only.
+   - "button" — button or CTA text. Action verb + noun, Book Style. Populate 'ctas' only.
+   - "status" — confirmation, success notification, status badge, toast. Short noun phrase, Book Style. Populate 'headline' only.
+   - "full" — only when the request explicitly covers multiple copy elements together (heading + body + buttons). Populate headline, body, and ctas.`,
+    `2. Identify exactly which element(s) the user wants to update from the "Current UI Text" list.`,
+    `3. If original copy exists in the context (from Figma nodes or the user's message), consolidate it into the 'original' field as plain text. Omit 'original' if there is no source copy.`,
+    `4. Provide exactly ${parts.variantCount} copy variant(s) in the 'variants' array. Populate only the fields relevant to the detected format — leave others as empty string or empty array.`,
+    `5. Set 'recommended' to the zero-based index of the variant you consider best. If only one variant, set it to 0.`,
   ];
   if (parts.includeReasoning) {
-    instructions.push("5. Fill in the 'reasoning' object with per-section explanations: 'headline' — why this heading approach, 'body' — why this body text (omit if no body), 'ctas' — why these button labels. Keep each to 1–2 sentences, cite specific style rules.");
+    instructions.push("6. Fill in 'reasoning' only for the sections you populated: 'headline' if you wrote a headline, 'body' if you wrote body text, 'ctas' if you wrote CTAs. Keep each to 1–2 sentences, cite specific style rules.");
   }
   if (parts.fixGrammar) {
-    instructions.push("6. After delivering the copy variants, audit the existing copy for issues: wrong capitalization style, passive voice, filler/marketing language, invented terminology (vs. canonical glossary), punctuation errors (hyphens used as em-dashes), and known anti-patterns. Return each issue in the 'fixes' array as { original, corrected, rule }. This is secondary — the copy variants come first.");
+    instructions.push("7. After delivering the copy variants, audit the existing copy for issues: wrong capitalization style, passive voice, filler/marketing language, invented terminology (vs. canonical glossary), punctuation errors (hyphens used as em-dashes), and known anti-patterns. Return each issue in the 'fixes' array as { original, corrected, rule }. This is secondary — the copy variants come first.");
   }
   sections.push(`## Instructions\n${instructions.join("\n")}`);
 

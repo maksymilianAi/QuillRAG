@@ -1,8 +1,21 @@
 import { useState } from "react";
-import type { GenerateCopyResponse, SectionReasoning } from "../types";
+import type { CopyFormat, GenerateCopyResponse, SectionReasoning } from "../types";
 import copyIconUrl from "../assets/copy-icon.svg";
 import checkIconUrl from "../assets/check-icon.svg";
 import crossIconUrl from "../assets/cross-icon.svg";
+
+type SectionKey = "headline" | "body" | "ctas";
+
+const SECTION_CONFIG: Record<CopyFormat, Partial<Record<SectionKey, string>>> = {
+  full:    { headline: "Headline", body: "Body Text", ctas: "CTAs" },
+  tooltip: { body: "Tooltip" },
+  info:    { body: "Info Message" },
+  warning: { body: "Warning Message" },
+  error:   { body: "Error Message" },
+  label:   { headline: "Label" },
+  button:  { ctas: "Button" },
+  status:  { headline: "Status" },
+};
 
 interface Props {
   data: GenerateCopyResponse;
@@ -85,12 +98,24 @@ function SectionNote({ text }: { text: string }) {
 }
 
 export function ResponseCard({ data }: Props) {
-  const hasBody = data.variants.some((v) => v.body);
-  const hasCtas = data.variants.some((v) => v.ctas.length > 0);
+  const format: CopyFormat = data.format ?? "full";
+  const sections = SECTION_CONFIG[format];
   const reasoning: SectionReasoning = data.reasoning ?? {};
+
+  const hasHeadline = !!sections.headline && data.variants.some((v) => v.headline);
+  const hasBody     = !!sections.body     && data.variants.some((v) => v.body);
+  const hasCtas     = !!sections.ctas     && data.variants.some((v) => v.ctas.length > 0);
 
   return (
     <div className="space-y-5 animate-slide-up">
+
+      {/* Format mismatch note */}
+      {data.formatNote && (
+        <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl border border-amber-500/30 bg-amber-500/8">
+          <span className="text-amber-400 text-sm shrink-0 mt-0.5">⚠</span>
+          <p className="text-xs text-amber-300/90 leading-relaxed">{data.formatNote}</p>
+        </div>
+      )}
 
       {/* Original copy block */}
       {data.original && (
@@ -101,19 +126,16 @@ export function ResponseCard({ data }: Props) {
       )}
 
       {/* Headline variants */}
-      {data.variants.length > 0 && (
+      {hasHeadline && (
         <div className="space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">Headline</p>
-          {data.variants.map((v, i) => (
-            <VariantRow
-              key={i}
-              index={i}
-              isRecommended={i === data.recommended}
-              copyText={v.headline}
-            >
-              <p className="text-sm font-semibold text-[var(--color-text-primary)] leading-snug truncate">{v.headline}</p>
-            </VariantRow>
-          ))}
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">{sections.headline}</p>
+          {data.variants.map((v, i) =>
+            v.headline ? (
+              <VariantRow key={i} index={i} isRecommended={i === data.recommended} copyText={v.headline}>
+                <p className="text-sm font-semibold text-[var(--color-text-primary)] leading-snug truncate">{v.headline}</p>
+              </VariantRow>
+            ) : null
+          )}
           {reasoning.headline && <SectionNote text={reasoning.headline} />}
         </div>
       )}
@@ -121,15 +143,10 @@ export function ResponseCard({ data }: Props) {
       {/* Body text variants */}
       {hasBody && (
         <div className="space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">Body text</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">{sections.body}</p>
           {data.variants.map((v, i) =>
             v.body ? (
-              <VariantRow
-                key={i}
-                index={i}
-                isRecommended={i === data.recommended}
-                copyText={v.body}
-              >
+              <VariantRow key={i} index={i} isRecommended={i === data.recommended} copyText={v.body}>
                 <p className="text-sm text-[var(--color-text-secondary)] leading-snug">{v.body}</p>
               </VariantRow>
             ) : null
@@ -141,15 +158,10 @@ export function ResponseCard({ data }: Props) {
       {/* CTA variants */}
       {hasCtas && (
         <div className="space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">CTAs</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">{sections.ctas}</p>
           {data.variants.flatMap((v, i) =>
             v.ctas.map((cta, ci) => (
-              <VariantRow
-                key={`${i}-${ci}`}
-                index={i}
-                isRecommended={i === data.recommended}
-                copyText={cta}
-              >
+              <VariantRow key={`${i}-${ci}`} index={i} isRecommended={i === data.recommended} copyText={cta}>
                 <span className={`px-2.5 py-0.5 rounded-md text-xs font-medium border ${
                   ci === 0
                     ? "bg-[var(--color-brand)]/15 border-[var(--color-brand)]/30 text-[var(--color-brand-light)]"
@@ -170,10 +182,7 @@ export function ResponseCard({ data }: Props) {
           <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-2">Grammar & Style Fixes</p>
           <div className="space-y-2">
             {data.fixes.map((fix, i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 text-sm"
-              >
+              <div key={i} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 text-sm">
                 <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">{fix.rule}</p>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">

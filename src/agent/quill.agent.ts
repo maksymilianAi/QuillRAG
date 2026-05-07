@@ -14,13 +14,17 @@ import type { GenerateCopyInput, AgentResponse } from "./agent.types.js";
 
 /** Zod schema for structured LLM output */
 const agentResponseSchema = z.object({
+  format: z.enum(["full", "tooltip", "error", "warning", "info", "label", "button", "status"])
+    .describe("Detected copy format based on BOTH the user's request AND the tone/content of the text. Analyze the actual text — if it describes a failure, missing configuration, or required action with consequences, classify as 'error' or 'warning' even if the user called it something else."),
+  formatNote: z.string().optional()
+    .describe("If the actual tone or severity of the text differs from what the user labeled it — explain the mismatch in one sentence. E.g. 'This reads as a warning, not an info message — it describes a required action that affects payments.' Omit if there is no mismatch."),
   original: z.string().optional().describe("Original copy text from the design context, as plain text. Omit if no original context is available."),
   recommended: z.number().int().min(0).describe("Zero-based index of the recommended variant"),
   variants: z.array(
     z.object({
-      headline: z.string().describe("Title or heading text (Book Style)"),
-      body: z.string().optional().describe("Supporting/descriptive body text, if applicable"),
-      ctas: z.array(z.string()).describe("Button labels — primary first, secondary second (Book Style)"),
+      headline: z.string().optional().describe("Title or heading text (Book Style) — populate for 'full', 'label', 'status' formats only"),
+      body: z.string().optional().describe("Supporting/descriptive body text — populate for 'full', 'tooltip', 'error' formats only"),
+      ctas: z.array(z.string()).describe("Button labels — populate for 'full' and 'button' formats; empty array otherwise"),
     })
   ),
   fixes: z.array(
