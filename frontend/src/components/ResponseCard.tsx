@@ -109,14 +109,6 @@ export function ResponseCard({ data }: Props) {
   return (
     <div className="space-y-5 animate-slide-up">
 
-      {/* Format mismatch note */}
-      {data.formatNote && (
-        <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl border border-amber-500/30 bg-amber-500/8">
-          <span className="text-amber-400 text-sm shrink-0 mt-0.5">⚠</span>
-          <p className="text-xs text-amber-300/90 leading-relaxed">{data.formatNote}</p>
-        </div>
-      )}
-
       {/* Original copy block */}
       {data.original && (
         <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
