@@ -22,7 +22,6 @@ interface Props {
   prompt?: string;
 }
 
-
 function InlineCopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -57,25 +56,35 @@ function InlineCopyButton({ text }: { text: string }) {
 interface VariantRowProps {
   index: number;
   isRecommended: boolean;
+  isUnchanged?: boolean;
   children: React.ReactNode;
   copyText: string;
 }
 
-function VariantRow({ index, isRecommended, children, copyText }: VariantRowProps) {
+function VariantRow({ index, isRecommended, isUnchanged, children, copyText }: VariantRowProps) {
   return (
     <div className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border transition-all duration-500 ${
-      isRecommended
+      isUnchanged
+        ? "border-[var(--color-success)]/30 bg-[var(--color-success)]/5"
+        : isRecommended
         ? "border-[rgba(63,104,255,0.5)] bg-[var(--color-brand)]/5"
         : "border-[var(--color-border)] bg-transparent"
     }`}>
       <div className="flex items-center gap-2.5 min-w-0">
         <span className={`shrink-0 flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold ${
-          isRecommended ? "bg-[var(--color-brand)] text-white" : "bg-[var(--color-surface-card)] text-[var(--color-text-muted)]"
+          isUnchanged ? "bg-[var(--color-success)]/20 text-[var(--color-success)]"
+          : isRecommended ? "bg-[var(--color-brand)] text-white"
+          : "bg-[var(--color-surface-card)] text-[var(--color-text-muted)]"
         }`}>
           {index + 1}
         </span>
         <div className="min-w-0">{children}</div>
-        {isRecommended && (
+        {isUnchanged && (
+          <span className="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[var(--color-success)]/15 text-[var(--color-success)] uppercase tracking-wider">
+            Already correct
+          </span>
+        )}
+        {!isUnchanged && isRecommended && (
           <span className="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[var(--color-brand)]/15 text-[var(--color-brand-light)] uppercase tracking-wider">
             Best
           </span>
@@ -89,11 +98,19 @@ function VariantRow({ index, isRecommended, children, copyText }: VariantRowProp
 function SectionNote({ text }: { text: string }) {
   const sentences = text.split(/(?<=\.)\s+/).filter(Boolean);
   return (
-    <div className="mt-2 pl-3 border-l border-[var(--color-border)] space-y-1">
-      {sentences.map((s, i) => (
-        <p key={i} className="text-[11px] text-[var(--color-text-muted)] leading-relaxed">{s}</p>
-      ))}
-    </div>
+    <details className="mt-2 group">
+      <summary className="flex items-center gap-1.5 cursor-pointer list-none select-none text-[11px] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors w-fit">
+        <svg className="w-3 h-3 transition-transform group-open:rotate-90 shrink-0" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        Why
+      </summary>
+      <div className="mt-1.5 pl-3 border-l border-[var(--color-border)] space-y-1">
+        {sentences.map((s, i) => (
+          <p key={i} className="text-xs text-[var(--color-text-muted)] leading-relaxed">{s}</p>
+        ))}
+      </div>
+    </details>
   );
 }
 
@@ -117,6 +134,10 @@ export function ResponseCard({ data }: Props) {
   const hasBody     = !!sections.body     && data.variants.some((v) => v.body);
   const hasCtas     = !!sections.ctas     && data.variants.some((v) => v.ctas.length > 0);
 
+  // Detect when a variant is identical to the original (LLM returned unchanged copy)
+  const isVariantUnchanged = (text: string | undefined) =>
+    !!text && !!data.original && text.trim() === data.original.trim();
+
   return (
     <div className="space-y-5 animate-slide-up">
 
@@ -134,7 +155,7 @@ export function ResponseCard({ data }: Props) {
           <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">{sections.headline}</p>
           {data.variants.map((v, i) =>
             v.headline ? (
-              <VariantRow key={i} index={i} isRecommended={i === data.recommended} copyText={v.headline}>
+              <VariantRow key={i} index={i} isRecommended={i === data.recommended} isUnchanged={isVariantUnchanged(v.headline)} copyText={v.headline}>
                 <p className="text-sm font-semibold text-[var(--color-text-primary)] leading-snug truncate">{v.headline}</p>
               </VariantRow>
             ) : null
@@ -149,7 +170,7 @@ export function ResponseCard({ data }: Props) {
           <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">{sections.body}</p>
           {data.variants.map((v, i) =>
             v.body ? (
-              <VariantRow key={i} index={i} isRecommended={i === data.recommended} copyText={v.body}>
+              <VariantRow key={i} index={i} isRecommended={i === data.recommended} isUnchanged={isVariantUnchanged(v.body)} copyText={v.body}>
                 <p className="text-sm text-[var(--color-text-secondary)] leading-snug">{v.body}</p>
               </VariantRow>
             ) : null
@@ -164,7 +185,7 @@ export function ResponseCard({ data }: Props) {
           <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">{sections.ctas}</p>
           {data.variants.flatMap((v, i) =>
             v.ctas.map((cta, ci) => (
-              <VariantRow key={`${i}-${ci}`} index={i} isRecommended={i === data.recommended} copyText={cta}>
+              <VariantRow key={`${i}-${ci}`} index={i} isRecommended={i === data.recommended} isUnchanged={isVariantUnchanged(cta)} copyText={cta}>
                 <span className={`px-2.5 py-0.5 rounded-md text-xs font-medium border ${
                   ci === 0
                     ? "bg-[var(--color-brand)]/15 border-[var(--color-brand)]/30 text-[var(--color-brand-light)]"
@@ -179,14 +200,19 @@ export function ResponseCard({ data }: Props) {
         </div>
       )}
 
-      {/* Grammar Fixes */}
-      {data.fixes.length > 0 && (
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-2">Grammar & Style Fixes</p>
+      {/* Grammar & Style Fixes */}
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-2">Grammar & Style</p>
+        {data.fixes.length === 0 ? (
+          <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--color-success)]/20 bg-[var(--color-success)]/5">
+            <img src={checkIconUrl} alt="" className="w-3.5 h-3.5 shrink-0" />
+            <p className="text-xs text-[var(--color-text-muted)]">No issues found.</p>
+          </div>
+        ) : (
           <div className="space-y-2">
             {data.fixes.map((fix, i) => (
               <div key={i} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 text-sm">
-                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">{fix.rule}</p>
+                <p className="text-[11px] text-[var(--color-text-muted)] mb-2">{fix.rule}</p>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
                     <img src={crossIconUrl} alt="" className="w-4 h-4 shrink-0" />
@@ -200,8 +226,9 @@ export function ResponseCard({ data }: Props) {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
     </div>
   );
 }
