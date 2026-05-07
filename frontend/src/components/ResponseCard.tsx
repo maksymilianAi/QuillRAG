@@ -98,6 +98,17 @@ function SectionNote({ text }: { text: string }) {
 }
 
 export function ResponseCard({ data }: Props) {
+  if (data.approved) {
+    return (
+      <div className="animate-slide-up flex items-start gap-3 px-4 py-3.5 rounded-xl border border-[var(--color-success)]/30 bg-[var(--color-success)]/8">
+        <img src={checkIconUrl} alt="" className="w-4 h-4 shrink-0 mt-0.5" />
+        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+          {data.approvalNote ?? "Looks good — no changes needed."}
+        </p>
+      </div>
+    );
+  }
+
   const format: CopyFormat = data.format ?? "full";
   const sections = SECTION_CONFIG[format];
   const reasoning: SectionReasoning = data.reasoning ?? {};

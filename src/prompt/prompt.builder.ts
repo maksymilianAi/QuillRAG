@@ -138,14 +138,15 @@ export function buildUserPrompt(parts: PromptParts): string {
    - "full" — only when the request explicitly covers multiple copy elements together (heading + body + buttons). Populate headline, body, and ctas.`,
     `2. Identify exactly which element(s) the user wants to update from the "Current UI Text" list.`,
     `3. If original copy exists in the context (from Figma nodes or the user's message), consolidate it into the 'original' field as plain text. Omit 'original' if there is no source copy.`,
-    `4. Provide exactly ${parts.variantCount} copy variant(s) in the 'variants' array. Populate only the fields relevant to the detected format — leave others as empty string or empty array.`,
-    `5. Set 'recommended' to the zero-based index of the variant you consider best. If only one variant, set it to 0.`,
+    `4. Before writing variants: if the submitted copy already meets all style rules and knowledge base guidelines with no issues — set 'approved: true', write a short 'approvalNote' explaining why it passes (cite the specific rules it satisfies), and return empty 'variants' and 'fixes' arrays. Do not invent alternatives just to fill a slot.`,
+    `5. If changes are needed, provide 1 to ${parts.variantCount} variant(s). Return 1 variant when one strong option clearly covers the need. Return multiple variants only when they represent genuinely different approaches — different structure, tone, or strategy. Never duplicate with minor wording changes.`,
+    `6. Set 'recommended' to the zero-based index of the variant you consider best. If only one variant, set it to 0.`,
   ];
   if (parts.includeReasoning) {
-    instructions.push("6. Fill in 'reasoning' only for the sections you populated: 'headline' if you wrote a headline, 'body' if you wrote body text, 'ctas' if you wrote CTAs. Keep each to 1–2 sentences, cite specific style rules.");
+    instructions.push("7. Fill in 'reasoning' only for the sections you populated. Keep each to 1–2 sentences, cite specific style rules. Omit if approved=true.");
   }
   if (parts.fixGrammar) {
-    instructions.push("7. After delivering the copy variants, audit the existing copy for issues: wrong capitalization style, passive voice, filler/marketing language, invented terminology (vs. canonical glossary), punctuation errors (hyphens used as em-dashes), and known anti-patterns. Return each issue in the 'fixes' array as { original, corrected, rule }. This is secondary — the copy variants come first.");
+    instructions.push("8. Audit the existing copy for issues: wrong capitalization style, passive voice, filler/marketing language, invented terminology, punctuation errors. Return each in 'fixes' as { original, corrected, rule }. Omit if approved=true.");
   }
   sections.push(`## Instructions\n${instructions.join("\n")}`);
 

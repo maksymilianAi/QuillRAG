@@ -17,7 +17,11 @@ const agentResponseSchema = z.object({
   format: z.enum(["full", "tooltip", "error", "warning", "info", "label", "button", "status"])
     .describe("Detected copy format based on BOTH the user's request AND the tone/content of the text. Analyze the actual text — if it describes a failure, missing configuration, or required action with consequences, classify as 'error' or 'warning' even if the user called it something else."),
   formatNote: z.string().optional()
-    .describe("If the actual tone or severity of the text differs from what the user labeled it — explain the mismatch in one sentence. E.g. 'This reads as a warning, not an info message — it describes a required action that affects payments.' Omit if there is no mismatch."),
+    .describe("If the actual tone or severity of the text differs from what the user labeled it — explain the mismatch in one sentence. Omit if there is no mismatch."),
+  approved: z.boolean().optional()
+    .describe("Set to true if the submitted copy already meets all style rules and guidelines and needs no changes. When true, set approvalNote and return empty variants and fixes arrays."),
+  approvalNote: z.string().optional()
+    .describe("Short confirmation when approved=true, e.g. 'Looks good — verb-first, sentence style, period at end.' Omit when approved is not true."),
   original: z.string().optional().describe("Original copy text from the design context, as plain text. Omit if no original context is available."),
   recommended: z.number().int().min(0).describe("Zero-based index of the recommended variant"),
   variants: z.array(

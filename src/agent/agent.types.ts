@@ -30,6 +30,8 @@ export interface SectionReasoning {
 export interface AgentResponse {
   format: CopyFormat;
   formatNote?: string;
+  approved?: boolean;
+  approvalNote?: string;
   original?: string;
   recommended: number;
   variants: CopyVariant[];
