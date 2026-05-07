@@ -114,7 +114,7 @@ function SectionNote({ text }: { text: string }) {
   );
 }
 
-export function ResponseCard({ data }: Props) {
+export function ResponseCard({ data, prompt }: Props) {
   if (data.approved) {
     return (
       <div className="animate-slide-up flex items-start gap-3 px-4 py-3.5 rounded-xl border border-[var(--color-success)]/30 bg-[var(--color-success)]/8">
@@ -134,9 +134,15 @@ export function ResponseCard({ data }: Props) {
   const hasBody     = !!sections.body     && data.variants.some((v) => v.body);
   const hasCtas     = !!sections.ctas     && data.variants.some((v) => v.ctas.length > 0);
 
+  // Use data.original if available, otherwise extract quoted text from the user's prompt
+  const promptQuoted = prompt
+    ? (prompt.match(/["""«»](.+?)["""«»]/) ?? prompt.match(/'(.+?)'/))?.[ 1]
+    : undefined;
+  const originalText = data.original || promptQuoted;
+
   // Detect when a variant is identical to the original (LLM returned unchanged copy)
   const isVariantUnchanged = (text: string | undefined) =>
-    !!text && !!data.original && text.trim() === data.original.trim();
+    !!text && !!originalText && text.trim() === originalText.trim();
 
   return (
     <div className="space-y-5 animate-slide-up">
