@@ -108,30 +108,30 @@ export function ClassicChat() {
       <main className="flex-1 overflow-y-auto overflow-x-hidden relative flex flex-col items-center">
         <div className="max-w-[968px] w-full px-4 md:px-6 py-8 space-y-6 flex-1 flex flex-col">
           {messages.length === 0 && (
-            <div className="flex-1 flex flex-col items-center justify-center text-center animate-slide-up py-12">
+            <div className="flex-1 flex flex-col items-center justify-center text-center animate-slide-up" style={{ paddingBottom: "8%" }}>
               <img
                 src="/quill-logo.png"
                 alt="Quill"
-                className="w-20 h-20 mb-7"
-                style={{ borderRadius: "20px" }}
+                className="w-16 h-16 mb-5"
+                style={{ borderRadius: "18px" }}
               />
-              <h2 className="text-4xl font-extrabold text-[var(--color-text-primary)] mb-3 tracking-tight">
+              <h2 className="text-3xl font-extrabold text-[var(--color-text-primary)] mb-2 tracking-tight">
                 Quill
               </h2>
-              <p className="text-base text-[var(--color-text-muted)] mb-10">
+              <p className="text-sm text-[var(--color-text-muted)] mb-7">
                 Your Copywriting Assistant
               </p>
-              
-              <div className="w-full max-w-md space-y-3">
-                <p className="text-xs font-medium text-[var(--color-text-muted)] mb-4">
+
+              <div className="w-full max-w-lg space-y-3">
+                <p className="text-xs font-medium text-[var(--color-text-muted)] mb-3">
                   Try asking
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    "Rewrite checkout page copy to be more engaging",
-                    "Improve error messages for a login form",
-                    "Write onboarding screen headlines",
-                    "Review and fix copy for a pricing page",
+                    "Rewrite a page or modal copy",
+                    "Improve specific text",
+                    "Write copy from scratch",
+                    "Review and audit copy",
                   ].map((suggestion) => (
                     <button
                       key={suggestion}
