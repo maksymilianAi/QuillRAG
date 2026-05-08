@@ -90,41 +90,34 @@ export default async function handler(request: Request): Promise<Response> {
     includeReasoning,
   });
 
-  const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>();
-  const writer = writable.getWriter();
   const enc = new TextEncoder();
 
-  const write = (chunk: string) => writer.write(enc.encode(chunk));
-
-  // Fire off generation in the background — don't await here
-  (async () => {
-    try {
-      const { partialObjectStream, object } = streamObject({
-        model,
-        schema: agentResponseSchema,
-        system: systemPrompt,
-        prompt: userPrompt,
-      });
-
-      for await (const partial of partialObjectStream) {
-        await write(`event: partial\ndata: ${JSON.stringify(partial)}\n\n`);
-      }
-
-      const result = await object;
-      await write(`event: done\ndata: ${JSON.stringify(result)}\n\n`);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
+  const stream = new ReadableStream({
+    async start(controller) {
       try {
-        await write(`event: error\ndata: ${JSON.stringify({ message })}\n\n`);
-      } catch {
-        // writer already closed
-      }
-    } finally {
-      try { writer.close(); } catch { /* already closed */ }
-    }
-  })();
+        const { partialObjectStream, object } = streamObject({
+          model,
+          schema: agentResponseSchema,
+          system: systemPrompt,
+          prompt: userPrompt,
+        });
 
-  return new Response(readable, {
+        for await (const partial of partialObjectStream) {
+          controller.enqueue(enc.encode(`event: partial\ndata: ${JSON.stringify(partial)}\n\n`));
+        }
+
+        const result = await object;
+        controller.enqueue(enc.encode(`event: done\ndata: ${JSON.stringify(result)}\n\n`));
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        controller.enqueue(enc.encode(`event: error\ndata: ${JSON.stringify({ message })}\n\n`));
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
