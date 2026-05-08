@@ -1,5 +1,5 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { generateObject, type LanguageModel } from "ai";
+import { generateObject, streamObject, type LanguageModel } from "ai";
 import type { LLMProvider } from "./llm.interface.js";
 import { config } from "../config.js";
 import type { z } from "zod";
@@ -27,5 +27,15 @@ export class ClaudeProvider implements LLMProvider {
       prompt: userPrompt,
     });
     return object;
+  }
+
+  streamCopy<T>(systemPrompt: string, userPrompt: string, schema: z.ZodSchema<T>) {
+    const { partialObjectStream, object } = streamObject({
+      model: this.model,
+      schema,
+      system: systemPrompt,
+      prompt: userPrompt,
+    });
+    return { partialObjectStream, object } as { partialObjectStream: AsyncIterable<unknown>; object: Promise<T> };
   }
 }

@@ -135,4 +135,69 @@ export class QuillAgent {
 
     return object;
   }
+
+  /**
+   * Stream a copywriting request, calling onPartial for each incremental update.
+   * Falls back to blocking generateCopy for providers without streaming support.
+   */
+  async processStream(
+    input: GenerateCopyInput,
+    onPartial: (partial: unknown) => void
+  ): Promise<AgentResponse> {
+    let activeLlm = this.llm;
+    const userKey = input.provider === "local" ? input.localApiKey : input.apiKey;
+    if (input.provider && userKey) {
+      activeLlm = createLLM(input.provider, userKey, input.localUrl, input.localModel);
+    }
+
+    if (!activeLlm) {
+      throw new Error(
+        "No LLM provider available. Please provide an API key in the settings sidebar or set it in the server .env file."
+      );
+    }
+
+    console.log(`[Quill] Streaming request: "${input.prompt}"`);
+
+    const ragResults = await this.rag.retrieve(input.prompt, input.provider, input.apiKey);
+    const ragContext = ragResults.map((r) => r.document.text);
+
+    let figmaNodes = input.figmaNodes || [];
+    if (figmaNodes.length === 0) {
+      const figmaParsed = parseFigmaUrl(input.prompt);
+      if (figmaParsed) {
+        try {
+          const extraction = await getFigmaText(figmaParsed.fileId, figmaParsed.nodeId, input.figmaToken);
+          figmaNodes = extraction.nodes;
+        } catch (err) {
+          console.warn(`[Quill] Figma extraction failed:`, err);
+        }
+      }
+    }
+
+    const systemPrompt = buildSystemPrompt();
+    const userPrompt = buildUserPrompt({
+      userPrompt: input.prompt,
+      ragContext,
+      figmaNodes,
+      variantCount: input.options?.variantCount ?? 2,
+      fixGrammar: input.options?.fixGrammar ?? true,
+      includeReasoning: input.options?.includeReasoning ?? true,
+    });
+
+    if (activeLlm.streamCopy) {
+      const { partialObjectStream, object } = activeLlm.streamCopy(
+        systemPrompt,
+        userPrompt,
+        agentResponseSchema
+      );
+
+      for await (const partial of partialObjectStream) {
+        onPartial(partial);
+      }
+
+      return await object;
+    }
+
+    return await activeLlm.generateCopy(systemPrompt, userPrompt, agentResponseSchema);
+  }
 }

@@ -207,7 +207,7 @@ export async function generateCopy(
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 60_000);
+  const timeout = setTimeout(() => controller.abort(), 90_000);
 
   try {
     const res = await fetch(`${API_BASE}/generate-copy`, {
@@ -222,6 +222,10 @@ export async function generateCopy(
       throw new Error(error.message || `HTTP ${res.status}`);
     }
 
+    const contentType = res.headers.get("content-type") ?? "";
+    if (contentType.includes("text/event-stream")) {
+      return await readSSEStream(res);
+    }
     return res.json();
   } catch (err) {
     if (err instanceof DOMException && err.name === "AbortError") {
@@ -230,6 +234,39 @@ export async function generateCopy(
     throw err;
   } finally {
     clearTimeout(timeout);
+  }
+}
+
+async function readSSEStream(res: Response): Promise<GenerateCopyResponse> {
+  const reader = res.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) throw new Error("Stream ended without a response. Please try again.");
+
+      buffer += decoder.decode(value, { stream: true });
+
+      let boundary: number;
+      while ((boundary = buffer.indexOf("\n\n")) !== -1) {
+        const event = buffer.slice(0, boundary);
+        buffer = buffer.slice(boundary + 2);
+
+        const lines = event.split("\n");
+        const type = lines.find((l) => l.startsWith("event:"))?.slice(6).trim();
+        const dataLine = lines.find((l) => l.startsWith("data:"));
+        if (!dataLine) continue;
+
+        const data = JSON.parse(dataLine.slice(5).trim());
+        if (type === "done") return data as GenerateCopyResponse;
+        if (type === "error") throw new Error(data.message ?? "Generation failed");
+        // "partial" events are ignored — TypingIndicator is already visible
+      }
+    }
+  } finally {
+    reader.releaseLock();
   }
 }
 

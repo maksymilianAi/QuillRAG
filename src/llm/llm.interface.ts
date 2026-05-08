@@ -19,4 +19,11 @@ export interface LLMProvider {
 
   /** Generates structured copy variants based on prompts */
   generateCopy<T>(systemPrompt: string, userPrompt: string, schema: z.ZodSchema<T>): Promise<T>;
+
+  /** Streams structured copy, yielding partial objects as they arrive */
+  streamCopy?<T>(
+    systemPrompt: string,
+    userPrompt: string,
+    schema: z.ZodSchema<T>
+  ): { partialObjectStream: AsyncIterable<unknown>; object: Promise<T> };
 }

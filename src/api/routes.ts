@@ -70,52 +70,57 @@ export function createRoutes(agent: QuillAgent): Router {
     });
   });
 
-  // Main endpoint: generate copy
+  // Main endpoint: generate copy (SSE streaming)
   router.post("/generate-copy", async (req: Request, res: Response) => {
-    try {
-      // Validate input
-      const parsed = generateCopySchema.safeParse(req.body);
+    const parsed = generateCopySchema.safeParse(req.body);
 
-      if (!parsed.success) {
-        res.status(400).json({
-          error: "Validation error",
-          details: parsed.error.flatten().fieldErrors,
-        });
-        return;
-      }
-
-      const { prompt, options, provider, apiKey, figmaToken, localUrl, localModel, localApiKey } = parsed.data;
-
-      // Reject prompt injection and out-of-scope requests before touching the LLM
-      if (isInjectionAttempt(prompt)) {
-        console.warn(`[API] Blocked suspicious prompt: "${prompt.slice(0, 120)}"`);
-        res.status(400).json({
-          error: "Out-of-scope request",
-          message: "Quill only handles UX copywriting tasks. Please describe the copy you need help with.",
-        });
-        return;
-      }
-
-      // Process through agent
-      const result = await agent.process({
-        prompt,
-        options,
-        provider,
-        apiKey,
-        figmaToken,
-        localUrl,
-        localModel,
-        localApiKey,
+    if (!parsed.success) {
+      res.status(400).json({
+        error: "Validation error",
+        details: parsed.error.flatten().fieldErrors,
       });
+      return;
+    }
 
-      res.json(result);
+    const { prompt, options, provider, apiKey, figmaToken, localUrl, localModel, localApiKey } = parsed.data;
+
+    if (isInjectionAttempt(prompt)) {
+      console.warn(`[API] Blocked suspicious prompt: "${prompt.slice(0, 120)}"`);
+      res.status(400).json({
+        error: "Out-of-scope request",
+        message: "Quill only handles UX copywriting tasks. Please describe the copy you need help with.",
+      });
+      return;
+    }
+
+    // SSE — send headers immediately so Vercel doesn't time out before we start writing
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
+    res.flushHeaders();
+
+    // Heartbeat keeps the connection alive through proxies / Vercel gateway
+    const ping = setInterval(() => {
+      try { res.write(":ping\n\n"); } catch { clearInterval(ping); }
+    }, 3000);
+
+    try {
+      const result = await agent.processStream(
+        { prompt, options, provider, apiKey, figmaToken, localUrl, localModel, localApiKey },
+        (partial) => {
+          try { res.write(`event: partial\ndata: ${JSON.stringify(partial)}\n\n`); } catch { /* closed */ }
+        }
+      );
+
+      res.write(`event: done\ndata: ${JSON.stringify(result)}\n\n`);
     } catch (err) {
       console.error("[API] Error generating copy:", err);
-      res.status(500).json({
-        error: "Internal server error",
-        message:
-          err instanceof Error ? err.message : "Unknown error",
-      });
+      const message = err instanceof Error ? err.message : "Unknown error";
+      try { res.write(`event: error\ndata: ${JSON.stringify({ message })}\n\n`); } catch { /* closed */ }
+    } finally {
+      clearInterval(ping);
+      res.end();
     }
   });
 
