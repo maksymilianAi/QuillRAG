@@ -146,7 +146,11 @@ export default async function handler(request: Request): Promise<Response> {
     async start(controller) {
       controller.enqueue(enc.encode(":ok\n\n"));
 
+      const fetchAbort = new AbortController();
+      const fetchTimeout = setTimeout(() => fetchAbort.abort(), 28_000);
+
       try {
+        console.log("[Edge] calling Anthropic API...");
         const res = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: {
@@ -162,7 +166,9 @@ export default async function handler(request: Request): Promise<Response> {
             tools: [GENERATE_COPY_TOOL],
             tool_choice: { type: "tool", name: "generate_copy" },
           }),
+          signal: fetchAbort.signal,
         });
+        console.log("[Edge] Anthropic responded:", res.status);
 
         if (!res.ok) {
           const errText = await res.text();
@@ -188,6 +194,7 @@ export default async function handler(request: Request): Promise<Response> {
           enc.encode(`event: error\ndata: ${JSON.stringify({ message })}\n\n`)
         );
       } finally {
+        clearTimeout(fetchTimeout);
         controller.close();
       }
     },
