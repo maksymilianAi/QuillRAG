@@ -7,7 +7,7 @@
  */
 
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { streamObject } from "ai";
+import { generateObject } from "ai";
 import { agentResponseSchema } from "../src/agent/agent.schema.js";
 import { buildSystemPrompt, buildUserPrompt } from "../src/prompt/prompt.builder.js";
 
@@ -98,30 +98,19 @@ export default async function handler(request: Request): Promise<Response> {
       // while Claude generates (which can take 20-30s)
       controller.enqueue(enc.encode(":ok\n\n"));
 
-      const abort = new AbortController();
-      const killTimer = setTimeout(() => abort.abort(), 60_000);
-
       try {
-        const { partialObjectStream, object } = streamObject({
+        const { object } = await generateObject({
           model,
           schema: agentResponseSchema,
           system: systemPrompt,
           prompt: userPrompt,
-          abortSignal: abort.signal,
         });
-
-        for await (const partial of partialObjectStream) {
-          controller.enqueue(enc.encode(`event: partial\ndata: ${JSON.stringify(partial)}\n\n`));
-        }
-
-        const result = await object;
-        controller.enqueue(enc.encode(`event: done\ndata: ${JSON.stringify(result)}\n\n`));
+        controller.enqueue(enc.encode(`event: done\ndata: ${JSON.stringify(object)}\n\n`));
       } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error";
-        console.error("[Edge] streamObject error:", message);
+        console.error("[Edge] generateObject error:", message);
         controller.enqueue(enc.encode(`event: error\ndata: ${JSON.stringify({ message })}\n\n`));
       } finally {
-        clearTimeout(killTimer);
         controller.close();
       }
     },
