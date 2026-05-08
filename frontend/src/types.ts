@@ -40,6 +40,9 @@ export interface SectionReasoning {
 export interface GenerateCopyResponse {
   format: CopyFormat;
   formatNote?: string;
+  needsClarification?: boolean;
+  clarifyingQuestions?: string[];
+  quickOptions?: string[];
   approved?: boolean;
   approvalNote?: string;
   original?: string;
