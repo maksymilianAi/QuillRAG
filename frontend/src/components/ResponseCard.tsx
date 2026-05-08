@@ -4,6 +4,7 @@ import copyIconUrl from "../assets/copy-icon.svg";
 import checkIconUrl from "../assets/check-icon.svg";
 import crossIconUrl from "../assets/cross-icon.svg";
 import arrowRightUrl from "../assets/arrow-right.svg";
+import editIconUrl from "../assets/edit-icon.svg";
 
 const REWRITE_QUICK_ACTIONS = [
   "Make it shorter",
@@ -44,7 +45,7 @@ function InlineCopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleClick}
-      className={`shrink-0 flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold transition-all duration-200 border rounded-lg ${
+      className={`shrink-0 flex items-center gap-1 px-2.5 py-1 text-xs font-semibold transition-all duration-200 border rounded-lg ${
         copied
           ? "bg-[var(--color-success)]/10 border-[var(--color-success)]/30 text-[var(--color-success)]"
           : "bg-transparent border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[rgba(63,104,255,0.65)] hover:text-white"
@@ -66,13 +67,14 @@ interface VariantRowProps {
   index: number;
   isRecommended: boolean;
   isUnchanged?: boolean;
+  totalVariants?: number;
   children: React.ReactNode;
   copyText: string;
   onRewriteClick?: () => void;
   isRewriting?: boolean;
 }
 
-function VariantRow({ index, isRecommended, isUnchanged, children, copyText, onRewriteClick, isRewriting }: VariantRowProps) {
+function VariantRow({ index, isRecommended, isUnchanged, totalVariants, children, copyText, onRewriteClick, isRewriting }: VariantRowProps) {
   return (
     <div className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border transition-all duration-500 ${
       isUnchanged
@@ -82,7 +84,7 @@ function VariantRow({ index, isRecommended, isUnchanged, children, copyText, onR
         : "border-[var(--color-border)] bg-transparent"
     }`}>
       <div className="flex items-center gap-2.5 min-w-0">
-        <span className={`shrink-0 flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold ${
+        <span className={`shrink-0 flex items-center justify-center w-4 h-4 rounded-full text-xs font-bold ${
           isUnchanged ? "bg-[var(--color-success)]/20 text-[var(--color-success)]"
           : isRecommended ? "bg-[var(--color-brand)] text-white"
           : "bg-[var(--color-surface-card)] text-[var(--color-text-muted)]"
@@ -91,12 +93,12 @@ function VariantRow({ index, isRecommended, isUnchanged, children, copyText, onR
         </span>
         <div className="min-w-0">{children}</div>
         {isUnchanged && (
-          <span className="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[var(--color-success)]/15 text-[var(--color-success)] uppercase tracking-wider">
+          <span className="shrink-0 px-1.5 py-0.5 rounded text-xs font-semibold bg-[var(--color-success)]/15 text-[var(--color-success)] uppercase tracking-wider">
             Already correct
           </span>
         )}
-        {!isUnchanged && isRecommended && (
-          <span className="shrink-0 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[var(--color-brand)]/15 text-[var(--color-brand-light)] uppercase tracking-wider">
+        {!isUnchanged && isRecommended && (totalVariants ?? 2) > 1 && (
+          <span className="shrink-0 px-1.5 py-0.5 rounded text-xs font-semibold bg-[var(--color-brand)]/15 text-[var(--color-brand-light)] uppercase tracking-wider">
             Best
           </span>
         )}
@@ -104,12 +106,13 @@ function VariantRow({ index, isRecommended, isUnchanged, children, copyText, onR
       <div className="flex items-center gap-1.5 shrink-0">
         <button
           onClick={onRewriteClick}
-          className={`flex items-center gap-1 px-2.5 py-1 text-[10px] font-semibold transition-all duration-200 border rounded-lg ${
+          className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold transition-all duration-200 border rounded-lg ${
             isRewriting
               ? "bg-[var(--color-brand)]/10 border-[var(--color-brand)]/40 text-[var(--color-brand-light)]"
               : "bg-transparent border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[rgba(63,104,255,0.65)] hover:text-white"
           }`}
         >
+          <img src={editIconUrl} alt="" className="w-3 h-3" style={{ filter: "brightness(0) invert(0.6)" }} />
           Rewrite
         </button>
         <InlineCopyButton text={copyText} />
@@ -122,11 +125,11 @@ function SectionNote({ text }: { text: string }) {
   const sentences = text.split(/(?<=\.)\s+/).filter(Boolean);
   return (
     <details className="mt-2 group">
-      <summary className="flex items-center gap-1.5 cursor-pointer list-none select-none text-[11px] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors w-fit">
+      <summary className="flex items-center gap-1.5 cursor-pointer list-none select-none text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors w-fit">
         <svg className="w-3 h-3 transition-transform group-open:rotate-90 shrink-0" viewBox="0 0 16 16" fill="currentColor">
           <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        Why
+        Why this copy
       </summary>
       <div className="mt-1.5 pl-3 border-l border-[var(--color-border)] space-y-1">
         {sentences.map((s, i) => (
@@ -152,7 +155,7 @@ function RewritePanel({ variantText, input, onInputChange, onSubmit }: RewritePa
           <button
             key={action}
             onClick={() => onSubmit(variantText, action)}
-            className="px-2.5 py-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/60 text-[11px] text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] transition-all duration-200"
+            className="px-2.5 py-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/60 text-xs text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] transition-all duration-200"
           >
             {action}
           </button>
@@ -187,10 +190,10 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
 
   const handleRewriteSubmit = (variantText: string, instruction: string) => {
     const text = instruction.trim();
-    if (!text) return;
+    if (!text || !onAnswer) return;
     setRewritingKey(null);
     setRewriteInput("");
-    onAnswer?.(`Refine this copy variant: "${variantText}"\nInstruction: ${text}`);
+    onAnswer(`Refine this copy variant: "${variantText}"\nInstruction: ${text}`);
   };
 
   const submitClarification = (text: string) => {
@@ -205,13 +208,13 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
       <div className="animate-slide-up space-y-4">
         {/* Questions */}
         <div className="space-y-2">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">
+          <p className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">
             A few questions before I start
           </p>
           <ol className="space-y-1.5 pl-1">
             {data.clarifyingQuestions.map((q, i) => (
               <li key={i} className="flex items-start gap-2.5">
-                <span className="shrink-0 flex items-center justify-center w-4 h-4 rounded-full bg-[var(--color-surface-card)] text-[9px] font-bold text-[var(--color-text-muted)] mt-0.5">
+                <span className="shrink-0 flex items-center justify-center w-4 h-4 rounded-full bg-[var(--color-surface-card)] text-xs font-bold text-[var(--color-text-muted)] mt-0.5">
                   {i + 1}
                 </span>
                 <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{q}</p>
@@ -295,7 +298,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
       {/* Original copy block */}
       {data.original && (
         <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-2">Original</p>
+          <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)] mb-2">Original</p>
           <p className="text-sm text-[var(--color-text-muted)] leading-relaxed whitespace-pre-line">{data.original}</p>
         </div>
       )}
@@ -303,7 +306,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
       {/* Headline variants */}
       {hasHeadline && (
         <div className="space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">{sections.headline}</p>
+          <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">{sections.headline}</p>
           {data.variants.map((v, i) =>
             v.headline ? (
               <div key={i}>
@@ -311,6 +314,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
                   index={i}
                   isRecommended={i === data.recommended}
                   isUnchanged={isVariantUnchanged(v.headline)}
+                  totalVariants={data.variants.filter(v => v.headline).length}
                   copyText={v.headline}
                   onRewriteClick={() => setRewritingKey(rewritingKey === `headline-${i}` ? null : `headline-${i}`)}
                   isRewriting={rewritingKey === `headline-${i}`}
@@ -335,7 +339,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
       {/* Body text variants */}
       {hasBody && (
         <div className="space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">{sections.body}</p>
+          <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">{sections.body}</p>
           {data.variants.map((v, i) =>
             v.body ? (
               <div key={i}>
@@ -343,6 +347,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
                   index={i}
                   isRecommended={i === data.recommended}
                   isUnchanged={isVariantUnchanged(v.body)}
+                  totalVariants={data.variants.filter(v => v.body).length}
                   copyText={v.body}
                   onRewriteClick={() => setRewritingKey(rewritingKey === `body-${i}` ? null : `body-${i}`)}
                   isRewriting={rewritingKey === `body-${i}`}
@@ -367,7 +372,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
       {/* CTA variants */}
       {hasCtas && (
         <div className="space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">{sections.ctas}</p>
+          <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">{sections.ctas}</p>
           {data.variants.flatMap((v, i) =>
             v.ctas.map((cta, ci) => (
               <div key={`${i}-${ci}`}>
@@ -375,6 +380,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
                   index={i}
                   isRecommended={i === data.recommended}
                   isUnchanged={isVariantUnchanged(cta)}
+                  totalVariants={data.variants.filter(v => v.ctas.length > 0).length}
                   copyText={cta}
                   onRewriteClick={() => setRewritingKey(rewritingKey === `cta-${i}-${ci}` ? null : `cta-${i}-${ci}`)}
                   isRewriting={rewritingKey === `cta-${i}-${ci}`}
@@ -404,25 +410,28 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
 
       {/* Grammar & Style Fixes */}
       <div>
-        <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)] mb-2">Grammar & Style</p>
+        <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)] mb-2">Grammar & Style</p>
         {data.fixes.length === 0 ? (
           <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--color-success)]/20 bg-[var(--color-success)]/5">
             <img src={checkIconUrl} alt="" className="w-3.5 h-3.5 shrink-0" />
             <p className="text-xs text-[var(--color-text-muted)]">No issues found.</p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 space-y-4">
             {data.fixes.map((fix, i) => (
-              <div key={i} className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 text-sm">
-                <p className="text-[11px] text-[var(--color-text-muted)] mb-2">{fix.rule}</p>
-                <div className="flex flex-col gap-1">
+              <div key={i} className="flex gap-3">
+                <span className="shrink-0 flex items-center justify-center w-4 h-4 rounded-full bg-[var(--color-surface-elevated)] text-xs font-bold text-[var(--color-text-muted)] mt-0.5">
+                  {i + 1}
+                </span>
+                <div className="space-y-1.5 min-w-0">
+                  <p className="text-xs text-[var(--color-text-muted)]">{fix.rule}</p>
                   <div className="flex items-center gap-2">
-                    <img src={crossIconUrl} alt="" className="w-4 h-4 shrink-0" />
-                    <p className="text-[var(--color-text-secondary)] line-through decoration-[var(--color-error)]/40">{fix.original}</p>
+                    <img src={crossIconUrl} alt="" className="w-3.5 h-3.5 shrink-0" />
+                    <p className="text-sm text-[var(--color-text-secondary)] line-through decoration-[var(--color-error)]/40">{fix.original}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <img src={checkIconUrl} alt="" className="w-4 h-4 shrink-0" />
-                    <p className="text-[var(--color-text-primary)] font-medium">{fix.corrected}</p>
+                    <img src={checkIconUrl} alt="" className="w-3.5 h-3.5 shrink-0" />
+                    <p className="text-sm text-[var(--color-text-primary)] font-medium">{fix.corrected}</p>
                   </div>
                 </div>
               </div>

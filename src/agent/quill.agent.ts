@@ -18,6 +18,12 @@ const agentResponseSchema = z.object({
     .describe("Detected copy format based on BOTH the user's request AND the tone/content of the text. Analyze the actual text — if it describes a failure, missing configuration, or required action with consequences, classify as 'error' or 'warning' even if the user called it something else."),
   formatNote: z.string().optional()
     .describe("If the actual tone or severity of the text differs from what the user labeled it — explain the mismatch in one sentence. Omit if there is no mismatch."),
+  needsClarification: z.boolean().optional()
+    .describe("Set to true when the request lacks enough context to generate accurate copy — e.g. the component type, purpose, or content is unspecified. When true, populate clarifyingQuestions and return empty variants and fixes."),
+  clarifyingQuestions: z.array(z.string()).optional()
+    .describe("2–4 specific questions to ask the user when needsClarification=true. Ask only what is genuinely missing. Each question should be concrete and answerable in one sentence."),
+  quickOptions: z.array(z.string()).optional()
+    .describe("3–5 short context chips when needsClarification=true — common component types or use cases relevant to the request (e.g. 'Empty state', 'Error message', 'Success confirmation'). Omit otherwise."),
   approved: z.boolean().optional()
     .describe("Set to true if the submitted copy already meets all style rules and guidelines and needs no changes. When true, set approvalNote and return empty variants and fixes arrays."),
   approvalNote: z.string().optional()

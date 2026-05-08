@@ -30,6 +30,9 @@ export interface SectionReasoning {
 export interface AgentResponse {
   format: CopyFormat;
   formatNote?: string;
+  needsClarification?: boolean;
+  clarifyingQuestions?: string[];
+  quickOptions?: string[];
   approved?: boolean;
   approvalNote?: string;
   original?: string;

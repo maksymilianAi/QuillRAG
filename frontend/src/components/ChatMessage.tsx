@@ -3,24 +3,25 @@ import { ResponseCard } from "./ResponseCard";
 
 interface Props {
   message: ChatMessageType;
+  onAnswer?: (text: string) => void;
 }
 
 /**
  * Single chat message bubble — user or assistant.
  */
-export function ChatMessage({ message }: Props) {
+export function ChatMessage({ message, onAnswer }: Props) {
   const isUser = message.role === "user";
 
   if (isUser) {
     return (
       <div className="flex justify-end animate-slide-up">
         <div className="max-w-[75%]">
-          <div className="border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/40 rounded-2xl px-4 py-3">
-            <p className="text-[14px] text-[var(--color-text-primary)] leading-relaxed">
+          <div className="border border-[var(--color-brand)]/25 bg-[var(--color-brand)]/8 rounded-2xl px-4 py-3">
+            <p className="text-sm text-[var(--color-text-primary)] leading-relaxed">
               {message.content}
             </p>
           </div>
-          <p className="text-[10px] text-[var(--color-text-muted)] text-right mt-1.5 pr-1">
+          <p className="text-xs text-[var(--color-text-muted)] text-right mt-1.5 pr-1">
             {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
           </p>
         </div>
@@ -34,7 +35,7 @@ export function ChatMessage({ message }: Props) {
         <div className="bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] rounded-2xl border border-[var(--color-border)] px-6 py-5 glass-effect">
           <div className="space-y-3">
             {message.data ? (
-              <ResponseCard data={message.data} prompt={message.prompt} />
+              <ResponseCard data={message.data} prompt={message.prompt} onAnswer={onAnswer} />
             ) : (
               <p className="text-[15px] leading-relaxed text-[var(--color-text-secondary)]">
                 {message.content}
@@ -42,7 +43,7 @@ export function ChatMessage({ message }: Props) {
             )}
           </div>
         </div>
-        <p className="text-[10px] text-[var(--color-text-muted)] mt-1.5 pl-1">
+        <p className="text-xs text-[var(--color-text-muted)] mt-1.5 pl-1">
           {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </p>
       </div>

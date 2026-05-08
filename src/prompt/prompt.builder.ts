@@ -124,7 +124,17 @@ export function buildUserPrompt(parts: PromptParts): string {
 
   // Instructions
   const instructions: string[] = [
-    `1. Determine the copy format by analyzing BOTH the user's request AND the actual tone and content of the text they provide.
+    `1. First, decide whether the request provides enough context to generate accurate copy.
+   Set 'needsClarification: true' and populate 'clarifyingQuestions' (2–4 questions) when ALL of the following are true:
+   - No existing copy is provided to review or improve
+   - The component type or screen is not clearly identified
+   - The purpose or user action is not stated
+   Ask only what is genuinely missing. Do not ask for clarification when reviewing existing copy — even if context is minimal.
+   If needsClarification=true, return empty variants, fixes, and reasoning.
+
+   "Write from scratch" requests with sufficient context (component type + purpose + content direction) should proceed directly to generation — no clarification needed.
+
+2. Determine the copy format by analyzing BOTH the user's request AND the actual tone and content of the text they provide.
    Do not trust the user's label alone — if they say "info message" but the text describes a failure, missing configuration, or a required action with consequences, classify it as "error" or "warning". If the detected format differs from what the user called it, set 'formatNote' to explain the mismatch in one sentence (e.g. "This reads as a warning, not an info message — it describes a required action that affects payments.").
 
    Format definitions:
@@ -136,17 +146,17 @@ export function buildUserPrompt(parts: PromptParts): string {
    - "button" — button or CTA text. Action verb + noun, Book Style. Populate 'ctas' only.
    - "status" — confirmation, success notification, status badge, toast. Short noun phrase, Book Style. Populate 'headline' only.
    - "full" — only when the request explicitly covers multiple copy elements together (heading + body + buttons). Populate headline, body, and ctas.`,
-    `2. Identify exactly which element(s) the user wants to update from the "Current UI Text" list.`,
-    `3. If original copy exists in the context (from Figma nodes or the user's message), consolidate it into the 'original' field as plain text. Omit 'original' if there is no source copy.`,
-    `4. Before writing variants: if the submitted copy already meets all style rules and knowledge base guidelines with no issues — set 'approved: true', write a short 'approvalNote' explaining why it passes (cite the specific rules it satisfies), and return empty 'variants' and 'fixes' arrays. Do not invent alternatives just to fill a slot.`,
-    `5. If changes are needed, provide 1 to ${parts.variantCount} variant(s). Return 1 variant when one strong option clearly covers the need. Return multiple variants only when they represent genuinely different approaches — different structure, tone, or strategy. Never duplicate with minor wording changes.`,
-    `6. Set 'recommended' to the zero-based index of the variant you consider best. If only one variant, set it to 0.`,
+    `3. Identify exactly which element(s) the user wants to update from the "Current UI Text" list.`,
+    `4. If original copy exists in the context (from Figma nodes or the user's message), consolidate it into the 'original' field as plain text. Omit 'original' if there is no source copy.`,
+    `5. Before writing variants: if the submitted copy already meets all style rules and knowledge base guidelines with no issues — set 'approved: true', write a short 'approvalNote' explaining why it passes (cite the specific rules it satisfies), and return empty 'variants' and 'fixes' arrays. Do not invent alternatives just to fill a slot.`,
+    `6. If changes are needed, provide 1 to ${parts.variantCount} variant(s). Return 1 variant when one strong option clearly covers the need. Return multiple variants only when they represent genuinely different approaches — different structure, tone, or strategy. Never duplicate with minor wording changes.`,
+    `7. Set 'recommended' to the zero-based index of the variant you consider best. If only one variant, set it to 0.`,
   ];
   if (parts.includeReasoning) {
-    instructions.push("7. Fill in 'reasoning' only for the sections you populated. Keep each to 1–2 sentences, cite specific style rules. Omit if approved=true.");
+    instructions.push("8. Fill in 'reasoning' only for the sections you populated. Keep each to 1–2 sentences, cite specific style rules. Omit if approved=true or needsClarification=true.");
   }
   if (parts.fixGrammar) {
-    instructions.push("8. Audit the existing copy for issues: wrong capitalization style, passive voice, filler/marketing language, invented terminology, punctuation errors. Return each in 'fixes' as { original, corrected, rule }. Omit if approved=true.");
+    instructions.push("9. Audit the existing copy for surface-level grammar and punctuation errors only: wrong capitalization style (e.g. sentence style used where Book Style is required, or vice versa), missing or incorrect punctuation (period at end of tooltip/error, exclamation mark that should be removed), passive blame phrasing ('You entered' → 'Enter'), filler/marketing words ('simply', 'easily', 'great news'). Do NOT include copywriting direction changes here — those belong in 'reasoning'. Each fix must cite the specific rule broken. Return as { original, corrected, rule }. Omit if approved=true or needsClarification=true.");
   }
   sections.push(`## Instructions\n${instructions.join("\n")}`);
 

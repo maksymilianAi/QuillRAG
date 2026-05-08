@@ -10,14 +10,45 @@ import { TypingIndicator } from "./TypingIndicator";
 import { generateCopy } from "../api";
 import type { ChatMessage as ChatMessageType } from "../types";
 
+const STORAGE_KEY = "quill_chat_history";
+const today = () => new Date().toDateString();
+
+function loadHistory(): ChatMessageType[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const { date, messages } = JSON.parse(raw);
+    if (date !== today()) {
+      localStorage.removeItem(STORAGE_KEY);
+      return [];
+    }
+    return messages.map((m: ChatMessageType) => ({ ...m, timestamp: new Date(m.timestamp as unknown as string) }));
+  } catch {
+    return [];
+  }
+}
+
+const MAX_STORED_MESSAGES = 30;
+
+function saveHistory(messages: ChatMessageType[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: today(), messages: messages.slice(-MAX_STORED_MESSAGES) }));
+  } catch {}
+}
+
 export function ClassicChat() {
-  const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const [messages, setMessages] = useState<ChatMessageType[]>(() => loadHistory());
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingClarification, setPendingClarification] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    saveHistory(messages);
+  }, [messages]);
 
   const handleSend = async (content: string) => {
     const userMessage: ChatMessageType = {
@@ -29,15 +60,25 @@ export function ClassicChat() {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
+    // If this is a follow-up to a clarification request, combine with the original prompt
+    const prompt = pendingClarification
+      ? `${pendingClarification}\n\nAdditional context: ${content}`
+      : content;
+    setPendingClarification(null);
+
     try {
       const response = await generateCopy({
-        prompt: content,
+        prompt,
         options: {
           variantCount: 2,
           fixGrammar: true,
           includeReasoning: true,
         },
       });
+
+      if (response.needsClarification) {
+        setPendingClarification(content);
+      }
 
       const assistantMessage: ChatMessageType = {
         id: crypto.randomUUID(),
@@ -82,10 +123,10 @@ export function ClassicChat() {
               </p>
               
               <div className="w-full max-w-md space-y-3">
-                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.2em] mb-4">
-                  Quick Start Suggestions
+                <p className="text-xs font-medium text-[var(--color-text-muted)] mb-4">
+                  Try asking
                 </p>
-                <div className="grid grid-cols-1 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {[
                     "Rewrite checkout page copy to be more engaging",
                     "Improve error messages for a login form",
@@ -108,7 +149,7 @@ export function ClassicChat() {
 
           <div className="space-y-6">
             {messages.map((msg) => (
-              <ChatMessage key={msg.id} message={msg} />
+              <ChatMessage key={msg.id} message={msg} onAnswer={handleSend} />
             ))}
             {isLoading && <TypingIndicator />}
           </div>
