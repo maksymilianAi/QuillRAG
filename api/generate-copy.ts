@@ -2,13 +2,10 @@
  * Edge Function — /api/generate-copy
  *
  * Runs on Vercel Edge Runtime (no Node.js 10s limit).
- * Streams the Claude response as SSE so the client sees the typing indicator
- * throughout generation and gets the full ResponseCard when done.
+ * Uses a direct fetch() to the Anthropic Messages API — bypasses the AI SDK
+ * to avoid Edge runtime compatibility issues with Zod v4 / generateObject.
  */
 
-import { createAnthropic } from "@ai-sdk/anthropic";
-import { generateObject } from "ai";
-import { agentResponseSchema } from "../src/agent/agent.schema.js";
 import { buildSystemPrompt, buildUserPrompt } from "../src/prompt/prompt.builder.js";
 
 export const config = { runtime: "edge" };
@@ -30,6 +27,62 @@ const INJECTION_PATTERNS = [
 function isInjectionAttempt(prompt: string): boolean {
   return INJECTION_PATTERNS.some((re) => re.test(prompt));
 }
+
+const GENERATE_COPY_TOOL = {
+  name: "generate_copy",
+  description: "Output structured UX copywriting result",
+  input_schema: {
+    type: "object",
+    properties: {
+      format: {
+        type: "string",
+        enum: ["full", "tooltip", "error", "warning", "info", "label", "button", "status"],
+        description: "Detected copy format",
+      },
+      formatNote: { type: "string" },
+      needsClarification: { type: "boolean" },
+      clarifyingQuestions: { type: "array", items: { type: "string" } },
+      quickOptions: { type: "array", items: { type: "string" } },
+      approved: { type: "boolean" },
+      approvalNote: { type: "string" },
+      original: { type: "string" },
+      recommended: { type: "integer", minimum: 0 },
+      variants: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            headline: { type: "string" },
+            body: { type: "string" },
+            ctas: { type: "array", items: { type: "string" } },
+          },
+          required: ["ctas"],
+        },
+      },
+      fixes: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            original: { type: "string" },
+            corrected: { type: "string" },
+            rule: { type: "string" },
+          },
+          required: ["original", "corrected", "rule"],
+        },
+      },
+      reasoning: {
+        type: "object",
+        properties: {
+          headline: { type: "string" },
+          body: { type: "string" },
+          ctas: { type: "string" },
+        },
+      },
+    },
+    required: ["format", "recommended", "variants", "fixes", "reasoning"],
+  },
+};
 
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== "POST") {
@@ -69,16 +122,13 @@ export default async function handler(request: Request): Promise<Response> {
   const fixGrammar = options.fixGrammar !== false;
   const includeReasoning = options.includeReasoning !== false;
 
-  const apiKey = process.env.ANTHROPIC_API_KEY ?? (process.env.Claude_API as string | undefined);
+  const apiKey = (process.env.ANTHROPIC_API_KEY ?? process.env.Claude_API) as string | undefined;
   if (!apiKey) {
     return new Response(JSON.stringify({ error: "Anthropic API key not configured" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }
-
-  const anthropic = createAnthropic({ apiKey });
-  const model = anthropic("claude-sonnet-4-6");
 
   const systemPrompt = buildSystemPrompt();
   const userPrompt = buildUserPrompt({
@@ -94,22 +144,49 @@ export default async function handler(request: Request): Promise<Response> {
 
   const stream = new ReadableStream({
     async start(controller) {
-      // Flush headers immediately — this keeps the Edge connection alive
-      // while Claude generates (which can take 20-30s)
       controller.enqueue(enc.encode(":ok\n\n"));
 
       try {
-        const { object } = await generateObject({
-          model,
-          schema: agentResponseSchema,
-          system: systemPrompt,
-          prompt: userPrompt,
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "x-api-key": apiKey,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-6",
+            max_tokens: 4096,
+            system: systemPrompt,
+            messages: [{ role: "user", content: userPrompt }],
+            tools: [GENERATE_COPY_TOOL],
+            tool_choice: { type: "tool", name: "generate_copy" },
+          }),
         });
-        controller.enqueue(enc.encode(`event: done\ndata: ${JSON.stringify(object)}\n\n`));
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Anthropic API error ${res.status}: ${errText}`);
+        }
+
+        const result = (await res.json()) as {
+          content: Array<{ type: string; input?: unknown }>;
+        };
+
+        const toolUse = result.content.find((c) => c.type === "tool_use");
+        if (!toolUse?.input) {
+          throw new Error("No tool_use block in Anthropic response");
+        }
+
+        controller.enqueue(
+          enc.encode(`event: done\ndata: ${JSON.stringify(toolUse.input)}\n\n`)
+        );
       } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error";
-        console.error("[Edge] generateObject error:", message);
-        controller.enqueue(enc.encode(`event: error\ndata: ${JSON.stringify({ message })}\n\n`));
+        console.error("[Edge] Anthropic fetch error:", message);
+        controller.enqueue(
+          enc.encode(`event: error\ndata: ${JSON.stringify({ message })}\n\n`)
+        );
       } finally {
         controller.close();
       }
