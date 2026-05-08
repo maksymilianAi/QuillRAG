@@ -431,7 +431,11 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
                   </div>
                   <div className="flex items-center gap-2">
                     <img src={checkIconUrl} alt="" className="w-3.5 h-3.5 shrink-0" />
-                    <p className="text-sm text-[var(--color-text-primary)] font-medium">{fix.corrected}</p>
+                    {fix.corrected ? (
+                      <p className="text-sm text-[var(--color-text-primary)] font-medium">{fix.corrected}</p>
+                    ) : (
+                      <p className="text-xs italic text-[var(--color-text-muted)]">(delete)</p>
+                    )}
                   </div>
                 </div>
               </div>
