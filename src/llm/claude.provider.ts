@@ -16,7 +16,7 @@ export class ClaudeProvider implements LLMProvider {
     if (!key) throw new Error("Anthropic API key is missing");
 
     const client = createAnthropic({ apiKey: key });
-    this.model = client("claude-sonnet-4-5");
+    this.model = client("claude-sonnet-4-6");
   }
 
   async generateCopy<T>(systemPrompt: string, userPrompt: string, schema: z.ZodSchema<T>): Promise<T> {

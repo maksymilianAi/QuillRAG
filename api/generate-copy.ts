@@ -78,7 +78,7 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   const anthropic = createAnthropic({ apiKey });
-  const model = anthropic("claude-sonnet-4-5");
+  const model = anthropic("claude-sonnet-4-6");
 
   const systemPrompt = buildSystemPrompt();
   const userPrompt = buildUserPrompt({
@@ -98,12 +98,16 @@ export default async function handler(request: Request): Promise<Response> {
       // while Claude generates (which can take 20-30s)
       controller.enqueue(enc.encode(":ok\n\n"));
 
+      const abort = new AbortController();
+      const killTimer = setTimeout(() => abort.abort(), 60_000);
+
       try {
         const { partialObjectStream, object } = streamObject({
           model,
           schema: agentResponseSchema,
           system: systemPrompt,
           prompt: userPrompt,
+          abortSignal: abort.signal,
         });
 
         for await (const partial of partialObjectStream) {
@@ -114,8 +118,10 @@ export default async function handler(request: Request): Promise<Response> {
         controller.enqueue(enc.encode(`event: done\ndata: ${JSON.stringify(result)}\n\n`));
       } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error";
+        console.error("[Edge] streamObject error:", message);
         controller.enqueue(enc.encode(`event: error\ndata: ${JSON.stringify({ message })}\n\n`));
       } finally {
+        clearTimeout(killTimer);
         controller.close();
       }
     },
