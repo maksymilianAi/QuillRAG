@@ -10,8 +10,9 @@
     }
   },
   "rewrites": [
-    { "source": "/api/generate-copy", "destination": "/api/generate-copy" },
-    { "source": "/api/(.*)", "destination": "/api/[...path]" },
+    { "source": "/api/health", "destination": "/api/[...path]" },
+    { "source": "/api/extract-figma", "destination": "/api/[...path]" },
+    { "source": "/api/feedback", "destination": "/api/[...path]" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
