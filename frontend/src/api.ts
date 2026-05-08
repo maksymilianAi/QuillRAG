@@ -117,6 +117,27 @@ const MOCK_RESPONSES: Record<string, GenerateCopyResponse> = {
     },
   },
 
+  clarification: {
+    format: "full",
+    needsClarification: true,
+    clarifyingQuestions: [
+      "What type of component or screen is this for?",
+      "What is the user's goal or action on this screen?",
+      "What content or key message should be communicated?",
+    ],
+    quickOptions: [
+      "Empty state screen",
+      "Error message",
+      "Success confirmation",
+      "Onboarding step",
+      "Modal dialog",
+    ],
+    recommended: 0,
+    variants: [],
+    fixes: [],
+    reasoning: {},
+  },
+
   status: {
     format: "status",
     original: "Your payment was processed!",
@@ -155,6 +176,11 @@ function getMockResponse(prompt: string): GenerateCopyResponse {
     base = MOCK_RESPONSES.button;
   } else if (p.includes("status") || p.includes("confirmation") || p.includes("success") || p.includes("notification") || p.includes("toast") || p.includes("badge")) {
     base = MOCK_RESPONSES.status;
+  } else if (
+    (p.includes("write") || p.includes("create") || p.includes("generate") || p.includes("make")) &&
+    !p.includes("additional context:")
+  ) {
+    base = MOCK_RESPONSES.clarification;
   } else if (p.includes("page") || p.includes("modal") || p.includes("screen") || p.includes("popup") || p.includes("section")) {
     base = MOCK_RESPONSES.full;
   } else if (originalText) {
