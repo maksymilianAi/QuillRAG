@@ -7,7 +7,7 @@
  */
 
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { generateObject } from "ai";
+import { streamObject } from "ai";
 import { agentResponseSchema } from "../src/agent/agent.schema.js";
 import { buildSystemPrompt, buildUserPrompt } from "../src/prompt/prompt.builder.js";
 
@@ -90,14 +90,42 @@ export default async function handler(request: Request): Promise<Response> {
     includeReasoning,
   });
 
-  const { object } = await generateObject({
-    model,
-    schema: agentResponseSchema,
-    system: systemPrompt,
-    prompt: userPrompt,
+  const enc = new TextEncoder();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      // Flush headers immediately — this keeps the Edge connection alive
+      // while Claude generates (which can take 20-30s)
+      controller.enqueue(enc.encode(":ok\n\n"));
+
+      try {
+        const { partialObjectStream, object } = streamObject({
+          model,
+          schema: agentResponseSchema,
+          system: systemPrompt,
+          prompt: userPrompt,
+        });
+
+        for await (const partial of partialObjectStream) {
+          controller.enqueue(enc.encode(`event: partial\ndata: ${JSON.stringify(partial)}\n\n`));
+        }
+
+        const result = await object;
+        controller.enqueue(enc.encode(`event: done\ndata: ${JSON.stringify(result)}\n\n`));
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        controller.enqueue(enc.encode(`event: error\ndata: ${JSON.stringify({ message })}\n\n`));
+      } finally {
+        controller.close();
+      }
+    },
   });
 
-  return new Response(JSON.stringify(object), {
-    headers: { "Content-Type": "application/json" },
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "X-Accel-Buffering": "no",
+    },
   });
 }
