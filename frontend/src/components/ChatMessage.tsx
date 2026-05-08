@@ -31,7 +31,7 @@ export function ChatMessage({ message, onAnswer }: Props) {
 
   return (
     <div className="flex justify-start animate-slide-up">
-      <div className="max-w-[85%] md:max-w-[80%]">
+      <div className="min-w-[280px] max-w-[600px] w-[85%]">
         <div className="bg-[var(--color-surface-elevated)] text-[var(--color-text-primary)] rounded-2xl border border-[var(--color-border)] px-6 py-5 glass-effect">
           <div className="space-y-3">
             {message.data ? (

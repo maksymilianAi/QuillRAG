@@ -173,7 +173,6 @@ export function IDEChat({
                               <span className="text-[var(--color-success)] text-[10px]">✓</span>
                               <p className="text-[11px] text-[var(--color-text-primary)] font-medium">{fix.corrected}</p>
                             </div>
-                            <p className="text-[9px] text-[var(--color-text-muted)] mt-1 italic">{fix.rule}</p>
                           </div>
                         ))}
                       </div>

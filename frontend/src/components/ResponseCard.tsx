@@ -385,13 +385,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
                   onRewriteClick={() => setRewritingKey(rewritingKey === `cta-${i}-${ci}` ? null : `cta-${i}-${ci}`)}
                   isRewriting={rewritingKey === `cta-${i}-${ci}`}
                 >
-                  <span className={`px-2.5 py-0.5 rounded-md text-xs font-medium border ${
-                    ci === 0
-                      ? "bg-[var(--color-brand)]/15 border-[var(--color-brand)]/30 text-[var(--color-brand-light)]"
-                      : "border-[var(--color-border)] text-[var(--color-text-muted)]"
-                  }`}>
-                    {cta}
-                  </span>
+                  <span className="text-sm text-[var(--color-text-primary)] font-medium">{cta}</span>
                 </VariantRow>
                 {rewritingKey === `cta-${i}-${ci}` && (
                   <RewritePanel
@@ -414,17 +408,18 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
         {data.fixes.length === 0 ? (
           <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--color-success)]/20 bg-[var(--color-success)]/5">
             <img src={checkIconUrl} alt="" className="w-3.5 h-3.5 shrink-0" />
-            <p className="text-xs text-[var(--color-text-muted)]">No issues found.</p>
+            <p className="text-xs text-[var(--color-text-muted)]">Grammar check passed — no issues found.</p>
           </div>
         ) : (
           <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 space-y-4">
             {data.fixes.map((fix, i) => (
               <div key={i} className="flex gap-3">
-                <span className="shrink-0 flex items-center justify-center w-4 h-4 rounded-full bg-[var(--color-surface-elevated)] text-xs font-bold text-[var(--color-text-muted)] mt-0.5">
-                  {i + 1}
-                </span>
+                {data.fixes.length > 1 && (
+                  <span className="shrink-0 flex items-center justify-center w-4 h-4 rounded-full bg-[var(--color-surface-elevated)] text-xs font-bold text-[var(--color-text-muted)] mt-0.5">
+                    {i + 1}
+                  </span>
+                )}
                 <div className="space-y-1.5 min-w-0">
-                  <p className="text-xs text-[var(--color-text-muted)]">{fix.rule}</p>
                   <div className="flex items-center gap-2">
                     <img src={crossIconUrl} alt="" className="w-3.5 h-3.5 shrink-0" />
                     <p className="text-sm text-[var(--color-text-secondary)] line-through decoration-[var(--color-error)]/40">{fix.original}</p>
