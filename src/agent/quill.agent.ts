@@ -11,6 +11,7 @@ import { getFigmaText, parseFigmaUrl } from "../mcp/figma.tool.js";
 import { buildSystemPrompt, buildUserPrompt } from "../prompt/prompt.builder.js";
 import type { GenerateCopyInput, AgentResponse } from "./agent.types.js";
 import { agentResponseSchema } from "./agent.schema.js";
+import { configStore } from "../api/config.store.js";
 
 export class QuillAgent {
   private llm: LLMProvider;
@@ -25,11 +26,22 @@ export class QuillAgent {
    * Process a copywriting request end-to-end.
    */
   async process(input: GenerateCopyInput): Promise<AgentResponse> {
-    // 1. Resolve LLM provider (use request-specific if provided)
+    // 1. Resolve LLM provider (use config store if not provided in request)
+    const session = configStore.get();
+    const provider = input.provider || session.provider;
+    
     let activeLlm = this.llm;
-    const userKey = input.provider === "local" ? input.localApiKey : input.apiKey;
-    if (input.provider && userKey) {
-      activeLlm = createLLM(input.provider, userKey, input.localUrl, input.localModel);
+    if (provider) {
+      const apiKey = input.apiKey || session.apiKey;
+      const localUrl = input.localUrl || session.localUrl;
+      const localModel = input.localModel || session.localModel;
+      const localApiKey = input.localApiKey || session.localApiKey;
+      
+      const userKey = provider === "local" ? (localApiKey || "local") : apiKey;
+      
+      if (userKey || provider === "local") {
+        activeLlm = createLLM(provider, userKey, localUrl, localModel);
+      }
     }
 
     if (!activeLlm) {
@@ -39,6 +51,7 @@ export class QuillAgent {
     }
 
     console.log(`[Quill] Processing request: "${input.prompt}"`);
+    console.log(`[Quill] 🤖 Active LLM: ${activeLlm.name} (${provider || 'default'})`);
 
     // 2. Retrieve RAG context (using the provider's own embedding model if available)
     const ragResults = await this.rag.retrieve(input.prompt, input.provider, input.apiKey);
@@ -105,10 +118,21 @@ export class QuillAgent {
     input: GenerateCopyInput,
     onPartial: (partial: unknown) => void
   ): Promise<AgentResponse> {
+    const session = configStore.get();
+    const provider = input.provider || session.provider;
+    
     let activeLlm = this.llm;
-    const userKey = input.provider === "local" ? input.localApiKey : input.apiKey;
-    if (input.provider && userKey) {
-      activeLlm = createLLM(input.provider, userKey, input.localUrl, input.localModel);
+    if (provider) {
+      const apiKey = input.apiKey || session.apiKey;
+      const localUrl = input.localUrl || session.localUrl;
+      const localModel = input.localModel || session.localModel;
+      const localApiKey = input.localApiKey || session.localApiKey;
+      
+      const userKey = provider === "local" ? (localApiKey || "local") : apiKey;
+      
+      if (userKey || provider === "local") {
+        activeLlm = createLLM(provider, userKey, localUrl, localModel);
+      }
     }
 
     if (!activeLlm) {
@@ -118,6 +142,7 @@ export class QuillAgent {
     }
 
     console.log(`[Quill] Streaming request: "${input.prompt}"`);
+    console.log(`[Quill] 🤖 Active LLM: ${activeLlm.name} (${provider || 'default'})`);
 
     const ragResults = await this.rag.retrieve(input.prompt, input.provider, input.apiKey);
     const ragContext = ragResults.map((r) => r.document.text);

@@ -198,6 +198,26 @@ function getMockResponse(prompt: string): GenerateCopyResponse {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+export interface SessionConfig {
+  provider?: string;
+  apiKey?: string;
+  localUrl?: string;
+  localModel?: string;
+  localApiKey?: string;
+  figmaToken?: string;
+}
+
+/**
+ * Update session-specific configuration on the server.
+ */
+export async function updateServerConfig(config: SessionConfig): Promise<void> {
+  await fetch(`${API_BASE}/config`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(config),
+  });
+}
+
 export async function generateCopy(
   request: GenerateCopyRequest
 ): Promise<GenerateCopyResponse> {
