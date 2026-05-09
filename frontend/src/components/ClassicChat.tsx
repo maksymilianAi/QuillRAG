@@ -79,9 +79,14 @@ export function ClassicChat() {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
-    // If this is a follow-up to a clarification request, combine with the original prompt
-    const prompt = pendingClarification
+    const isFollowUp = pendingClarification !== null;
+    // Accumulate full context — original prompt is never lost across follow-up rounds
+    const accumulatedPrompt = isFollowUp
       ? `${pendingClarification}\n\nAdditional context: ${content}`
+      : content;
+    // On a follow-up, instruct the model to generate immediately and not ask again
+    const prompt = isFollowUp
+      ? `${accumulatedPrompt}\n\n[The user has answered your clarifying questions. Generate copy now — do not ask for more clarification.]`
       : content;
     setPendingClarification(null);
 
@@ -96,7 +101,8 @@ export function ClassicChat() {
       });
 
       if (response.needsClarification) {
-        setPendingClarification(content);
+        // Store the accumulated prompt (not just content) so context carries forward
+        setPendingClarification(accumulatedPrompt);
       }
 
       const assistantMessage: ChatMessageType = {
