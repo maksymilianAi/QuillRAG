@@ -471,8 +471,8 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
         </div>
       )}
 
-      {/* Grammar Check */}
-      <div>
+      {/* Grammar Check — only shown when there is original copy to audit */}
+      {data.original && <div>
         <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)] mb-2">Grammar Check</p>
         {data.fixes.length === 0 ? (
           <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--color-success)]/20 bg-[var(--color-success)]/5">
@@ -506,7 +506,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
             ))}
           </div>
         )}
-      </div>
+      </div>}
 
     </div>
   );
