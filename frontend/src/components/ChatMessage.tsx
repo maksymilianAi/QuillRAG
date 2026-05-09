@@ -29,6 +29,20 @@ export function ChatMessage({ message, onAnswer }: Props) {
     );
   }
 
+  // Approved responses render their own green card — skip the outer wrapper
+  if (message.data?.approved) {
+    return (
+      <div className="flex justify-start animate-slide-up">
+        <div className="min-w-[280px] max-w-[600px] w-[85%]">
+          <ResponseCard data={message.data} prompt={message.prompt} onAnswer={onAnswer} />
+          <p className="text-xs text-[var(--color-text-muted)] mt-1.5 pl-1">
+            {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-start animate-slide-up">
       <div className="min-w-[280px] max-w-[600px] w-[85%]">

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { CopyFormat, GenerateCopyResponse, SectionReasoning } from "../types";
+import { generateCopy } from "../api";
 import copyIconUrl from "../assets/copy-icon.svg";
 import checkIconUrl from "../assets/check-icon.svg";
 import crossIconUrl from "../assets/cross-icon.svg";
@@ -8,9 +9,9 @@ import editIconUrl from "../assets/edit-icon.svg";
 
 const REWRITE_QUICK_ACTIONS = [
   "Make it shorter",
-  "Make it longer",
   "Make it more formal",
   "Simplify the language",
+  "Make it more direct",
 ];
 
 type SectionKey = "headline" | "body" | "ctas";
@@ -34,13 +35,11 @@ interface Props {
 
 function InlineCopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
-
-  const handleClick = () => {
+  const handleClick = () =>
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
-  };
 
   return (
     <button
@@ -52,7 +51,7 @@ function InlineCopyButton({ text }: { text: string }) {
       }`}
     >
       {copied ? (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3">
+        <svg viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3">
           <path fillRule="evenodd" d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z" clipRule="evenodd" />
         </svg>
       ) : (
@@ -64,61 +63,71 @@ function InlineCopyButton({ text }: { text: string }) {
 }
 
 interface VariantRowProps {
-  index: number;
+  variantIndex: number;
   isRecommended: boolean;
   isUnchanged?: boolean;
-  totalVariants?: number;
+  isLoading?: boolean;
+  totalVariants: number;
   children: React.ReactNode;
   copyText: string;
   onRewriteClick?: () => void;
   isRewriting?: boolean;
 }
 
-function VariantRow({ index, isRecommended, isUnchanged, totalVariants, children, copyText, onRewriteClick, isRewriting }: VariantRowProps) {
+function VariantRow({
+  variantIndex, isRecommended, isUnchanged, isLoading, totalVariants,
+  children, copyText, onRewriteClick, isRewriting,
+}: VariantRowProps) {
   return (
-    <div className={`group flex items-center justify-between gap-3 px-4 py-3 rounded-xl border transition-all duration-200 ${
-      isUnchanged
-        ? "border-[var(--color-success)]/30 bg-[var(--color-success)]/5"
-        : isRecommended
-        ? "border-[rgba(63,104,255,0.5)] bg-[var(--color-brand)]/5"
-        : "border-[var(--color-border)] bg-transparent"
+    <div className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border transition-all duration-200 ${
+      isLoading     ? "border-[var(--color-border)] opacity-60"
+      : isUnchanged ? "border-[var(--color-success)]/30 bg-[var(--color-success)]/5"
+      : isRecommended ? "border-[rgba(63,104,255,0.5)] bg-[var(--color-brand)]/5"
+      : "border-[var(--color-border)] bg-transparent"
     }`}>
-      <div className="flex items-center gap-2.5 min-w-0">
-        {(totalVariants ?? 2) > 1 && (
+      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        {totalVariants > 1 && (
           <span className={`shrink-0 flex items-center justify-center w-4 h-4 rounded-full text-xs font-bold ${
-            isUnchanged ? "bg-[var(--color-success)]/20 text-[var(--color-success)]"
+            isUnchanged   ? "bg-[var(--color-success)]/20 text-[var(--color-success)]"
             : isRecommended ? "bg-[var(--color-brand)] text-white"
             : "bg-[var(--color-surface-card)] text-[var(--color-text-muted)]"
           }`}>
-            {index + 1}
+            {variantIndex + 1}
           </span>
         )}
-        <div className="min-w-0">{children}</div>
-        {isUnchanged && (
+        <div className="min-w-0 flex-1">
+          {isLoading
+            ? <div className="skeleton h-4 w-48 rounded" />
+            : children
+          }
+        </div>
+        {!isLoading && isUnchanged && (
           <span className="shrink-0 px-1.5 py-0.5 rounded text-xs font-semibold bg-[var(--color-success)]/15 text-[var(--color-success)] uppercase tracking-wider">
             Already correct
           </span>
         )}
-        {!isUnchanged && isRecommended && (totalVariants ?? 2) > 1 && (
+        {!isLoading && !isUnchanged && isRecommended && totalVariants > 1 && (
           <span className="shrink-0 px-1.5 py-0.5 rounded text-xs font-semibold bg-[var(--color-brand)]/15 text-[var(--color-brand-light)] uppercase tracking-wider">
             Best
           </span>
         )}
       </div>
-      <div className="flex items-center gap-1.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
-        <button
-          onClick={onRewriteClick}
-          className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold transition-all duration-200 border rounded-lg ${
-            isRewriting
-              ? "bg-[var(--color-brand)]/10 border-[var(--color-brand)]/40 text-[var(--color-brand-light)]"
-              : "bg-transparent border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[rgba(63,104,255,0.65)] hover:text-white"
-          }`}
-        >
-          <img src={editIconUrl} alt="" className="w-3 h-3" style={{ filter: "brightness(0) invert(0.6)" }} />
-          Rewrite
-        </button>
-        <InlineCopyButton text={copyText} />
-      </div>
+      {!isLoading && (
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={onRewriteClick}
+            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold transition-all duration-200 border rounded-lg ${
+              isRewriting
+                ? "bg-[var(--color-brand)]/10 border-[var(--color-brand)]/40 text-[var(--color-brand-light)]"
+                : "bg-transparent border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[rgba(63,104,255,0.65)] hover:text-white"
+            }`}
+          >
+            <img src={editIconUrl} alt="" className="w-3 h-3" style={{ filter: "brightness(0) invert(0.6)" }} />
+            Rewrite
+          </button>
+          <InlineCopyButton text={copyText} />
+        </div>
+      )}
     </div>
   );
 }
@@ -131,56 +140,95 @@ function SectionNote({ text }: { text: string }) {
         <svg className="w-3 h-3 transition-transform group-open:rotate-90 shrink-0" viewBox="0 0 16 16" fill="currentColor">
           <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        Why this copy
+        Why this copy?
       </summary>
-      <div className="mt-1.5 pl-3 border-l border-[var(--color-border)] space-y-1">
-        {sentences.map((s, i) => (
-          <p key={i} className="text-xs text-[var(--color-text-muted)] leading-relaxed">{s}</p>
-        ))}
+      <div className="mt-1.5 pl-3 border-l border-[var(--color-border)]">
+        {sentences.length > 1 ? (
+          <ol className="space-y-1 list-none">
+            {sentences.map((s, i) => (
+              <li key={i} className="flex gap-2 text-xs text-[var(--color-text-muted)] leading-relaxed">
+                <span className="shrink-0 font-medium">{i + 1}.</span>
+                <span>{s}</span>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="text-xs text-[var(--color-text-muted)] leading-relaxed">{text}</p>
+        )}
       </div>
     </details>
   );
 }
 
 interface RewritePanelProps {
-  variantText: string;
-  input: string;
-  onInputChange: (val: string) => void;
-  onSubmit: (variantText: string, instruction: string) => void;
+  isLoading: boolean;
+  onClose: () => void;
+  onSubmit: (instruction: string) => void;
 }
 
-function RewritePanel({ variantText, input, onInputChange, onSubmit }: RewritePanelProps) {
+function RewritePanel({ isLoading, onClose, onSubmit }: RewritePanelProps) {
+  const [input, setInput] = useState("");
+
+  const submit = (instruction: string) => {
+    if (!instruction.trim() || isLoading) return;
+    onSubmit(instruction);
+  };
+
   return (
-    <div className="mt-1.5 ml-6 rounded-xl border border-[var(--color-brand)]/20 bg-[var(--color-brand)]/5 p-3 space-y-2.5 animate-slide-up">
-      <div className="flex flex-wrap gap-1.5">
-        {REWRITE_QUICK_ACTIONS.map((action) => (
-          <button
-            key={action}
-            onClick={() => onSubmit(variantText, action)}
-            className="px-2.5 py-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/60 text-xs text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] transition-all duration-200"
-          >
-            {action}
-          </button>
-        ))}
+    <div className="mt-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-3 space-y-3 animate-slide-up">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-[var(--color-text-muted)]">Refine this copy</span>
+        <button
+          onClick={onClose}
+          className="w-5 h-5 flex items-center justify-center rounded text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)] transition-all text-base leading-none"
+        >
+          ×
+        </button>
       </div>
+
+      {/* Input */}
       <div className="flex gap-2">
         <input
           type="text"
           value={input}
-          onChange={(e) => onInputChange(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && onSubmit(variantText, input)}
-          placeholder="Or describe what to change..."
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit(input)}
+          placeholder="Describe what to change..."
           autoFocus
-          className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text-primary)] outline-none focus:border-[var(--color-brand)] transition-all placeholder-[var(--color-text-muted)]"
+          disabled={isLoading}
+          className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--color-brand)] transition-all placeholder-[var(--color-text-muted)] disabled:opacity-50"
         />
         <button
-          onClick={() => onSubmit(variantText, input)}
-          disabled={!input.trim()}
-          className="px-3 py-2 rounded-lg bg-[var(--color-brand)] text-white text-xs font-medium hover:bg-[var(--color-brand-dark)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          onClick={() => submit(input)}
+          disabled={!input.trim() || isLoading}
+          className="px-3 py-2 rounded-lg bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-dark)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
         >
-          <img src={arrowRightUrl} alt="Submit" className="w-3.5 h-3.5" style={{ filter: "brightness(0) invert(1)" }} />
+          {isLoading ? (
+            <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            <img src={arrowRightUrl} alt="" className="w-3.5 h-3.5" style={{ filter: "brightness(0) invert(1)" }} />
+          )}
         </button>
       </div>
+
+      {/* Quick actions */}
+      {!isLoading && (
+        <div className="space-y-1.5">
+          <p className="text-[10px] font-semibold tracking-wider uppercase text-[var(--color-text-muted)] opacity-60">Quick actions</p>
+          <div className="flex flex-wrap gap-1.5">
+            {REWRITE_QUICK_ACTIONS.map((action) => (
+              <button
+                key={action}
+                onClick={() => submit(action)}
+                className="px-2.5 py-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/60 text-xs text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] transition-all duration-200"
+              >
+                {action}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -188,15 +236,30 @@ function RewritePanel({ variantText, input, onInputChange, onSubmit }: RewritePa
 export function ResponseCard({ data, prompt, onAnswer }: Props) {
   const [clarifyInput, setClarifyInput] = useState("");
   const [rewritingKey, setRewritingKey] = useState<string | null>(null);
-  const [rewriteInput, setRewriteInput] = useState("");
+  const [rewriteLoading, setRewriteLoading] = useState<Set<string>>(new Set());
+  const [rewriteResults, setRewriteResults] = useState<Map<string, string>>(new Map());
 
-  const handleRewriteSubmit = (variantText: string, instruction: string) => {
-    const text = instruction.trim();
-    if (!text || !onAnswer) return;
+  const handleRewriteSubmit = async (key: string, originalText: string, instruction: string) => {
+    if (!instruction.trim()) return;
     setRewritingKey(null);
-    setRewriteInput("");
-    onAnswer(`Refine this copy variant: "${variantText}"\nInstruction: ${text}`);
+    setRewriteLoading((prev) => new Set(prev).add(key));
+    try {
+      const response = await generateCopy({
+        prompt: `Refine this copy: "${originalText}"\n\nInstruction: ${instruction.trim()}`,
+        options: { variantCount: 1, fixGrammar: false, includeReasoning: false },
+      });
+      const v = response.variants[0];
+      const newText = v?.headline || v?.body || v?.ctas?.[0] || originalText;
+      setRewriteResults((prev) => new Map(prev).set(key, newText));
+    } catch {
+      // keep original on error
+    } finally {
+      setRewriteLoading((prev) => { const s = new Set(prev); s.delete(key); return s; });
+    }
   };
+
+  const clearRewrite = (key: string) =>
+    setRewriteResults((prev) => { const m = new Map(prev); m.delete(key); return m; });
 
   const submitClarification = (text: string) => {
     const val = text.trim();
@@ -205,10 +268,10 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
     onAnswer?.(val);
   };
 
+  // ── Clarification ──────────────────────────────────────────────────────────
   if (data.needsClarification && data.clarifyingQuestions?.length) {
     return (
       <div className="animate-slide-up space-y-4">
-        {/* Questions */}
         <div className="space-y-2">
           <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">
             A few questions before I start
@@ -224,8 +287,6 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
             ))}
           </ol>
         </div>
-
-        {/* Primary: text input */}
         <div className="flex gap-2">
           <input
             type="text"
@@ -243,8 +304,6 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
             →
           </button>
         </div>
-
-        {/* Secondary: quick option chips */}
         {data.quickOptions && data.quickOptions.length > 0 && (
           <div className="space-y-2">
             <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">Quick options</p>
@@ -265,17 +324,31 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
     );
   }
 
+  // ── Approved ───────────────────────────────────────────────────────────────
   if (data.approved) {
+    const sentences = (data.approvalNote ?? "Looks good — no changes needed.")
+      .split(/(?<=\.)\s+/)
+      .filter(Boolean);
     return (
       <div className="animate-slide-up flex items-start gap-3 px-4 py-3.5 rounded-xl border border-[var(--color-success)]/30 bg-[var(--color-success)]/8">
         <img src={checkIconUrl} alt="" className="w-4 h-4 shrink-0 mt-0.5" />
-        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
-          {data.approvalNote ?? "Looks good — no changes needed."}
-        </p>
+        {sentences.length > 1 ? (
+          <ul className="space-y-1">
+            {sentences.map((s, i) => (
+              <li key={i} className="flex gap-2 text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                <span className="shrink-0">·</span>
+                <span>{s}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{sentences[0]}</p>
+        )}
       </div>
     );
   }
 
+  // ── Main response ──────────────────────────────────────────────────────────
   const format: CopyFormat = data.format ?? "full";
   const sections = SECTION_CONFIG[format];
   const reasoning: SectionReasoning = data.reasoning ?? {};
@@ -284,20 +357,72 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
   const hasBody     = !!sections.body     && data.variants.some((v) => v.body);
   const hasCtas     = !!sections.ctas     && data.variants.some((v) => v.ctas.length > 0);
 
-  // Use data.original if available, otherwise extract quoted text from the user's prompt
   const promptQuoted = prompt
     ? (prompt.match(/["""«»](.+?)["""«»]/) ?? prompt.match(/'(.+?)'/))?.[ 1]
     : undefined;
   const originalText = data.original || promptQuoted;
-
-  // Detect when a variant is identical to the original (LLM returned unchanged copy)
   const isVariantUnchanged = (text: string | undefined) =>
     !!text && !!originalText && text.trim() === originalText.trim();
+
+  const renderVariantBlock = (
+    key: string,
+    variantIndex: number,
+    originalVariantText: string,
+    isRecommended: boolean,
+    totalVariants: number,
+    renderContent: (displayText: string) => React.ReactNode
+  ) => {
+    const loading = rewriteLoading.has(key);
+    const rewritten = rewriteResults.get(key);
+    const displayText = rewritten ?? originalVariantText;
+    const isOpen = rewritingKey === key;
+
+    return (
+      <div key={key}>
+        <VariantRow
+          variantIndex={variantIndex}
+          isRecommended={isRecommended}
+          isUnchanged={isVariantUnchanged(displayText)}
+          isLoading={loading}
+          totalVariants={totalVariants}
+          copyText={displayText}
+          onRewriteClick={() => setRewritingKey(isOpen ? null : key)}
+          isRewriting={isOpen}
+        >
+          {renderContent(displayText)}
+        </VariantRow>
+
+        {/* Rewritten "before" indicator */}
+        {rewritten && !loading && (
+          <div className="ml-4 mt-1 flex items-center gap-2">
+            <span className="text-xs text-[var(--color-text-muted)] line-through opacity-40 truncate max-w-[240px]">
+              {originalVariantText}
+            </span>
+            <button
+              onClick={() => clearRewrite(key)}
+              className="text-xs text-[var(--color-brand-light)] hover:underline shrink-0"
+            >
+              Undo
+            </button>
+          </div>
+        )}
+
+        {/* Rewrite panel */}
+        {isOpen && (
+          <RewritePanel
+            isLoading={loading}
+            onClose={() => setRewritingKey(null)}
+            onSubmit={(instruction) => handleRewriteSubmit(key, originalVariantText, instruction)}
+          />
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-5 animate-slide-up">
 
-      {/* Original copy block */}
+      {/* Original */}
       {data.original && (
         <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface-card)]/30 px-4 py-3">
           <p className="text-[10px] font-semibold tracking-widest uppercase text-[var(--color-text-muted)] mb-1.5 opacity-60">Original</p>
@@ -309,64 +434,28 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
       {hasHeadline && (
         <div className="space-y-2">
           <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">{sections.headline}</p>
-          {data.variants.map((v, i) =>
-            v.headline ? (
-              <div key={i}>
-                <VariantRow
-                  index={i}
-                  isRecommended={i === data.recommended}
-                  isUnchanged={isVariantUnchanged(v.headline)}
-                  totalVariants={data.variants.filter(v => v.headline).length}
-                  copyText={v.headline}
-                  onRewriteClick={() => setRewritingKey(rewritingKey === `headline-${i}` ? null : `headline-${i}`)}
-                  isRewriting={rewritingKey === `headline-${i}`}
-                >
-                  <p className="text-sm font-semibold text-[var(--color-text-primary)] leading-snug truncate">{v.headline}</p>
-                </VariantRow>
-                {rewritingKey === `headline-${i}` && (
-                  <RewritePanel
-                    variantText={v.headline}
-                    input={rewriteInput}
-                    onInputChange={setRewriteInput}
-                    onSubmit={handleRewriteSubmit}
-                  />
-                )}
-              </div>
-            ) : null
-          )}
+          {data.variants.map((v, i) => {
+            if (!v.headline) return null;
+            const total = data.variants.filter((x) => x.headline).length;
+            return renderVariantBlock(`headline-${i}`, i, v.headline, i === data.recommended, total, (text) => (
+              <p className="text-sm font-semibold text-[var(--color-text-primary)] leading-snug">{text}</p>
+            ));
+          })}
           {reasoning.headline && <SectionNote text={reasoning.headline} />}
         </div>
       )}
 
-      {/* Body text variants */}
+      {/* Body variants */}
       {hasBody && (
         <div className="space-y-2">
           <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">{sections.body}</p>
-          {data.variants.map((v, i) =>
-            v.body ? (
-              <div key={i}>
-                <VariantRow
-                  index={i}
-                  isRecommended={i === data.recommended}
-                  isUnchanged={isVariantUnchanged(v.body)}
-                  totalVariants={data.variants.filter(v => v.body).length}
-                  copyText={v.body}
-                  onRewriteClick={() => setRewritingKey(rewritingKey === `body-${i}` ? null : `body-${i}`)}
-                  isRewriting={rewritingKey === `body-${i}`}
-                >
-                  <p className="text-sm text-[var(--color-text-secondary)] leading-snug">{v.body}</p>
-                </VariantRow>
-                {rewritingKey === `body-${i}` && (
-                  <RewritePanel
-                    variantText={v.body}
-                    input={rewriteInput}
-                    onInputChange={setRewriteInput}
-                    onSubmit={handleRewriteSubmit}
-                  />
-                )}
-              </div>
-            ) : null
-          )}
+          {data.variants.map((v, i) => {
+            if (!v.body) return null;
+            const total = data.variants.filter((x) => x.body).length;
+            return renderVariantBlock(`body-${i}`, i, v.body, i === data.recommended, total, (text) => (
+              <p className="text-sm text-[var(--color-text-secondary)] leading-snug">{text}</p>
+            ));
+          })}
           {reasoning.body && <SectionNote text={reasoning.body} />}
         </div>
       )}
@@ -376,37 +465,20 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
         <div className="space-y-2">
           <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">{sections.ctas}</p>
           {data.variants.flatMap((v, i) =>
-            v.ctas.map((cta, ci) => (
-              <div key={`${i}-${ci}`}>
-                <VariantRow
-                  index={i}
-                  isRecommended={i === data.recommended}
-                  isUnchanged={isVariantUnchanged(cta)}
-                  totalVariants={data.variants.filter(v => v.ctas.length > 0).length}
-                  copyText={cta}
-                  onRewriteClick={() => setRewritingKey(rewritingKey === `cta-${i}-${ci}` ? null : `cta-${i}-${ci}`)}
-                  isRewriting={rewritingKey === `cta-${i}-${ci}`}
-                >
-                  <span className="text-sm text-[var(--color-text-primary)] font-medium">{cta}</span>
-                </VariantRow>
-                {rewritingKey === `cta-${i}-${ci}` && (
-                  <RewritePanel
-                    variantText={cta}
-                    input={rewriteInput}
-                    onInputChange={setRewriteInput}
-                    onSubmit={handleRewriteSubmit}
-                  />
-                )}
-              </div>
-            ))
+            v.ctas.map((cta, ci) => {
+              const total = data.variants.filter((x) => x.ctas.length > 0).length;
+              return renderVariantBlock(`cta-${i}-${ci}`, i, cta, i === data.recommended, total, (text) => (
+                <span className="text-sm text-[var(--color-text-primary)] font-medium">{text}</span>
+              ));
+            })
           )}
           {reasoning.ctas && <SectionNote text={reasoning.ctas} />}
         </div>
       )}
 
-      {/* Grammar & Style Fixes */}
+      {/* Grammar Check */}
       <div>
-        <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)] mb-2">Grammar & Style</p>
+        <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)] mb-2">Grammar Check</p>
         {data.fixes.length === 0 ? (
           <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--color-success)]/20 bg-[var(--color-success)]/5">
             <img src={checkIconUrl} alt="" className="w-3.5 h-3.5 shrink-0" />
