@@ -244,7 +244,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
     setRewriteLoading((prev) => new Set(prev).add(key));
     try {
       const response = await generateCopy({
-        prompt: `Refine this copy: "${originalText}"\n\nInstruction: ${instruction.trim()}`,
+        prompt: `Rewrite this UI copy: "${originalText}"\n\nInstruction: ${instruction.trim()}\n\nYou MUST return a different version — do not repeat the exact same text. If the current copy is already good, still provide a clearly distinct alternative phrasing that satisfies the instruction.`,
         options: { variantCount: 1, fixGrammar: false, includeReasoning: false },
       });
       const v = response.variants[0];
@@ -361,9 +361,11 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
     const history = rewriteHistory.get(key) ?? [];
     const displayText = history.at(-1) ?? originalVariantText;
     const isOpen = rewritingKey === key;
-    // allVersions = [original, ...history]; previousVersions = all except current
+    // allVersions = [original, ...history]; previousVersions = all except current, deduplicated
     const allVersions = [originalVariantText, ...history];
-    const previousVersions = history.length > 0 ? allVersions.slice(0, -1) : [];
+    const previousVersions = history.length > 0
+      ? allVersions.slice(0, -1).filter((v, i, arr) => v !== displayText && v !== arr[i + 1])
+      : [];
 
     return (
       <div key={key}>
