@@ -11,8 +11,7 @@ export function Header({ activeView, onViewChange }: HeaderProps) {
         <img
           src="/quill-logo.png"
           alt="Quill"
-          className="w-7 h-7"
-          style={{ borderRadius: "4px" }}
+          className="w-7 h-7 rounded"
         />
         <span className="text-[18px] font-bold text-[var(--color-text-primary)]">Quill</span>
       </div>
@@ -21,7 +20,7 @@ export function Header({ activeView, onViewChange }: HeaderProps) {
       <div className="flex gap-1 p-1 rounded-xl bg-[var(--color-surface-elevated)] border border-[var(--color-border)]">
         <button
           onClick={() => onViewChange("classic")}
-          className={`py-1.5 px-4 rounded-lg text-[11px] font-bold transition-all ${
+          className={`py-1.5 px-4 rounded-lg text-xs font-semibold transition-all ${
             activeView === "classic"
               ? "bg-[var(--color-brand)] text-white shadow-sm"
               : "text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
@@ -31,7 +30,7 @@ export function Header({ activeView, onViewChange }: HeaderProps) {
         </button>
         <button
           onClick={() => onViewChange("ide")}
-          className={`py-1.5 px-4 rounded-lg text-[11px] font-bold transition-all ${
+          className={`py-1.5 px-4 rounded-lg text-xs font-semibold transition-all ${
             activeView === "ide"
               ? "bg-[var(--color-brand)] text-white shadow-sm"
               : "text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"

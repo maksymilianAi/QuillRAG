@@ -6,9 +6,28 @@
 import { useState, useRef, useEffect } from "react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
-import { TypingIndicator } from "./TypingIndicator";
 import { generateCopy } from "../api";
 import type { ChatMessage as ChatMessageType } from "../types";
+
+function ResponseSkeleton() {
+  return (
+    <div className="flex justify-start animate-fade-in">
+      <div className="min-w-[280px] max-w-[600px] w-[85%]">
+        <div className="bg-[var(--color-surface-elevated)] rounded-2xl border border-[var(--color-border)] px-6 py-5 space-y-4">
+          <div className="skeleton h-3 w-16 rounded" />
+          <div className="space-y-2">
+            <div className="skeleton h-10 w-full rounded-xl" />
+          </div>
+          <div className="space-y-2">
+            <div className="skeleton h-3 w-24 rounded" />
+            <div className="skeleton h-4 w-3/4 rounded" />
+            <div className="skeleton h-4 w-1/2 rounded" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const STORAGE_KEY = "quill_chat_history";
 const today = () => new Date().toDateString();
@@ -136,7 +155,7 @@ export function ClassicChat() {
                     <button
                       key={suggestion}
                       onClick={() => handleSend(suggestion)}
-                      className="group text-left text-xs px-4 py-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/50 text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text-primary)] transition-all duration-300 flex items-center justify-between"
+                      className="group text-left text-xs px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/50 text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text-primary)] transition-all duration-200 flex items-center justify-between"
                     >
                       <span>{suggestion}</span>
                       <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[var(--color-brand-light)]">→</span>
@@ -151,7 +170,7 @@ export function ClassicChat() {
             {messages.map((msg) => (
               <ChatMessage key={msg.id} message={msg} onAnswer={handleSend} />
             ))}
-            {isLoading && <TypingIndicator />}
+            {isLoading && <ResponseSkeleton />}
           </div>
 
           <div ref={messagesEndRef} className="h-4 shrink-0" />
@@ -159,7 +178,7 @@ export function ClassicChat() {
       </main>
 
       {/* Input area */}
-      <footer className="shrink-0 flex justify-center bg-gradient-to-t from-[var(--color-surface)] via-[var(--color-surface)] to-transparent pt-10 pb-12 z-20">
+      <footer className="shrink-0 flex justify-center bg-gradient-to-t from-[var(--color-surface)] via-[var(--color-surface)] to-transparent pt-6 pb-8 z-20">
         <div className="max-w-[968px] w-full px-6">
           <ChatInput onSend={handleSend} disabled={isLoading} />
         </div>

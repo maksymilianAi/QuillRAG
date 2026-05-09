@@ -76,7 +76,7 @@ interface VariantRowProps {
 
 function VariantRow({ index, isRecommended, isUnchanged, totalVariants, children, copyText, onRewriteClick, isRewriting }: VariantRowProps) {
   return (
-    <div className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border transition-all duration-500 ${
+    <div className={`group flex items-center justify-between gap-3 px-4 py-3 rounded-xl border transition-all duration-200 ${
       isUnchanged
         ? "border-[var(--color-success)]/30 bg-[var(--color-success)]/5"
         : isRecommended
@@ -84,13 +84,15 @@ function VariantRow({ index, isRecommended, isUnchanged, totalVariants, children
         : "border-[var(--color-border)] bg-transparent"
     }`}>
       <div className="flex items-center gap-2.5 min-w-0">
-        <span className={`shrink-0 flex items-center justify-center w-4 h-4 rounded-full text-xs font-bold ${
-          isUnchanged ? "bg-[var(--color-success)]/20 text-[var(--color-success)]"
-          : isRecommended ? "bg-[var(--color-brand)] text-white"
-          : "bg-[var(--color-surface-card)] text-[var(--color-text-muted)]"
-        }`}>
-          {index + 1}
-        </span>
+        {(totalVariants ?? 2) > 1 && (
+          <span className={`shrink-0 flex items-center justify-center w-4 h-4 rounded-full text-xs font-bold ${
+            isUnchanged ? "bg-[var(--color-success)]/20 text-[var(--color-success)]"
+            : isRecommended ? "bg-[var(--color-brand)] text-white"
+            : "bg-[var(--color-surface-card)] text-[var(--color-text-muted)]"
+          }`}>
+            {index + 1}
+          </span>
+        )}
         <div className="min-w-0">{children}</div>
         {isUnchanged && (
           <span className="shrink-0 px-1.5 py-0.5 rounded text-xs font-semibold bg-[var(--color-success)]/15 text-[var(--color-success)] uppercase tracking-wider">
@@ -103,7 +105,7 @@ function VariantRow({ index, isRecommended, isUnchanged, totalVariants, children
           </span>
         )}
       </div>
-      <div className="flex items-center gap-1.5 shrink-0">
+      <div className="flex items-center gap-1.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
         <button
           onClick={onRewriteClick}
           className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold transition-all duration-200 border rounded-lg ${
@@ -125,7 +127,7 @@ function SectionNote({ text }: { text: string }) {
   const sentences = text.split(/(?<=\.)\s+/).filter(Boolean);
   return (
     <details className="mt-2 group">
-      <summary className="flex items-center gap-1.5 cursor-pointer list-none select-none text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors w-fit">
+      <summary className="flex items-center gap-1.5 cursor-pointer list-none select-none text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors w-fit py-2 -my-2">
         <svg className="w-3 h-3 transition-transform group-open:rotate-90 shrink-0" viewBox="0 0 16 16" fill="currentColor">
           <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
@@ -208,7 +210,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
       <div className="animate-slide-up space-y-4">
         {/* Questions */}
         <div className="space-y-2">
-          <p className="text-xs font-bold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">
+          <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">
             A few questions before I start
           </p>
           <ol className="space-y-1.5 pl-1">
@@ -245,7 +247,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
         {/* Secondary: quick option chips */}
         {data.quickOptions && data.quickOptions.length > 0 && (
           <div className="space-y-2">
-            <p className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-[0.1em] font-bold">Quick options</p>
+            <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">Quick options</p>
             <div className="flex flex-wrap gap-2">
               {data.quickOptions.map((opt) => (
                 <button
@@ -297,9 +299,9 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
 
       {/* Original copy block */}
       {data.original && (
-        <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
-          <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)] mb-2">Original</p>
-          <p className="text-sm text-[var(--color-text-muted)] leading-relaxed whitespace-pre-line">{data.original}</p>
+        <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface-card)]/30 px-4 py-3">
+          <p className="text-[10px] font-semibold tracking-widest uppercase text-[var(--color-text-muted)] mb-1.5 opacity-60">Original</p>
+          <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed whitespace-pre-line">{data.original}</p>
         </div>
       )}
 

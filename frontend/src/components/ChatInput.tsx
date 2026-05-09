@@ -40,7 +40,7 @@ export function ChatInput({ onSend, disabled }: Props) {
           placeholder="Write your request or paste a Figma link..."
           disabled={disabled}
           rows={1}
-          className="flex-1 resize-none bg-transparent px-4 py-5 text-[16px] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] outline-none disabled:opacity-300 leading-normal"
+          className="flex-1 resize-none bg-transparent px-4 py-5 text-[16px] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] outline-none disabled:opacity-30 leading-normal"
           style={{ minHeight: "64px", maxHeight: "160px" }}
           onInput={(e) => {
             const target = e.target as HTMLTextAreaElement;
