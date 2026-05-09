@@ -234,10 +234,9 @@ function RewritePanel({ isLoading, onClose, onSubmit }: RewritePanelProps) {
 }
 
 export function ResponseCard({ data, prompt, onAnswer }: Props) {
-  const [clarifyInput, setClarifyInput] = useState("");
   const [rewritingKey, setRewritingKey] = useState<string | null>(null);
   const [rewriteLoading, setRewriteLoading] = useState<Set<string>>(new Set());
-  const [rewriteResults, setRewriteResults] = useState<Map<string, string>>(new Map());
+  const [rewriteHistory, setRewriteHistory] = useState<Map<string, string[]>>(new Map());
 
   const handleRewriteSubmit = async (key: string, originalText: string, instruction: string) => {
     if (!instruction.trim()) return;
@@ -250,7 +249,11 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
       });
       const v = response.variants[0];
       const newText = v?.headline || v?.body || v?.ctas?.[0] || originalText;
-      setRewriteResults((prev) => new Map(prev).set(key, newText));
+      setRewriteHistory((prev) => {
+        const m = new Map(prev);
+        m.set(key, [...(m.get(key) ?? []), newText]);
+        return m;
+      });
     } catch {
       // keep original on error
     } finally {
@@ -258,14 +261,13 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
     }
   };
 
-  const clearRewrite = (key: string) =>
-    setRewriteResults((prev) => { const m = new Map(prev); m.delete(key); return m; });
-
-  const submitClarification = (text: string) => {
-    const val = text.trim();
-    if (!val) return;
-    setClarifyInput("");
-    onAnswer?.(val);
+  const useVersion = (key: string, versionIndex: number) => {
+    setRewriteHistory((prev) => {
+      const m = new Map(prev);
+      if (versionIndex === 0) { m.delete(key); }
+      else { m.set(key, (m.get(key) ?? []).slice(0, versionIndex)); }
+      return m;
+    });
   };
 
   // ── Clarification ──────────────────────────────────────────────────────────
@@ -287,23 +289,6 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
             ))}
           </ol>
         </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={clarifyInput}
-            onChange={(e) => setClarifyInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && submitClarification(clarifyInput)}
-            placeholder="Describe the component or paste a Figma link..."
-            className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl px-4 py-2.5 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--color-brand)] transition-all placeholder-[var(--color-text-muted)]"
-          />
-          <button
-            onClick={() => submitClarification(clarifyInput)}
-            disabled={!clarifyInput.trim()}
-            className="px-4 py-2.5 rounded-xl bg-[var(--color-brand)] text-white text-sm font-medium hover:bg-[var(--color-brand-dark)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            →
-          </button>
-        </div>
         {data.quickOptions && data.quickOptions.length > 0 && (
           <div className="space-y-2">
             <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">Quick options</p>
@@ -311,7 +296,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
               {data.quickOptions.map((opt) => (
                 <button
                   key={opt}
-                  onClick={() => submitClarification(opt)}
+                  onClick={() => onAnswer?.(opt)}
                   className="px-3 py-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/50 text-xs text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] transition-all duration-200"
                 >
                   {opt}
@@ -373,9 +358,12 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
     renderContent: (displayText: string) => React.ReactNode
   ) => {
     const loading = rewriteLoading.has(key);
-    const rewritten = rewriteResults.get(key);
-    const displayText = rewritten ?? originalVariantText;
+    const history = rewriteHistory.get(key) ?? [];
+    const displayText = history.at(-1) ?? originalVariantText;
     const isOpen = rewritingKey === key;
+    // allVersions = [original, ...history]; previousVersions = all except current
+    const allVersions = [originalVariantText, ...history];
+    const previousVersions = history.length > 0 ? allVersions.slice(0, -1) : [];
 
     return (
       <div key={key}>
@@ -392,18 +380,23 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
           {renderContent(displayText)}
         </VariantRow>
 
-        {/* Rewritten "before" indicator */}
-        {rewritten && !loading && (
-          <div className="ml-4 mt-1 flex items-center gap-2">
-            <span className="text-xs text-[var(--color-text-muted)] line-through opacity-40 truncate max-w-[240px]">
-              {originalVariantText}
-            </span>
-            <button
-              onClick={() => clearRewrite(key)}
-              className="text-xs text-[var(--color-brand-light)] hover:underline shrink-0"
-            >
-              Undo
-            </button>
+        {/* Previous versions history */}
+        {previousVersions.length > 0 && !loading && (
+          <div className="ml-4 mt-2 space-y-1">
+            <p className="text-[10px] font-semibold tracking-wider uppercase text-[var(--color-text-muted)] opacity-50">
+              Previous versions
+            </p>
+            {previousVersions.map((version, i) => (
+              <div key={i} className="flex items-start gap-2 py-1 border-l border-[var(--color-border)] pl-2">
+                <p className="text-xs text-[var(--color-text-muted)] flex-1 leading-relaxed">{version}</p>
+                <button
+                  onClick={() => useVersion(key, i)}
+                  className="shrink-0 text-xs text-[var(--color-brand-light)] hover:underline px-1.5 py-0.5 rounded border border-transparent hover:border-[var(--color-brand)]/30 transition-all"
+                >
+                  Use this
+                </button>
+              </div>
+            ))}
           </div>
         )}
 
@@ -412,7 +405,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
           <RewritePanel
             isLoading={loading}
             onClose={() => setRewritingKey(null)}
-            onSubmit={(instruction) => handleRewriteSubmit(key, originalVariantText, instruction)}
+            onSubmit={(instruction) => handleRewriteSubmit(key, displayText, instruction)}
           />
         )}
       </div>
