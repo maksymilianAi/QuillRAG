@@ -9,6 +9,8 @@ import { getFigmaText, parseFigmaUrl } from "../mcp/figma.tool.js";
 import { createLLM } from "../llm/index.js";
 import { ContextAgent } from "../agent/context.agent.js";
 
+import { configStore } from "./config.store.js";
+
 /** Patterns that indicate prompt injection or out-of-scope requests. */
 const INJECTION_PATTERNS = [
   /ignore\s+(previous|all|your)\s+(instructions?|rules?|prompt)/i,
@@ -61,6 +63,16 @@ const generateCopySchema = z.object({
  */
 export function createRoutes(agent: QuillAgent): Router {
   const router = Router();
+
+  /** Update session-specific configuration. */
+  router.post("/config", (req: Request, res: Response) => {
+    try {
+      configStore.update(req.body);
+      res.json({ status: "ok", current: configStore.get().provider });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update config" });
+    }
+  });
 
   // Health check
   router.get("/health", (_req: Request, res: Response) => {
