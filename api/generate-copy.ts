@@ -7,6 +7,7 @@
  */
 
 import { buildSystemPrompt, buildUserPrompt } from "../src/prompt/prompt.builder.js";
+import { retrieve } from "../src/rag/retrieval.js";
 
 export const config = { runtime: "edge" };
 
@@ -189,7 +190,7 @@ export default async function handler(request: Request): Promise<Response> {
   const systemPrompt = buildSystemPrompt();
   const userPrompt = buildUserPrompt({
     userPrompt: prompt,
-    ragContext: [],
+    ragContext: retrieve(prompt),
     figmaNodes,
     variantCount,
     fixGrammar,
