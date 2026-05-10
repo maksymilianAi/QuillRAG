@@ -25,11 +25,15 @@ export function OllamaTool() {
   }, []);
 
   const syncWithServer = async (targetProvider = "local") => {
-    await updateServerConfig({
-      provider: targetProvider,
-      localUrl: url,
-      localModel: model,
-    });
+    try {
+      await updateServerConfig({
+        provider: targetProvider,
+        localUrl: url,
+        localModel: model,
+      });
+    } catch {
+      // server may be unavailable; local state is still updated
+    }
     if (targetProvider === "local") {
       checkConnection();
     }

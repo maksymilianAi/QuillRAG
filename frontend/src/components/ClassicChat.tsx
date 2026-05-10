@@ -88,8 +88,6 @@ export function ClassicChat() {
     const prompt = isFollowUp
       ? `${accumulatedPrompt}\n\n[The user has answered your clarifying questions. Generate copy now — do not ask for more clarification.]`
       : content;
-    setPendingClarification(null);
-
     try {
       const response = await generateCopy({
         prompt,
@@ -100,9 +98,11 @@ export function ClassicChat() {
         },
       });
 
+      // Clear or update pendingClarification only after a successful response
       if (response.needsClarification) {
-        // Store the accumulated prompt (not just content) so context carries forward
         setPendingClarification(accumulatedPrompt);
+      } else {
+        setPendingClarification(null);
       }
 
       const assistantMessage: ChatMessageType = {

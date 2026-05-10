@@ -39,7 +39,7 @@ function InlineCopyButton({ text }: { text: string }) {
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    });
+    }).catch(() => {});
 
   return (
     <button
@@ -353,10 +353,14 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
     const history = rewriteHistory.get(key) ?? [];
     const displayText = history.at(-1) ?? originalVariantText;
     const isOpen = rewritingKey === key;
-    // allVersions = [original, ...history]; previousVersions = all except current, deduplicated
+    // allVersions = [original, ...history]; carry originalIndex through deduplication
+    // so useVersion() always slices the real history position, not the filtered index
     const allVersions = [originalVariantText, ...history];
-    const previousVersions = history.length > 0
-      ? allVersions.slice(0, -1).filter((v, i, arr) => v !== displayText && v !== arr[i + 1])
+    const previousVersions: { text: string; originalIndex: number }[] = history.length > 0
+      ? allVersions
+          .slice(0, -1)
+          .map((text, originalIndex) => ({ text, originalIndex }))
+          .filter(({ text }, i, arr) => text !== displayText && text !== arr[i + 1]?.text)
       : [];
 
     return (
@@ -380,11 +384,11 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
             <p className="text-[10px] font-semibold tracking-wider uppercase text-[var(--color-text-muted)] opacity-50">
               Previous versions
             </p>
-            {previousVersions.map((version, i) => (
-              <div key={i} className="flex items-start gap-2 py-1 border-l border-[var(--color-border)] pl-2">
-                <p className="text-xs text-[var(--color-text-muted)] flex-1 leading-relaxed">{version}</p>
+            {previousVersions.map(({ text, originalIndex }) => (
+              <div key={originalIndex} className="flex items-start gap-2 py-1 border-l border-[var(--color-border)] pl-2">
+                <p className="text-xs text-[var(--color-text-muted)] flex-1 leading-relaxed">{text}</p>
                 <button
-                  onClick={() => useVersion(key, i)}
+                  onClick={() => useVersion(key, originalIndex)}
                   className="shrink-0 text-xs text-[var(--color-brand-light)] hover:underline px-1.5 py-0.5 rounded border border-transparent hover:border-[var(--color-brand)]/30 transition-all"
                 >
                   Back to this
