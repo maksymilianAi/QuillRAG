@@ -41,7 +41,10 @@ function loadHistory(): ChatMessageType[] {
       localStorage.removeItem(STORAGE_KEY);
       return [];
     }
-    return messages.map((m: ChatMessageType) => ({ ...m, timestamp: new Date(m.timestamp as unknown as string) }));
+    return messages.map((m: ChatMessageType) => {
+      const ts = new Date(m.timestamp as unknown as string);
+      return { ...m, timestamp: isNaN(ts.getTime()) ? new Date() : ts };
+    });
   } catch {
     return [];
   }

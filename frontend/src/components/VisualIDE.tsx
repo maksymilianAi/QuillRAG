@@ -111,7 +111,8 @@ export function VisualIDE() {
                 <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-4 mx-auto">
                   <span className="text-3xl">⚠️</span>
                 </div>
-                <p className="text-sm text-[var(--color-error)] mb-4">{error}</p>
+                <p className="text-sm text-[var(--color-error)] mb-2">{error}</p>
+                <p className="text-xs text-[var(--color-text-muted)] mb-4">Check your Figma URL and token, then try again.</p>
                 <button
                   onClick={handleExtract}
                   className="text-xs text-[var(--color-brand)] hover:underline"

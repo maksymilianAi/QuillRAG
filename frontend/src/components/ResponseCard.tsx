@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { CopyFormat, GenerateCopyResponse, SectionReasoning } from "../types";
 import { generateCopy } from "../api";
 import copyIconUrl from "../assets/copy-icon.svg";
@@ -35,16 +35,20 @@ interface Props {
 
 function InlineCopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const handleClick = () =>
     navigator.clipboard.writeText(text).then(() => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
     }).catch(() => {});
 
   return (
     <button
       onClick={handleClick}
       title={copied ? "Copied!" : "Copy"}
+      aria-label={copied ? "Copied!" : "Copy"}
       className={`shrink-0 flex items-center justify-center w-8 h-8 transition-all duration-200 border rounded-lg ${
         copied
           ? "bg-[var(--color-success)]/10 border-[var(--color-success)]/30 text-[var(--color-success)]"
@@ -117,6 +121,7 @@ function VariantRow({
           <button
             onClick={onRewriteClick}
             title="Rewrite"
+            aria-label="Rewrite"
             className={`flex items-center justify-center w-8 h-8 transition-all duration-200 border rounded-lg ${
               isRewriting
                 ? "bg-[var(--color-brand)]/10 border-[var(--color-brand)]/40 text-[var(--color-brand-light)]"
@@ -177,19 +182,18 @@ function RewritePanel({ isLoading, onClose, onSubmit }: RewritePanelProps) {
   return (
     <div className="mt-2 animate-slide-up space-y-2.5">
       {/* Quick actions first */}
-      {!isLoading && (
-        <div className="flex flex-wrap gap-1.5">
-          {REWRITE_QUICK_ACTIONS.map((action) => (
-            <button
-              key={action}
-              onClick={() => submit(action)}
-              className="px-2.5 py-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/60 text-xs text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] transition-all duration-200"
-            >
-              {action}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="flex flex-wrap gap-1.5">
+        {REWRITE_QUICK_ACTIONS.map((action) => (
+          <button
+            key={action}
+            onClick={() => submit(action)}
+            disabled={isLoading}
+            className="px-2.5 py-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/60 text-xs text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {action}
+          </button>
+        ))}
+      </div>
 
       {/* Input row with × inside */}
       <div className="flex gap-2">
