@@ -175,7 +175,7 @@ function RewritePanel({ isLoading, onClose, onSubmit }: RewritePanelProps) {
   };
 
   return (
-    <div className="mt-1 pt-3 border-t border-[var(--color-border)] animate-slide-up space-y-2.5">
+    <div className="mt-2 animate-slide-up space-y-2.5">
       {/* Quick actions first */}
       {!isLoading && (
         <div className="flex flex-wrap gap-1.5">
@@ -360,7 +360,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
       : [];
 
     return (
-      <div key={key} className={isOpen ? "mb-3" : ""}>
+      <div key={key} className={isOpen ? "mb-5" : ""}>
         <VariantRow
           variantIndex={variantIndex}
           isRecommended={isRecommended}
