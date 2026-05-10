@@ -71,6 +71,7 @@ Contrast examples:
 
 ## General writing rules
 - Active voice only.
+- Gender-neutral language only. Never use he/him/his or she/her/hers. Use they/them, the employee's name, or rephrase around a role or action ("A confirmation will be sent to the email on file" not "to her email on file").
 - Oxford comma in lists.
 - Use "including" to enumerate sub-items: "including claims, contributions, and payments".
 - 1 sentence preferred, 2 max for support text.
@@ -131,6 +132,8 @@ export function buildUserPrompt(parts: PromptParts): string {
    - The purpose or user action is not stated
    Ask only what is genuinely missing. Do not ask for clarification when reviewing existing copy — even if context is minimal.
    If needsClarification=true, return empty variants, fixes, and reasoning.
+
+   Each clarifying question must be short — one plain noun phrase or short question, 8 words max. No examples in parentheses, no em-dash elaborations, no sub-clauses. Good: "What is the modal's purpose?" Bad: "What is the modal's purpose — what action is the user performing (e.g., submitting a reimbursement, adding a dependent)?"
 
    "Write from scratch" requests with sufficient context (component type + purpose + content direction) should proceed directly to generation — no clarification needed.
 

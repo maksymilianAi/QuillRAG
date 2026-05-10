@@ -44,20 +44,20 @@ function InlineCopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleClick}
-      className={`shrink-0 flex items-center gap-1 px-2.5 py-1 text-xs font-semibold transition-all duration-200 border rounded-lg ${
+      title={copied ? "Copied!" : "Copy"}
+      className={`shrink-0 flex items-center justify-center w-8 h-8 transition-all duration-200 border rounded-lg ${
         copied
           ? "bg-[var(--color-success)]/10 border-[var(--color-success)]/30 text-[var(--color-success)]"
           : "bg-transparent border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[rgba(63,104,255,0.65)] hover:text-white"
       }`}
     >
       {copied ? (
-        <svg viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3">
+        <svg viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4">
           <path fillRule="evenodd" d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z" clipRule="evenodd" />
         </svg>
       ) : (
-        <img src={copyIconUrl} alt="" className="w-3 h-3" style={{ filter: "brightness(0) invert(0.6)" }} />
+        <img src={copyIconUrl} alt="" className="w-4 h-4" style={{ filter: "brightness(0) invert(0.6)" }} />
       )}
-      {copied ? "Copied" : "Copy"}
     </button>
   );
 }
@@ -87,7 +87,7 @@ function VariantRow({
     }`}>
       <div className="flex items-center gap-2.5 min-w-0 flex-1">
         {totalVariants > 1 && (
-          <span className={`shrink-0 flex items-center justify-center w-4 h-4 rounded-full text-xs font-bold ${
+          <span className={`shrink-0 flex items-center justify-center w-4 h-4 rounded text-xs font-bold ${
             isUnchanged   ? "bg-[var(--color-success)]/20 text-[var(--color-success)]"
             : isRecommended ? "bg-[var(--color-brand)] text-white"
             : "bg-[var(--color-surface-card)] text-[var(--color-text-muted)]"
@@ -116,14 +116,14 @@ function VariantRow({
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={onRewriteClick}
-            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-semibold transition-all duration-200 border rounded-lg ${
+            title="Rewrite"
+            className={`flex items-center justify-center w-8 h-8 transition-all duration-200 border rounded-lg ${
               isRewriting
                 ? "bg-[var(--color-brand)]/10 border-[var(--color-brand)]/40 text-[var(--color-brand-light)]"
                 : "bg-transparent border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[rgba(63,104,255,0.65)] hover:text-white"
             }`}
           >
-            <img src={editIconUrl} alt="" className="w-3 h-3" style={{ filter: "brightness(0) invert(0.6)" }} />
-            Rewrite
+            <img src={editIconUrl} alt="" className="w-4 h-4" style={{ filter: "brightness(0) invert(0.6)" }} />
           </button>
           <InlineCopyButton text={copyText} />
         </div>
@@ -175,60 +175,52 @@ function RewritePanel({ isLoading, onClose, onSubmit }: RewritePanelProps) {
   };
 
   return (
-    <div className="mt-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-3 space-y-3 animate-slide-up">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-[var(--color-text-muted)]">Refine this copy</span>
-        <button
-          onClick={onClose}
-          className="w-5 h-5 flex items-center justify-center rounded text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-elevated)] transition-all text-base leading-none"
-        >
-          ×
-        </button>
-      </div>
+    <div className="mt-1 pt-3 border-t border-[var(--color-border)] animate-slide-up space-y-2.5">
+      {/* Quick actions first */}
+      {!isLoading && (
+        <div className="flex flex-wrap gap-1.5">
+          {REWRITE_QUICK_ACTIONS.map((action) => (
+            <button
+              key={action}
+              onClick={() => submit(action)}
+              className="px-2.5 py-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/60 text-xs text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] transition-all duration-200"
+            >
+              {action}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {/* Input */}
+      {/* Input row with × inside */}
       <div className="flex gap-2">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && submit(input)}
-          placeholder="Describe what to change..."
+          placeholder="Or describe what to change..."
           autoFocus
           disabled={isLoading}
-          className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--color-brand)] transition-all placeholder-[var(--color-text-muted)] disabled:opacity-50"
+          className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-xs text-[var(--color-text-primary)] outline-none focus:border-[var(--color-brand)] transition-all placeholder-[var(--color-text-muted)] disabled:opacity-50"
         />
         <button
           onClick={() => submit(input)}
           disabled={!input.trim() || isLoading}
-          className="px-3 py-2 rounded-lg bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-dark)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-8 h-8 rounded-lg bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-dark)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shrink-0"
         >
           {isLoading ? (
-            <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
             <img src={arrowRightUrl} alt="" className="w-3.5 h-3.5" style={{ filter: "brightness(0) invert(1)" }} />
           )}
         </button>
+        <button
+          onClick={onClose}
+          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-text-muted)] transition-all text-base leading-none shrink-0"
+        >
+          ×
+        </button>
       </div>
-
-      {/* Quick actions */}
-      {!isLoading && (
-        <div className="space-y-1.5">
-          <p className="text-[10px] font-semibold tracking-wider uppercase text-[var(--color-text-muted)] opacity-60">Quick actions</p>
-          <div className="flex flex-wrap gap-1.5">
-            {REWRITE_QUICK_ACTIONS.map((action) => (
-              <button
-                key={action}
-                onClick={() => submit(action)}
-                className="px-2.5 py-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/60 text-xs text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] transition-all duration-200"
-              >
-                {action}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -395,7 +387,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
                   onClick={() => useVersion(key, i)}
                   className="shrink-0 text-xs text-[var(--color-brand-light)] hover:underline px-1.5 py-0.5 rounded border border-transparent hover:border-[var(--color-brand)]/30 transition-all"
                 >
-                  Use this
+                  Back to this
                 </button>
               </div>
             ))}
