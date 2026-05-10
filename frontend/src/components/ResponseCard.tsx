@@ -360,7 +360,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
       : [];
 
     return (
-      <div key={key}>
+      <div key={key} className={isOpen ? "mb-3" : ""}>
         <VariantRow
           variantIndex={variantIndex}
           isRecommended={isRecommended}
