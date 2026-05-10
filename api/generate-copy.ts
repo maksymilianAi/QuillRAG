@@ -84,6 +84,42 @@ const GENERATE_COPY_TOOL = {
   },
 };
 
+function parseFigmaUrl(url: string): { fileId: string; nodeId?: string } | null {
+  const fileMatch = url.match(/figma\.com\/(?:file|design)\/([a-zA-Z0-9]+)/);
+  if (!fileMatch) return null;
+  const nodeMatch = url.match(/node-id=([a-zA-Z0-9%:-]+)/);
+  return {
+    fileId: fileMatch[1],
+    nodeId: nodeMatch ? decodeURIComponent(nodeMatch[1]).replace(/-/g, ":") : undefined,
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function extractTextNodes(node: any, results: Array<{ id: string; name: string; text: string }> = []) {
+  if (node.type === "TEXT" && node.characters) {
+    results.push({ id: node.id, name: node.name || "Unnamed", text: node.characters });
+  }
+  if (node.children) for (const child of node.children) extractTextNodes(child, results);
+  return results;
+}
+
+async function fetchFigmaNodes(
+  fileId: string,
+  nodeId: string | undefined,
+  token: string
+): Promise<Array<{ id: string; name: string; text: string }>> {
+  const endpoint = nodeId
+    ? `https://api.figma.com/v1/files/${fileId}/nodes?ids=${nodeId}`
+    : `https://api.figma.com/v1/files/${fileId}`;
+  const res = await fetch(endpoint, { headers: { "X-Figma-Token": token } });
+  if (!res.ok) throw new Error(`Figma API ${res.status}`);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = await res.json() as any;
+  if (nodeId && data.nodes?.[nodeId]) return extractTextNodes(data.nodes[nodeId].document);
+  if (data.document) return extractTextNodes(data.document);
+  return [];
+}
+
 export default async function handler(request: Request): Promise<Response> {
   if (request.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
@@ -130,11 +166,31 @@ export default async function handler(request: Request): Promise<Response> {
     });
   }
 
+  // Extract Figma nodes if a Figma URL is present in the prompt
+  const figmaMatch = prompt.match(/https:\/\/(?:www\.)?figma\.com\/[^\s]+/);
+  let figmaNodes: Array<{ id: string; name: string; text: string }> = [];
+  if (figmaMatch) {
+    const figmaToken = (process.env.FIGMA_ACCESS_TOKEN ?? process.env.Figma_Token) as string | undefined;
+    if (figmaToken) {
+      const parsed = parseFigmaUrl(figmaMatch[0]);
+      if (parsed) {
+        try {
+          figmaNodes = await fetchFigmaNodes(parsed.fileId, parsed.nodeId, figmaToken);
+          console.log(`[Edge] Fetched ${figmaNodes.length} Figma nodes`);
+        } catch (err) {
+          console.error("[Edge] Figma fetch failed, proceeding without nodes:", err);
+        }
+      }
+    } else {
+      console.warn("[Edge] Figma URL detected but no Figma token configured");
+    }
+  }
+
   const systemPrompt = buildSystemPrompt();
   const userPrompt = buildUserPrompt({
     userPrompt: prompt,
     ragContext: [],
-    figmaNodes: [],
+    figmaNodes,
     variantCount,
     fixGrammar,
     includeReasoning,

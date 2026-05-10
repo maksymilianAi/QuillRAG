@@ -130,7 +130,7 @@ export function buildUserPrompt(parts: PromptParts): string {
    - No existing copy is provided to review or improve
    - The component type or screen is not clearly identified
    - The purpose or user action is not stated
-   Ask only what is genuinely missing. Do not ask for clarification when reviewing existing copy — even if context is minimal.
+   NEVER ask for clarification if ANY of the following is true: (a) the user provided existing copy to review or improve — whether quoted in the prompt, pasted directly, or present in the Figma nodes; (b) a Figma link or Figma node context is present. In these cases always generate improved variants immediately.
    If needsClarification=true, return empty variants, fixes, and reasoning.
 
    Each clarifying question must be short — one plain noun phrase or short question, 8 words max. No examples in parentheses, no em-dash elaborations, no sub-clauses. Good: "What is the modal's purpose?" Bad: "What is the modal's purpose — what action is the user performing (e.g., submitting a reimbursement, adding a dependent)?"
