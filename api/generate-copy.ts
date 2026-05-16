@@ -122,6 +122,11 @@ async function fetchFigmaNodes(
 }
 
 export default async function handler(request: Request): Promise<Response> {
+  const requestId = crypto.randomUUID().slice(0, 8);
+  const log = (msg: string, ...args: unknown[]) => console.log(`[Edge][${requestId}] ${msg}`, ...args);
+  const logError = (msg: string, ...args: unknown[]) => console.error(`[Edge][${requestId}] ${msg}`, ...args);
+  const logWarn = (msg: string, ...args: unknown[]) => console.warn(`[Edge][${requestId}] ${msg}`, ...args);
+
   if (request.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
   }
@@ -145,6 +150,7 @@ export default async function handler(request: Request): Promise<Response> {
   }
 
   if (isInjectionAttempt(prompt)) {
+    logWarn("Injection attempt blocked");
     return new Response(
       JSON.stringify({
         error: "Out-of-scope request",
@@ -161,6 +167,7 @@ export default async function handler(request: Request): Promise<Response> {
 
   const apiKey = (process.env.ANTHROPIC_API_KEY ?? process.env.Claude_API) as string | undefined;
   if (!apiKey) {
+    logError("Anthropic API key not configured");
     return new Response(JSON.stringify({ error: "Anthropic API key not configured" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
@@ -177,13 +184,13 @@ export default async function handler(request: Request): Promise<Response> {
       if (parsed) {
         try {
           figmaNodes = await fetchFigmaNodes(parsed.fileId, parsed.nodeId, figmaToken);
-          console.log(`[Edge] Fetched ${figmaNodes.length} Figma nodes`);
+          log(`Fetched ${figmaNodes.length} Figma nodes`);
         } catch (err) {
-          console.error("[Edge] Figma fetch failed, proceeding without nodes:", err);
+          logError("Figma fetch failed, proceeding without nodes:", err);
         }
       }
     } else {
-      console.warn("[Edge] Figma URL detected but no Figma token configured");
+      logWarn("Figma URL detected but no Figma token configured");
     }
   }
 
@@ -207,7 +214,7 @@ export default async function handler(request: Request): Promise<Response> {
       const fetchTimeout = setTimeout(() => fetchAbort.abort(), 28_000);
 
       try {
-        console.log("[Edge] calling Anthropic API...");
+        log("calling Anthropic API...");
         const res = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: {
@@ -225,7 +232,7 @@ export default async function handler(request: Request): Promise<Response> {
           }),
           signal: fetchAbort.signal,
         });
-        console.log("[Edge] Anthropic responded:", res.status);
+        log("Anthropic responded:", res.status);
 
         if (!res.ok) {
           const errText = await res.text();
@@ -246,7 +253,7 @@ export default async function handler(request: Request): Promise<Response> {
         );
       } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error";
-        console.error("[Edge] Anthropic fetch error:", message);
+        logError("Anthropic fetch error:", message);
         controller.enqueue(
           enc.encode(`event: error\ndata: ${JSON.stringify({ message })}\n\n`)
         );

@@ -28,50 +28,67 @@ const fullResponse: GenerateCopyResponse = {
   reasoning: {},
 };
 
+const fullResponse2: GenerateCopyResponse = {
+  format: "full",
+  recommended: 0,
+  variants: [{ headline: "Standalone", ctas: [] }],
+  fixes: [],
+  reasoning: {},
+};
+
+async function typeAndSend(user: ReturnType<typeof userEvent.setup>, text: string) {
+  await waitFor(() =>
+    expect(screen.getByPlaceholderText(/write your request/i)).not.toBeDisabled()
+  );
+  const textarea = screen.getByPlaceholderText(/write your request/i);
+  await user.click(textarea);
+  await user.type(textarea, text);
+  await user.keyboard("{Enter}");
+}
+
 // ─── Ticket: clarifying questions — pendingClarification flow ────────────────
 
 describe("ClassicChat – clarification flow", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.mocked(api.generateCopy).mockResolvedValue(clarifyResponse);
   });
 
   it("shows suggestion buttons on empty state", () => {
     render(<ClassicChat />);
-    expect(screen.getByText("Write onboarding screen headlines")).toBeInTheDocument();
+    expect(screen.getByText("Rewrite a page or modal copy")).toBeInTheDocument();
   });
 
   it("sends first request via suggestion click and shows clarification UI", async () => {
     const user = userEvent.setup();
     render(<ClassicChat />);
 
-    await user.click(screen.getByText("Write onboarding screen headlines"));
+    await user.click(screen.getByText("Rewrite a page or modal copy"));
 
     await waitFor(() => {
       expect(screen.getByText("What type of component is this?")).toBeInTheDocument();
     });
   });
 
-  it("combines original prompt with clarification answer on follow-up", async () => {
+  it("combines original prompt with follow-up answer", async () => {
     const user = userEvent.setup();
     render(<ClassicChat />);
 
-    // First message → clarification response
-    await user.click(screen.getByText("Write onboarding screen headlines"));
-    await waitFor(() => {
-      expect(screen.getByText("What type of component is this?")).toBeInTheDocument();
-    });
+    // First message → clarification
+    await user.click(screen.getByText("Rewrite a page or modal copy"));
+    await waitFor(() =>
+      expect(screen.getByText("What type of component is this?")).toBeInTheDocument()
+    );
 
-    // Second call returns full response
+    // Follow-up via quick option chip (calls onAnswer → handleSend)
     vi.mocked(api.generateCopy).mockResolvedValue(fullResponse);
-
-    // Answer via quick chip
     await user.click(screen.getByRole("button", { name: "Error message" }));
 
-    await waitFor(() => {
-      const secondCall = vi.mocked(api.generateCopy).mock.calls[1][0];
-      expect(secondCall.prompt).toContain("Write onboarding screen headlines");
-      expect(secondCall.prompt).toContain("Error message");
-    });
+    await waitFor(() => expect(screen.getAllByText("Done").length).toBeGreaterThanOrEqual(1));
+
+    const secondCall = vi.mocked(api.generateCopy).mock.calls[1][0];
+    expect(secondCall.prompt).toContain("Rewrite a page or modal copy");
+    expect(secondCall.prompt).toContain("Error message");
   });
 
   it("clears pendingClarification after follow-up so third message is standalone", async () => {
@@ -79,26 +96,23 @@ describe("ClassicChat – clarification flow", () => {
     render(<ClassicChat />);
 
     // Trigger → clarify
-    await user.click(screen.getByText("Write onboarding screen headlines"));
+    await user.click(screen.getByText("Rewrite a page or modal copy"));
     await waitFor(() =>
       expect(screen.getByText("What type of component is this?")).toBeInTheDocument()
     );
 
-    // Answer → full response
+    // Follow-up via quick option chip → full response
     vi.mocked(api.generateCopy).mockResolvedValue(fullResponse);
     await user.click(screen.getByRole("button", { name: "Error message" }));
-    await waitFor(() => expect(screen.getByText("Done")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText("Done").length).toBeGreaterThanOrEqual(1));
 
-    // Third message should NOT combine with prior clarification
-    vi.mocked(api.generateCopy).mockResolvedValue(fullResponse);
-    const textarea = screen.getByPlaceholderText(/write your request/i);
-    await user.type(textarea, "Improve error messages for a login form");
-    await user.keyboard("{Enter}");
+    // Third message via ChatInput — should NOT combine with prior clarification
+    vi.mocked(api.generateCopy).mockResolvedValue(fullResponse2);
+    await typeAndSend(user, "Improve error messages for a login form");
+    await waitFor(() => expect(screen.getByText("Standalone")).toBeInTheDocument());
 
-    await waitFor(() => {
-      const thirdCall = vi.mocked(api.generateCopy).mock.calls[2][0];
-      expect(thirdCall.prompt).not.toContain("Write onboarding screen headlines");
-      expect(thirdCall.prompt).toBe("Improve error messages for a login form");
-    });
+    const thirdCall = vi.mocked(api.generateCopy).mock.calls[2][0];
+    expect(thirdCall.prompt).not.toContain("Rewrite a page or modal copy");
+    expect(thirdCall.prompt).toBe("Improve error messages for a login form");
   });
 });

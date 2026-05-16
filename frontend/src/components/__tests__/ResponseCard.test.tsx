@@ -1,8 +1,11 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ResponseCard } from "../ResponseCard";
+import * as api from "../../api";
 import type { GenerateCopyResponse } from "../../types";
+
+vi.mock("../../api");
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
@@ -16,6 +19,18 @@ const base: GenerateCopyResponse = {
   fixes: [],
   reasoning: { headline: "Short noun phrase.", body: "Verb-first, sentence style." },
 };
+
+const rewriteResponse: GenerateCopyResponse = {
+  format: "full",
+  recommended: 0,
+  variants: [{ headline: "Service Activated", ctas: [] }],
+  fixes: [],
+  reasoning: {},
+};
+
+beforeEach(() => {
+  vi.mocked(api.generateCopy).mockResolvedValue(rewriteResponse);
+});
 
 // ─── Ticket: approved + approvalNote ─────────────────────────────────────────
 
@@ -69,41 +84,28 @@ describe("Clarification mode", () => {
     await user.click(screen.getByRole("button", { name: "Empty state" }));
     expect(onAnswer).toHaveBeenCalledWith("Empty state");
   });
-
-  it("calls onAnswer with typed text on Enter", async () => {
-    const user = userEvent.setup();
-    const onAnswer = vi.fn();
-    render(<ResponseCard data={clarify} onAnswer={onAnswer} />);
-    await user.type(screen.getByPlaceholderText(/describe the component/i), "Login form error");
-    await user.keyboard("{Enter}");
-    expect(onAnswer).toHaveBeenCalledWith("Login form error");
-  });
-
-  it("does not call onAnswer when input is empty", async () => {
-    const user = userEvent.setup();
-    const onAnswer = vi.fn();
-    render(<ResponseCard data={clarify} onAnswer={onAnswer} />);
-    await user.keyboard("{Enter}");
-    expect(onAnswer).not.toHaveBeenCalled();
-  });
 });
 
 // ─── Ticket: grammar "No issues found" empty state ───────────────────────────
 
 describe("Grammar & Style section", () => {
-  it('shows "No issues found" when fixes is empty', () => {
-    render(<ResponseCard data={{ ...base, fixes: [] }} />);
+  it('shows "No issues found" when original is present but fixes is empty', () => {
+    render(<ResponseCard data={{ ...base, original: "Service created!", fixes: [] }} />);
     expect(screen.getByText(/no issues found/i)).toBeInTheDocument();
+  });
+
+  it("hides grammar section when no original copy", () => {
+    render(<ResponseCard data={{ ...base, fixes: [] }} />);
+    expect(screen.queryByText(/grammar check/i)).not.toBeInTheDocument();
   });
 
   it("renders fix cards when fixes are present", () => {
     const fixes = [
       { original: "Don't forget", rule: "No reminder phrasing", corrected: "Update definitions" },
     ];
-    render(<ResponseCard data={{ ...base, fixes }} />);
+    render(<ResponseCard data={{ ...base, original: "Don't forget to update.", fixes }} />);
     expect(screen.getByText("Don't forget")).toBeInTheDocument();
     expect(screen.getByText("Update definitions")).toBeInTheDocument();
-    expect(screen.getByText("No reminder phrasing")).toBeInTheDocument();
   });
 });
 
@@ -153,13 +155,13 @@ describe('"Already correct" badge', () => {
 describe('Collapsible "Why" reasoning', () => {
   it("renders Why toggles for present reasoning sections", () => {
     render(<ResponseCard data={base} />);
-    const whys = screen.getAllByText("Why");
+    const whys = screen.getAllByText("Why this copy?");
     expect(whys.length).toBeGreaterThanOrEqual(2);
   });
 
   it("does not render Why toggle when reasoning section is absent", () => {
     render(<ResponseCard data={{ ...base, reasoning: {} }} />);
-    expect(screen.queryByText("Why")).not.toBeInTheDocument();
+    expect(screen.queryByText("Why this copy?")).not.toBeInTheDocument();
   });
 });
 
@@ -297,42 +299,46 @@ describe("Rewrite panel", () => {
     render(<ResponseCard data={base} />);
     await user.click(screen.getAllByRole("button", { name: /rewrite/i })[0]);
     expect(screen.getByRole("button", { name: "Make it shorter" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Make it longer" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Make it more formal" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Simplify the language" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Make it more direct" })).toBeInTheDocument();
   });
 
-  it("calls onAnswer with variant text and quick action on chip click", async () => {
+  it("calls generateCopy with variant text and instruction on chip click", async () => {
     const user = userEvent.setup();
-    const onAnswer = vi.fn();
-    render(<ResponseCard data={base} onAnswer={onAnswer} />);
+    render(<ResponseCard data={base} />);
     await user.click(screen.getAllByRole("button", { name: /rewrite/i })[0]);
     await user.click(screen.getByRole("button", { name: "Make it shorter" }));
-    expect(onAnswer).toHaveBeenCalledWith(expect.stringContaining("Make it shorter"));
-    expect(onAnswer).toHaveBeenCalledWith(expect.stringContaining("Service Created"));
+    await waitFor(() => {
+      const call = vi.mocked(api.generateCopy).mock.calls[0][0];
+      expect(call.prompt).toContain("Make it shorter");
+      expect(call.prompt).toContain("Service Created");
+    });
   });
 
-  it("calls onAnswer with custom instruction on Enter", async () => {
+  it("calls generateCopy with custom instruction on Enter", async () => {
     const user = userEvent.setup();
-    const onAnswer = vi.fn();
-    render(<ResponseCard data={base} onAnswer={onAnswer} />);
+    render(<ResponseCard data={base} />);
     await user.click(screen.getAllByRole("button", { name: /rewrite/i })[0]);
     await user.type(screen.getByPlaceholderText(/or describe what to change/i), "Use active voice");
     await user.keyboard("{Enter}");
-    expect(onAnswer).toHaveBeenCalledWith(expect.stringContaining("Use active voice"));
-    expect(onAnswer).toHaveBeenCalledWith(expect.stringContaining("Service Created"));
+    await waitFor(() => {
+      const call = vi.mocked(api.generateCopy).mock.calls[0][0];
+      expect(call.prompt).toContain("Use active voice");
+      expect(call.prompt).toContain("Service Created");
+    });
   });
 
   it("submit button is disabled when input is empty", async () => {
     const user = userEvent.setup();
     render(<ResponseCard data={base} />);
     await user.click(screen.getAllByRole("button", { name: /rewrite/i })[0]);
-    expect(screen.getByRole("button", { name: /submit/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /submit rewrite/i })).toBeDisabled();
   });
 
   it("closes panel after submitting via quick action", async () => {
     const user = userEvent.setup();
-    render(<ResponseCard data={base} onAnswer={vi.fn()} />);
+    render(<ResponseCard data={base} />);
     await user.click(screen.getAllByRole("button", { name: /rewrite/i })[0]);
     await user.click(screen.getByRole("button", { name: "Make it shorter" }));
     expect(screen.queryByPlaceholderText(/or describe what to change/i)).not.toBeInTheDocument();

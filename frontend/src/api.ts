@@ -310,10 +310,20 @@ export function sendCopyFeedback(feedback: CopyFeedback): void {
 export async function extractFigma(
   request: ExtractFigmaRequest
 ): Promise<FigmaExtractionResponse> {
+  // Include provider settings from localStorage so the server doesn't need a
+  // prior /api/config call — each request is self-contained on cold starts.
+  const storedProvider = localStorage.getItem("copy_provider") ?? undefined;
+  const enriched: ExtractFigmaRequest = {
+    provider: storedProvider,
+    localUrl: storedProvider === "local" ? (localStorage.getItem("copy_local_url") ?? undefined) : undefined,
+    localModel: storedProvider === "local" ? (localStorage.getItem("copy_local_model") ?? undefined) : undefined,
+    ...request,
+  };
+
   const res = await fetch(`${API_BASE}/extract-figma`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(request),
+    body: JSON.stringify(enriched),
   });
 
   if (!res.ok) {

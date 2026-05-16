@@ -118,6 +118,10 @@ export function buildUserPrompt(parts: PromptParts): string {
       .map((n) => `- "${n.text}" (element: ${n.name})`)
       .join("\n");
     sections.push(`## Current UI Text (from Figma)\n${figmaText}`);
+  } else if (/figma\.com/i.test(parts.userPrompt)) {
+    sections.push(
+      `## Figma Link Detected\nThe user included a Figma link. Generate copy immediately — do NOT set needsClarification=true. If you cannot read the design, make reasonable assumptions based on any text in the URL or prompt and produce variants.`
+    );
   }
 
   // User task

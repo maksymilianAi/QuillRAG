@@ -210,6 +210,7 @@ function RewritePanel({ isLoading, onClose, onSubmit }: RewritePanelProps) {
         <button
           onClick={() => submit(input)}
           disabled={!input.trim() || isLoading}
+          aria-label="Submit rewrite"
           className="w-8 h-8 rounded-lg bg-[var(--color-brand)] text-white hover:bg-[var(--color-brand-dark)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shrink-0"
         >
           {isLoading ? (
