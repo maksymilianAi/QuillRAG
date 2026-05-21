@@ -57,7 +57,7 @@ export function VisualIDE() {
     <div className="flex-1 flex flex-col h-full min-w-0">
       {/* Header */}
       <header className="shrink-0 flex items-center border-b border-[var(--color-border)] bg-[var(--color-surface)]/80 backdrop-blur-md z-20">
-        <div className="flex items-center gap-4 px-6 py-4 w-full">
+        <div className="flex items-center gap-4 px-6 py-4 pr-40 w-full">
           <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--color-brand)] to-[var(--color-brand-dark)] shadow-lg shadow-[var(--color-brand)]/20">
             <span className="text-lg">🎨</span>
           </div>
