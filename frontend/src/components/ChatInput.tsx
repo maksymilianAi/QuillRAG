@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type KeyboardEvent } from "react";
+import { useState, useRef, type FormEvent, type KeyboardEvent } from "react";
 import arrowRightUrl from "../assets/arrow-right.svg";
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
  */
 export function ChatInput({ onSend, disabled }: Props) {
   const [value, setValue] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -18,6 +19,7 @@ export function ChatInput({ onSend, disabled }: Props) {
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setValue("");
+    if (textareaRef.current) textareaRef.current.style.height = "64px";
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -34,6 +36,7 @@ export function ChatInput({ onSend, disabled }: Props) {
     >
       <div className="relative flex-1 flex items-center gap-2 bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] focus-within:border-[var(--color-brand)] focus-within:ring-4 focus-within:ring-[var(--color-brand)]/10 transition-all duration-300 shadow-2xl px-3">
         <textarea
+          ref={textareaRef}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -41,11 +44,11 @@ export function ChatInput({ onSend, disabled }: Props) {
           disabled={disabled}
           rows={1}
           className="flex-1 resize-none bg-transparent px-4 py-5 text-[16px] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] outline-none disabled:opacity-30 leading-normal"
-          style={{ minHeight: "64px", maxHeight: "40vh", overflowY: "auto" }}
+          style={{ minHeight: "64px", maxHeight: "256px", overflowY: "auto" }}
           onInput={(e) => {
             const target = e.target as HTMLTextAreaElement;
             target.style.height = "64px";
-            target.style.height = `${target.scrollHeight}px`;
+            target.style.height = `${Math.min(target.scrollHeight, 256)}px`;
           }}
         />
         <div className="pr-2">
