@@ -32,7 +32,7 @@ export function ChatInput({ onSend, disabled }: Props) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center gap-3"
+      className="flex flex-col gap-1.5"
     >
       <div className="relative flex-1 flex items-center gap-2 bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] focus-within:border-[var(--color-brand)] focus-within:ring-4 focus-within:ring-[var(--color-brand)]/10 transition-all duration-300 shadow-2xl px-3">
         <textarea
@@ -61,6 +61,11 @@ export function ChatInput({ onSend, disabled }: Props) {
           </button>
         </div>
       </div>
+      {value && (
+        <p className="text-[10px] text-[var(--color-text-muted)] text-right pr-1 select-none">
+          Shift+Enter for new line
+        </p>
+      )}
     </form>
   );
 }

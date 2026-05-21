@@ -7,19 +7,31 @@ function App() {
   const [activeView, setActiveView] = useState<"classic" | "ide">(
     () => (localStorage.getItem("copy_active_view") as "classic" | "ide") || "classic"
   );
+  const [chatKey, setChatKey] = useState(0);
 
   const handleViewChange = (view: "classic" | "ide") => {
     setActiveView(view);
     localStorage.setItem("copy_active_view", view);
   };
 
+  const handleNewChat = () => {
+    localStorage.removeItem("quill_chat_history");
+    setChatKey((k) => k + 1);
+  };
+
   return (
     <div className="relative h-screen bg-[var(--color-surface)] selection:bg-[var(--color-brand)]/30 overflow-hidden">
 
-      {/* Logo — floating top-left */}
+      {/* Logo — floating top-left; click resets chat */}
       <div className="absolute top-3 left-4 z-30 flex items-center gap-2.5">
-        <img src="/quill-logo.png" alt="Quill" className="w-7 h-7 rounded" />
-        <span className="text-[17px] font-bold text-[var(--color-text-primary)]">Quill</span>
+        <button
+          onClick={activeView === "classic" ? handleNewChat : undefined}
+          className={`flex items-center gap-2 transition-opacity ${activeView === "classic" ? "cursor-pointer hover:opacity-70" : "cursor-default"}`}
+          title={activeView === "classic" ? "New chat" : undefined}
+        >
+          <img src="/quill-logo.png" alt="Quill" className="w-7 h-7 rounded" />
+          <span className="text-[17px] font-bold text-[var(--color-text-primary)]">Quill</span>
+        </button>
         <OllamaTool />
       </div>
 
@@ -50,7 +62,7 @@ function App() {
       </div>
 
       <div className={activeView === "classic" ? "flex h-full" : "hidden"}>
-        <ClassicChat />
+        <ClassicChat key={chatKey} />
       </div>
       <div className={activeView === "ide" ? "flex h-full" : "hidden"}>
         <VisualIDE />

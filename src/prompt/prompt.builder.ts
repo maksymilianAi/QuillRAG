@@ -50,7 +50,7 @@ Section headings — Book Style, 2–5 words.
 Buttons — Book Style, action verb + noun: "Submit Request", "Change Refund Method", "Log In", "Reset Password". Primary CTA per screen/email should be unique.
 Field labels — sentence style, 1–3 words, no punctuation.
 Field support text — sentence style, noun-first or verb-first, no period unless 2 sentences.
-Tooltips — sentence style, full sentences, period at end, factual and neutral. Pattern: "Limits the [what] that can be [action] [scope]."
+Tooltips — sentence style, full sentences, period at end, factual and neutral. 15 words max — cut every word that doesn't add meaning. Pattern: "Limits the [what] that can be [action] [scope]."
 Error & warning messages — sentence style, period at end, action-oriented: tell the user what to do, not just what went wrong. Avoid blame ("You entered" → "Enter").
 Legal / consent blocks — formal tone, full sentences, precise legal terminology: "tax filing due date", "Federal Income Tax Return".
 Checkbox confirmations — sentence style, short, no period: "I understand the above rules".
@@ -146,7 +146,7 @@ export function buildUserPrompt(parts: PromptParts): string {
    Do not trust the user's label alone — if they say "info message" but the text describes a failure, missing configuration, or a required action with consequences, classify it as "error" or "warning". If the detected format differs from what the user called it, set 'formatNote' to explain the mismatch in one sentence (e.g. "This reads as a warning, not an info message — it describes a required action that affects payments.").
 
    Format definitions:
-   - "tooltip" — neutral informational hover/helper text. One sentence, factual, no urgency. Populate 'body' only.
+   - "tooltip" — neutral informational hover/helper text. One sentence, factual, no urgency, 15 words max. Populate 'body' only.
    - "info" — neutral inline message providing context or guidance, no urgency, no required action. Populate 'body' only.
    - "warning" — advisory: action is needed but the system still works. The user should fix something. Populate 'body' only.
    - "error" — something failed or is blocked. Describes a broken state or invalid input. Verb-first, action-oriented. Populate 'body' only.
