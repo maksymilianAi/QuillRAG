@@ -41,11 +41,11 @@ export function ChatInput({ onSend, disabled }: Props) {
           disabled={disabled}
           rows={1}
           className="flex-1 resize-none bg-transparent px-4 py-5 text-[16px] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] outline-none disabled:opacity-30 leading-normal"
-          style={{ minHeight: "64px", maxHeight: "160px" }}
+          style={{ minHeight: "64px", maxHeight: "320px" }}
           onInput={(e) => {
             const target = e.target as HTMLTextAreaElement;
             target.style.height = "64px";
-            target.style.height = `${Math.min(target.scrollHeight, 160)}px`;
+            target.style.height = `${Math.min(target.scrollHeight, 320)}px`;
           }}
         />
         <div className="pr-2">
