@@ -45,6 +45,7 @@ export function IDEChat({
         content: `Selected: "${selectedNode.text}" (${selectedNode.name})`,
         timestamp: new Date(),
       };
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessages((prev) => [...prev, systemMsg]);
       inputRef.current?.focus();
     }

@@ -249,7 +249,7 @@ export async function generateCopy(
     return res.json();
   } catch (err) {
     if (err instanceof DOMException && err.name === "AbortError") {
-      throw new Error("Request timed out. Please try again.");
+      throw new Error("Request timed out. Please try again.", { cause: err });
     }
     throw err;
   } finally {

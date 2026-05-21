@@ -258,7 +258,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
     }
   };
 
-  const useVersion = (key: string, versionIndex: number) => {
+  const revertVersion = (key: string, versionIndex: number) => {
     setRewriteHistory((prev) => {
       const m = new Map(prev);
       if (versionIndex === 0) { m.delete(key); }
@@ -359,7 +359,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
     const displayText = history.at(-1) ?? originalVariantText;
     const isOpen = rewritingKey === key;
     // allVersions = [original, ...history]; carry originalIndex through deduplication
-    // so useVersion() always slices the real history position, not the filtered index
+    // so revertVersion() always slices the real history position, not the filtered index
     const allVersions = [originalVariantText, ...history];
     const previousVersions: { text: string; originalIndex: number }[] = history.length > 0
       ? allVersions
@@ -393,7 +393,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
               <div key={originalIndex} className="flex items-start gap-2 py-1 border-l border-[var(--color-border)] pl-2">
                 <p className="text-xs text-[var(--color-text-muted)] flex-1 leading-relaxed">{text}</p>
                 <button
-                  onClick={() => useVersion(key, originalIndex)}
+                  onClick={() => revertVersion(key, originalIndex)}
                   className="shrink-0 text-xs text-[var(--color-brand-light)] hover:underline px-1.5 py-0.5 rounded border border-transparent hover:border-[var(--color-brand)]/30 transition-all"
                 >
                   Back to this

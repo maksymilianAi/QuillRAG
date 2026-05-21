@@ -55,7 +55,9 @@ const MAX_STORED_MESSAGES = 30;
 function saveHistory(messages: ChatMessageType[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: today(), messages: messages.slice(-MAX_STORED_MESSAGES) }));
-  } catch {}
+  } catch {
+    // localStorage may be unavailable (private mode, storage quota)
+  }
 }
 
 export function ClassicChat() {

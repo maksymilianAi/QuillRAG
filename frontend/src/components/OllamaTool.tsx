@@ -3,41 +3,18 @@ import { updateServerConfig } from "../api";
 
 export function OllamaTool() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLocal, setIsLocal] = useState(false);
+  const [isLocal] = useState(() => {
+    const h = window.location.hostname;
+    return h === "localhost" || h === "127.0.0.1";
+  });
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<"idle" | "success" | "error">("idle");
-  
+
   // Settings state
   const [url, setUrl] = useState(() => localStorage.getItem("copy_local_url") || "http://localhost:11434/v1");
   const [model, setModel] = useState(() => localStorage.getItem("copy_local_model") || "llama3.2");
   const [isActive, setIsActive] = useState(() => localStorage.getItem("copy_provider") === "local");
   const [isSaved, setIsSaved] = useState(false);
-
-  useEffect(() => {
-    // Detect localhost
-    const hostname = window.location.hostname;
-    setIsLocal(hostname === "localhost" || hostname === "127.0.0.1");
-    
-    // Initial sync with server if active
-    if (localStorage.getItem("copy_provider") === "local") {
-      syncWithServer();
-    }
-  }, []);
-
-  const syncWithServer = async (targetProvider = "local") => {
-    try {
-      await updateServerConfig({
-        provider: targetProvider,
-        localUrl: url,
-        localModel: model,
-      });
-    } catch {
-      // server may be unavailable; local state is still updated
-    }
-    if (targetProvider === "local") {
-      checkConnection();
-    }
-  };
 
   const checkConnection = async (targetUrl = url) => {
     setIsConnecting(true);
@@ -55,13 +32,36 @@ export function OllamaTool() {
         setConnectionStatus("error");
         return false;
       }
-    } catch (err) {
+    } catch {
       setConnectionStatus("error");
       return false;
     } finally {
       setIsConnecting(false);
     }
   };
+
+  const syncWithServer = async (targetProvider = "local") => {
+    try {
+      await updateServerConfig({
+        provider: targetProvider,
+        localUrl: url,
+        localModel: model,
+      });
+    } catch {
+      // server may be unavailable; local state is still updated
+    }
+    if (targetProvider === "local") {
+      checkConnection();
+    }
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem("copy_provider") === "local") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      syncWithServer();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!isLocal) return null;
 
