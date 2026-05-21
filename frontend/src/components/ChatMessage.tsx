@@ -17,7 +17,7 @@ export function ChatMessage({ message, onAnswer }: Props) {
       <div className="flex justify-end animate-slide-up">
         <div className="max-w-[560px] w-[75%]">
           <div className="border border-[var(--color-brand)]/25 bg-[var(--color-brand)]/8 rounded-2xl px-4 py-3">
-            <p className="text-sm text-[var(--color-text-primary)] leading-relaxed">
+            <p className="text-sm text-[var(--color-text-primary)] leading-relaxed whitespace-pre-wrap">
               {message.content}
             </p>
           </div>
