@@ -7,7 +7,20 @@ import { useState, useRef, useEffect } from "react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { generateCopy } from "../api";
-import type { ChatMessage as ChatMessageType } from "../types";
+import type { ChatMessage as ChatMessageType, GenerateCopyResponse } from "../types";
+
+function buildRefinementContext(data: GenerateCopyResponse): string {
+  const parts: string[] = [];
+  if (data.original) parts.push(`Previous copy: "${data.original}"`);
+  if (data.variants?.length) {
+    const variantLines = data.variants.map((v, i) => {
+      const text = v.body || v.headline || v.ctas?.join(", ") || "";
+      return `${i + 1}. ${text}`;
+    });
+    parts.push(`Previous variants:\n${variantLines.join("\n")}`);
+  }
+  return parts.join("\n");
+}
 
 function ResponseSkeleton() {
   return (
@@ -89,9 +102,19 @@ export function ClassicChat() {
     const accumulatedPrompt = isFollowUp
       ? `${pendingClarification}\n\nAdditional context: ${content}`
       : content;
+
+    // Always include the last assistant response as context so the model can apply
+    // refinements without needing to ask for copy again
+    const lastAssistantData = !isFollowUp
+      ? [...messages].reverse().find((m) => m.role === "assistant" && m.data)?.data
+      : null;
+    const refinementContext = lastAssistantData ? buildRefinementContext(lastAssistantData) : null;
+
     // On a follow-up, instruct the model to generate immediately and not ask again
     const prompt = isFollowUp
       ? `${accumulatedPrompt}\n\n[The user has answered your clarifying questions. Generate copy now — do not ask for more clarification.]`
+      : refinementContext
+      ? `${refinementContext}\n\n[The user is refining the copy above. Apply the instruction immediately — do not ask for clarification.]\n\nRefinement instruction: ${content}`
       : content;
     try {
       const response = await generateCopy({
