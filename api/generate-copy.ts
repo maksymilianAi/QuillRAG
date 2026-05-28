@@ -133,7 +133,7 @@ export default async function handler(request: Request): Promise<Response> {
 
   let body: Record<string, unknown>;
   try {
-    body = await request.json();
+    body = await request.json() as Record<string, unknown>;
   } catch {
     return new Response(JSON.stringify({ error: "Invalid JSON" }), {
       status: 400,
