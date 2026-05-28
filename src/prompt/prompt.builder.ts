@@ -142,18 +142,22 @@ export function buildUserPrompt(parts: PromptParts): string {
 
    "Write from scratch" requests with sufficient context (component type + purpose + content direction) should proceed directly to generation — no clarification needed.
 
-2. Determine the copy format by analyzing BOTH the user's request AND the actual tone and content of the text they provide.
-   Do not trust the user's label alone — if they say "info message" but the text describes a failure, missing configuration, or a required action with consequences, classify it as "error" or "warning". If the detected format differs from what the user called it, set 'formatNote' to explain the mismatch in one sentence (e.g. "This reads as a warning, not an info message — it describes a required action that affects payments.").
+2. Determine the copy format using the decision tree below. Do not trust the user's label alone — verify against the actual content. If the detected format differs from what the user called it, set 'formatNote' to explain the mismatch in one sentence.
 
-   Format definitions:
-   - "tooltip" — neutral informational hover/helper text. One sentence, factual, no urgency, 15 words max. Populate 'body' only.
-   - "info" — neutral inline message providing context or guidance, no urgency, no required action. Populate 'body' only.
-   - "warning" — advisory: action is needed but the system still works. The user should fix something. Populate 'body' only.
-   - "error" — something failed or is blocked. Describes a broken state or invalid input. Verb-first, action-oriented. Populate 'body' only.
-   - "label" — field label, column header, section title, nav item, tab. 1–3 words, no punctuation. Populate 'headline' only.
-   - "button" — button or CTA text. Action verb + noun, Book Style, no period, 1–5 words. Populate 'ctas' only. NEVER classify as button if the original text contains a full sentence (has a period, question mark, or exclamation mark) or is longer than 5 words.
-   - "status" — confirmation, success notification, status badge, toast. Short noun phrase, Book Style. Populate 'headline' only.
-   - "full" — only when the request explicitly covers multiple copy elements together (heading + body + buttons). Populate headline, body, and ctas.`,
+   Step 1 — Is the text a short phrase (no sentence-ending punctuation, 1–5 words)?
+     → "button" if it is or should be an action CTA (action verb + noun). Populate 'ctas' only.
+     → "label" if it is a field name, column header, section title, nav item, or tab. Populate 'headline' only.
+     → "status" if it is a confirmation, badge, or toast notification. Populate 'headline' only.
+
+   Step 2 — Is the text one or more full sentences? Pick the SINGLE dominant type:
+     → "error" if anything in the text describes a failure, invalid input, blocked state, or system error. Error takes priority over all other types. Populate 'body' only.
+     → "warning" if the text is advisory — action is needed but nothing is broken yet. Populate 'body' only.
+     → "info" if the text is neutral guidance or context with no urgency and no required action. Populate 'body' only.
+     → "tooltip" if the text is a short factual hover/helper explanation, 15 words max. Populate 'body' only.
+
+   Step 3 — "full" ONLY if the user's request explicitly names multiple distinct UI elements together (e.g. "rewrite the heading, body copy, and button"). Never use "full" because the text has multiple sentences or covers multiple topics. Populate headline, body, and ctas.
+
+   When the text contains multiple sentences of different types, always pick the MOST URGENT single format: error > warning > info. Do not split into multiple formats.`,
     `3. Identify exactly which element(s) the user wants to update from the "Current UI Text" list.`,
     `4. If original copy exists in the context (from Figma nodes or the user's message), consolidate it into the 'original' field as plain text. Omit 'original' if there is no source copy.`,
     `5. Before writing variants: if the submitted copy already meets all style rules and knowledge base guidelines with no issues — set 'approved: true', write a short 'approvalNote' explaining why it passes (cite the specific rules it satisfies), and return empty 'variants' and 'fixes' arrays. Do not invent alternatives just to fill a slot.`,
