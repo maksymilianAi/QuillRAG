@@ -151,7 +151,7 @@ export function buildUserPrompt(parts: PromptParts): string {
    - "warning" — advisory: action is needed but the system still works. The user should fix something. Populate 'body' only.
    - "error" — something failed or is blocked. Describes a broken state or invalid input. Verb-first, action-oriented. Populate 'body' only.
    - "label" — field label, column header, section title, nav item, tab. 1–3 words, no punctuation. Populate 'headline' only.
-   - "button" — button or CTA text. Action verb + noun, Book Style. Populate 'ctas' only.
+   - "button" — button or CTA text. Action verb + noun, Book Style, no period, 1–5 words. Populate 'ctas' only. NEVER classify as button if the original text contains a full sentence (has a period, question mark, or exclamation mark) or is longer than 5 words.
    - "status" — confirmation, success notification, status badge, toast. Short noun phrase, Book Style. Populate 'headline' only.
    - "full" — only when the request explicitly covers multiple copy elements together (heading + body + buttons). Populate headline, body, and ctas.`,
     `3. Identify exactly which element(s) the user wants to update from the "Current UI Text" list.`,
