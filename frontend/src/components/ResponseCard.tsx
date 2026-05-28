@@ -474,13 +474,14 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
 
       {/* Grammar Check — only shown when there is original copy to audit */}
       {data.original && <div>
-        <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)] mb-2">Grammar Check</p>
         {data.fixes.length === 0 ? (
-          <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--color-success)]/20 bg-[var(--color-success)]/5">
-            <img src={checkIconUrl} alt="" className="w-3.5 h-3.5 shrink-0" />
-            <p className="text-xs text-[var(--color-text-muted)]">Grammar check passed — no issues found.</p>
-          </div>
+          <p className="flex items-center gap-1.5 text-[11px] text-[var(--color-text-muted)]">
+            <img src={checkIconUrl} alt="" className="w-3 h-3 shrink-0 opacity-50" />
+            Grammar check passed
+          </p>
         ) : (
+          <>
+          <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)] mb-2">Grammar Check</p>
           <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 space-y-4">
             {data.fixes.map((fix, i) => (
               <div key={i} className="flex gap-3">
@@ -506,6 +507,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
               </div>
             ))}
           </div>
+          </>
         )}
       </div>}
 

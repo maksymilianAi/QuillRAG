@@ -114,7 +114,7 @@ export function ClassicChat() {
     const prompt = isFollowUp
       ? `${accumulatedPrompt}\n\n[The user has answered your clarifying questions. Generate copy now — do not ask for more clarification.]`
       : refinementContext
-      ? `${refinementContext}\n\n[The user is refining the copy above. Apply the instruction immediately — do not ask for clarification.]\n\nRefinement instruction: ${content}`
+      ? `${refinementContext}\n\n[The user is refining the copy above. Apply the instruction to ALL variants — generate completely fresh copy, do not reuse or minimally edit the previous variants verbatim. Do not ask for clarification.]\n\nRefinement instruction: ${content}`
       : content;
     try {
       const response = await generateCopy({
