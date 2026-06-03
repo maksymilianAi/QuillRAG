@@ -50,7 +50,7 @@ Section headings — Book Style, 2–5 words.
 Buttons — Book Style, action verb + noun, 1–5 words, no period: "Submit Request", "Change Refund Method", "Log In". Primary CTA per screen should be unique.
 Field labels — sentence style, 1–3 words, no punctuation.
 Field support text — sentence style, 1 sentence preferred, no period unless 2 sentences.
-Tooltips — sentence style, 1 sentence, 15 words max, period at end. Pattern: "Limits the [what] that can be [action] [scope]."
+Tooltips — sentence style, EXACTLY 1 sentence (one period total), 12 words max, period at end. Cut every word that does not add unique information. If the explanation needs 2 sentences, drop the secondary one — users want brevity in tooltips. Pattern: "Limits the [what] that can be [action] [scope]."
 Error messages — sentence style, 1 sentence preferred (2 max), 20 words max, period at end. Verb-first, action-oriented: tell the user what to do, not just what went wrong. Never blame ("You entered" → "Enter").
 Warning messages — sentence style, 1–2 sentences, 25 words max, period at end. State the consequence and the required action.
 Info messages — sentence style, 1–2 sentences, 30 words max, period at end. Neutral context, no urgency.
@@ -126,18 +126,28 @@ export function buildUserPrompt(parts: PromptParts): string {
 
   // Instructions
   const instructions: string[] = [
-    `1. First, decide whether the request provides enough context to generate accurate copy.
-   Set 'needsClarification: true' and populate 'clarifyingQuestions' (2–4 questions) when ALL of the following are true:
-   - No existing copy is provided to review or improve
-   - The component type or screen is not clearly identified
-   - The purpose or user action is not stated
-   NEVER ask for clarification if ANY of the following is true: (a) the user provided existing copy to review or improve — whether quoted in the prompt, pasted directly, or present in the Figma nodes; (b) a Figma link or Figma node context is present; (c) the user is giving a direct refinement instruction — any prompt containing words like "incorporate", "include", "add", "adjust", "modify", "update", "change", "rewrite", "revise" referring to copy. In these cases always generate improved variants immediately.
-   If the user gives a refinement instruction but no copy is present to modify, ask only ONE question: "Please paste the copy you'd like me to modify." Do NOT ask about component type, purpose, or screen.
-   If needsClarification=true, return empty variants, fixes, and reasoning.
+    `1. Decide whether to ask for clarification or generate copy.
 
-   Each clarifying question must be short — one plain noun phrase or short question, 8 words max. No examples in parentheses, no em-dash elaborations, no sub-clauses. Good: "What is the modal's purpose?" Bad: "What is the modal's purpose — what action is the user performing (e.g., submitting a reimbursement, adding a dependent)?"
+   NEVER ask for clarification if the prompt contains ANY of these — generate immediately:
+   - Existing copy quoted or pasted in the user's message
+   - A "Previous copy:" or "Previous variants:" block — the user is refining an earlier response. Apply their instruction to that copy and return variants. The screen, purpose, and component were already established in the previous turn. Do NOT re-ask any of those.
+   - "## Current UI Text" or Figma node context
+   - A Figma URL anywhere in the prompt
+   - A refinement verb anywhere in the prompt: incorporate, include, add, adjust, modify, update, change, rewrite, revise, shorten, lengthen, simpler, longer, shorter, refine
 
-   "Write from scratch" requests with sufficient context (component type + purpose + content direction) should proceed directly to generation — no clarification needed.
+   SPECIAL — "incorporate"/"include"/"add" instructions:
+   When the user asks to incorporate, include, or add specific text into the copy:
+   - Identify the text/concept they want added (often immediately following the instruction).
+   - Take the most recent variant from "Previous variants:" as the base.
+   - Merge the user's text into the base in the most natural position (usually start or where it contextually fits).
+   - Keep the rest of the base copy intact — do not rewrite unrelated sentences.
+   - Never ignore the text the user asked you to add.
+
+   ONLY ask clarification when ALL of these are true: no existing copy anywhere in the prompt, no "Previous copy/variants" block, no Figma context, no refinement instruction.
+
+   If the user gave a refinement instruction but NO copy exists anywhere in the prompt, ask exactly ONE question: "Please paste the copy you'd like me to modify." Nothing more.
+
+   When asking clarification, max 3 questions, each 8 words or fewer, no parenthetical examples, no sub-clauses. If needsClarification=true, return empty variants, fixes, and reasoning.
 
 2. Determine the copy format using the decision tree below. Do not trust the user's label alone — verify against the actual content. If the detected format differs from what the user called it, set 'formatNote' to explain the mismatch in one sentence.
 
@@ -150,7 +160,7 @@ export function buildUserPrompt(parts: PromptParts): string {
      → "error" if anything in the text describes a failure, invalid input, blocked state, or system error. Error takes priority over all other types. Populate 'body' only.
      → "warning" if the text is advisory — action is needed but nothing is broken yet. Populate 'body' only.
      → "info" if the text is neutral guidance or context with no urgency and no required action. Populate 'body' only.
-     → "tooltip" if the text is a short factual hover/helper explanation, 15 words max. Populate 'body' only.
+     → "tooltip" if the text is a short factual hover/helper explanation, 1 sentence and 12 words max. Populate 'body' only.
 
    Step 3 — "full" ONLY if the user's request explicitly names multiple distinct UI elements together (e.g. "rewrite the heading, body copy, and button"). Never use "full" because the text has multiple sentences or covers multiple topics. Populate headline, body, and ctas.
 
@@ -161,15 +171,20 @@ export function buildUserPrompt(parts: PromptParts): string {
     `6. If changes are needed, provide 1 to ${parts.variantCount} variant(s).
    - Return 1 variant when one strong option clearly covers the need.
    - Return multiple variants ONLY when each represents a distinct strategy. Each variant must differ from the others in at least one NAMED dimension: opening word, sentence structure (imperative vs declarative), length, or framing (consequence-first vs action-first). Never return variants that differ only in synonyms or minor word swaps.
-   - All variants must stay within the SAME scope as the original: same user need, same information, same element type. Do not add new ideas, remove key information, or change the meaning.
-   - Apply ALL applicable length limits from the style rules. If the original is over the limit, the variants MUST be within it.`,
+
+   SCOPE — every variant must stay within the original's scope. Concretely:
+   - Same user need and same key information. Do not add new ideas, remove key information, or change the meaning.
+   - Do not introduce concepts not present in the original or explicitly requested by the user (e.g. do not invent "Review and submit your payment preferences" if the original is just about uploading a document).
+   - Do not drop required context the user explicitly asked to keep (e.g. if they said "incorporate X", X must appear in every variant).
+   - Length: stay within the format's word limit from the style rules. If the original is over the limit, variants MUST be within it.
+   - If you cannot improve the copy without changing scope, return 1 variant only — never invent a second variant by expanding the scope.`,
     `7. Set 'recommended' to the zero-based index of the variant you consider best. If only one variant, set it to 0.`,
   ];
   if (parts.includeReasoning) {
     instructions.push("8. Fill 'reasoning' only for sections you populated. Each entry: 1–2 sentences explaining WHY the chosen approach works, naming at least ONE specific rule by name (e.g. 'Active voice — \"Enter\" instead of \"You entered\"', 'Within 15-word tooltip limit', 'Removed banned filler word \"effortlessly\"'). Do not write generic phrases like 'more concise', 'clearer', or 'better' without naming the rule. Do not reference variants by index. Omit if approved=true or needsClarification=true.");
   }
   if (parts.fixGrammar) {
-    instructions.push("9. Grammar audit — only applies when the user provided existing copy to review or improve (i.e. the 'original' field is populated). If the user is writing from scratch, return fixes: [] immediately.\n\n   Check for spelling mistakes and typos ONLY. A valid fix flags a single misspelled word and provides the correctly spelled version. Examples: 'sodlier' → 'soldier', 'recieve' → 'receive', 'submited' → 'submitted'.\n\n   HARD RULES — every fix MUST satisfy ALL of:\n   - The 'original' field is a single word (1 word max). Never a phrase, sentence fragment, or full sentence.\n   - The 'corrected' field is the same word with the spelling corrected. Never empty, never '(delete)', never a different word, never a rewrite.\n   - The change is purely orthographic — same word, same meaning, just spelled correctly.\n\n   DO NOT flag (these are NOT grammar fixes — they belong in variants/reasoning):\n   - Whole sentences or phrases (no matter how poorly written).\n   - Capitalisation, punctuation, passive voice, word choice, filler words, awkward phrasing.\n   - Deletions of any kind. 'corrected' is never empty for a spelling fix.\n   - Grammar suggestions like 'have it another' → 'upload another' (that's word choice, not spelling).\n\n   If there are no real spelling typos in the original copy, return fixes: []. An empty array is the correct answer most of the time.\n\n   The 'rule' field: always 'Spelling mistake'. Return as { original, corrected, rule }. Omit if approved=true or needsClarification=true.");
+    instructions.push("9. Grammar audit — applies only when the user provided existing copy and the original field will be populated. If the user is writing from scratch, return fixes: [] immediately.\n\n   Default action: return fixes: []. Only deviate if you find a real spelling typo.\n\n   A real spelling typo means: a single word that is misspelled. Examples: 'sodlier' (should be 'soldier'), 'recieve' (should be 'receive'), 'submited' (should be 'submitted').\n\n   VALIDATION — before adding a fix, verify EACH of these. If any check fails, do NOT add the fix:\n   1. Does 'original' contain exactly 1 word, with no spaces? (If 2+ words → do not add.)\n   2. Is 'corrected' a non-empty string with the same word, just spelled correctly? (If empty, '(delete)', or a different word → do not add.)\n   3. Is the change purely orthographic — same meaning, just spelling? (If it changes meaning, removes content, or rewrites → do not add.)\n\n   NEVER use the grammar audit for:\n   - Marking sentences the variants dropped (that is content choice, not grammar).\n   - Capitalisation, punctuation, voice, word choice, awkward phrasing, filler words.\n   - Any fix where 'original' is more than 1 word.\n   - Any fix where 'corrected' is empty, '(delete)', '(remove)', or otherwise indicates removal.\n\n   When in doubt, return fixes: []. An empty array is almost always the correct answer.\n\n   The 'rule' field: always exactly 'Spelling mistake'. Return as { original, corrected, rule }. Omit if approved=true or needsClarification=true.");
   }
   sections.push(`## Instructions\n${instructions.join("\n")}`);
 
