@@ -223,7 +223,7 @@ export default async function handler(request: Request): Promise<Response> {
             "content-type": "application/json",
           },
           body: JSON.stringify({
-            model: "claude-sonnet-4-6",
+            model: "claude-sonnet-4-8",
             max_tokens: 4096,
             system: systemPrompt,
             messages: [{ role: "user", content: userPrompt }],
