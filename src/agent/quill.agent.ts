@@ -84,7 +84,6 @@ export class QuillAgent {
       ragContext,
       figmaNodes,
       variantCount: input.options?.variantCount ?? 2,
-      fixGrammar: input.options?.fixGrammar ?? true,
       includeReasoning: input.options?.includeReasoning ?? true,
     });
 
@@ -103,9 +102,7 @@ export class QuillAgent {
       agentResponseSchema
     );
 
-    console.log(
-      `[Quill] Generated ${object.variants.length} variants, ${object.fixes.length} fixes`
-    );
+    console.log(`[Quill] Generated ${object.variants.length} variants`);
 
     return object;
   }
@@ -166,7 +163,6 @@ export class QuillAgent {
       ragContext,
       figmaNodes,
       variantCount: input.options?.variantCount ?? 2,
-      fixGrammar: input.options?.fixGrammar ?? true,
       includeReasoning: input.options?.includeReasoning ?? true,
     });
 

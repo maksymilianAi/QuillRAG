@@ -121,7 +121,6 @@ export function ClassicChat() {
         prompt,
         options: {
           variantCount: 2,
-          fixGrammar: true,
           includeReasoning: true,
         },
       });

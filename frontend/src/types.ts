@@ -2,18 +2,16 @@
  * Frontend types matching the backend API contract.
  */
 
-export type CopyFormat = "full" | "tooltip" | "error" | "warning" | "info" | "label" | "button" | "status";
+export type CopyFormat =
+  | "confirmation_success"
+  | "confirmation_prompt"
+  | "destructive"
+  | "notification";
 
 export interface CopyVariant {
-  headline?: string;
+  headline: string;
   body?: string;
   ctas: string[];
-}
-
-export interface GrammarFix {
-  original: string;
-  corrected: string;
-  rule: string;
 }
 
 export interface GenerateCopyRequest {
@@ -26,7 +24,6 @@ export interface GenerateCopyRequest {
   localApiKey?: string;
   options?: {
     variantCount?: number;
-    fixGrammar?: boolean;
     includeReasoning?: boolean;
   };
 }
@@ -34,7 +31,6 @@ export interface GenerateCopyRequest {
 export interface SectionReasoning {
   headline?: string;
   body?: string;
-  ctas?: string;
 }
 
 export interface GenerateCopyResponse {
@@ -42,13 +38,11 @@ export interface GenerateCopyResponse {
   formatNote?: string;
   needsClarification?: boolean;
   clarifyingQuestions?: string[];
-  quickOptions?: string[];
   approved?: boolean;
   approvalNote?: string;
   original?: string;
   recommended: number;
   variants: CopyVariant[];
-  fixes: GrammarFix[];
   reasoning: SectionReasoning;
 }
 

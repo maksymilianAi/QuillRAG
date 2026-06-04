@@ -52,7 +52,6 @@ const generateCopySchema = z.object({
   options: z
     .object({
       variantCount: z.number().int().min(1).max(5).default(3),
-      fixGrammar: z.boolean().default(true),
       includeReasoning: z.boolean().default(true),
     })
     .optional(),

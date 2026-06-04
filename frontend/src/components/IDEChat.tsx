@@ -88,7 +88,6 @@ export function IDEChat({
         prompt: targetedPrompt,
         options: {
           variantCount: 1,
-          fixGrammar: true,
           includeReasoning: true,
         },
       });
@@ -161,23 +160,6 @@ export function IDEChat({
                   </div>
                 ) : msg.data ? (
                   <div className="space-y-2">
-                    {/* Fixes */}
-                    {msg.data.fixes.length > 0 && (
-                      <div className="space-y-1.5">
-                        {msg.data.fixes.map((fix, i) => (
-                          <div key={i} className="px-3 py-2 rounded-xl bg-[var(--color-surface-elevated)] border border-[var(--color-border)]">
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <span className="text-[var(--color-error)] text-[10px]">✕</span>
-                              <p className="text-[11px] text-[var(--color-text-muted)] line-through">{fix.original}</p>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[var(--color-success)] text-[10px]">✓</span>
-                              <p className="text-[11px] text-[var(--color-text-primary)] font-medium">{fix.corrected}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                     {/* Variants */}
                     {msg.data.variants.length > 0 && (
                       <div className="space-y-1.5">
@@ -185,18 +167,17 @@ export function IDEChat({
                           <div key={i} className="px-3 py-2 rounded-xl bg-[var(--color-surface-elevated)] border border-[var(--color-brand)]/20">
                             <p className="text-[10px] font-bold text-[var(--color-brand-light)] uppercase mb-1">Variant {i + 1}</p>
                             <p className="text-[11px] text-[var(--color-text-primary)] font-semibold">{variant.headline}</p>
-                            {variant.ctas.length > 0 && <p className="text-[10px] text-[var(--color-text-secondary)] mt-0.5">CTA: {variant.ctas.join(" · ")}</p>}
+                            {variant.body && <p className="text-[10px] text-[var(--color-text-secondary)] mt-1">{variant.body}</p>}
                           </div>
                         ))}
                       </div>
                     )}
                     {/* Reasoning */}
-                    {(msg.data.reasoning.headline || msg.data.reasoning.body || msg.data.reasoning.ctas) && (
+                    {(msg.data.reasoning.headline || msg.data.reasoning.body) && (
                       <div className="px-3 py-2 rounded-xl bg-[var(--color-surface-elevated)]/50 border border-[var(--color-border)]/50">
                         <p className="text-[9px] font-bold text-[var(--color-text-muted)] uppercase mb-1">Why</p>
                         {msg.data.reasoning.headline && <p className="text-[10px] text-[var(--color-text-muted)]">• {msg.data.reasoning.headline}</p>}
                         {msg.data.reasoning.body && <p className="text-[10px] text-[var(--color-text-muted)]">• {msg.data.reasoning.body}</p>}
-                        {msg.data.reasoning.ctas && <p className="text-[10px] text-[var(--color-text-muted)]">• {msg.data.reasoning.ctas}</p>}
                       </div>
                     )}
                   </div>

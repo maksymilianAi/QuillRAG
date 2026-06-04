@@ -41,14 +41,12 @@ export function VisualIDE() {
   };
 
   const handleCopyGenerated = (nodeId: string, response: GenerateCopyResponse) => {
-    // Optionally update node text on canvas after LLM response
-    if (figmaData && response.fixes.length > 0) {
-      const updatedNodes = figmaData.nodes.map((n) => {
-        if (n.id === nodeId) {
-          return { ...n, text: response.fixes[0].corrected };
-        }
-        return n;
-      });
+    // Optionally update node text on canvas with the recommended variant headline
+    const rec = response.variants[response.recommended];
+    if (figmaData && rec?.headline) {
+      const updatedNodes = figmaData.nodes.map((n) =>
+        n.id === nodeId ? { ...n, text: rec.headline } : n
+      );
       setFigmaData({ ...figmaData, nodes: updatedNodes });
     }
   };

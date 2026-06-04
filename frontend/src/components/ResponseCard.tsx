@@ -3,7 +3,6 @@ import type { CopyFormat, GenerateCopyResponse, SectionReasoning } from "../type
 import { generateCopy } from "../api";
 import copyIconUrl from "../assets/copy-icon.svg";
 import checkIconUrl from "../assets/check-icon.svg";
-import crossIconUrl from "../assets/cross-icon.svg";
 import arrowRightUrl from "../assets/arrow-right.svg";
 import editIconUrl from "../assets/edit-icon.svg";
 
@@ -17,14 +16,17 @@ const REWRITE_QUICK_ACTIONS = [
 type SectionKey = "headline" | "body" | "ctas";
 
 const SECTION_CONFIG: Record<CopyFormat, Partial<Record<SectionKey, string>>> = {
-  full:    { headline: "Headline", body: "Body Text", ctas: "CTAs" },
-  tooltip: { body: "Tooltip" },
-  info:    { body: "Info Message" },
-  warning: { body: "Warning Message" },
-  error:   { body: "Error Message" },
-  label:   { headline: "Label" },
-  button:  { ctas: "Button" },
-  status:  { headline: "Status" },
+  confirmation_success: { headline: "Title", body: "Body" },
+  confirmation_prompt:  { headline: "Title", body: "Body" },
+  destructive:          { headline: "Title", body: "Body" },
+  notification:         { headline: "Title", body: "Body" },
+};
+
+const FORMAT_LABEL: Record<CopyFormat, string> = {
+  confirmation_success: "Confirmation · Success",
+  confirmation_prompt:  "Confirmation · Prompt",
+  destructive:          "Destructive Confirmation",
+  notification:         "Notification",
 };
 
 interface Props {
@@ -230,7 +232,7 @@ function RewritePanel({ isLoading, onClose, onSubmit }: RewritePanelProps) {
   );
 }
 
-export function ResponseCard({ data, prompt, onAnswer }: Props) {
+export function ResponseCard({ data, prompt }: Props) {
   const [rewritingKey, setRewritingKey] = useState<string | null>(null);
   const [rewriteLoading, setRewriteLoading] = useState<Set<string>>(new Set());
   const [rewriteHistory, setRewriteHistory] = useState<Map<string, string[]>>(new Map());
@@ -242,7 +244,7 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
     try {
       const response = await generateCopy({
         prompt: `Rewrite this UI copy: "${originalText}"\n\nInstruction: ${instruction.trim()}\n\nYou MUST return a different version — do not repeat the exact same text. If the current copy is already good, still provide a clearly distinct alternative phrasing that satisfies the instruction.`,
-        options: { variantCount: 1, fixGrammar: false, includeReasoning: false },
+        options: { variantCount: 1, includeReasoning: false },
       });
       const v = response.variants[0];
       const newText = v?.headline || v?.body || v?.ctas?.[0] || originalText;
@@ -286,22 +288,6 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
             ))}
           </ol>
         </div>
-        {data.quickOptions && data.quickOptions.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">Quick options</p>
-            <div className="flex flex-wrap gap-2">
-              {data.quickOptions.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => onAnswer?.(opt)}
-                  className="px-3 py-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-elevated)]/50 text-xs text-[var(--color-text-secondary)] hover:border-[var(--color-brand)] hover:text-[var(--color-text-primary)] transition-all duration-200"
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     );
   }
@@ -331,13 +317,12 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
   }
 
   // ── Main response ──────────────────────────────────────────────────────────
-  const format: CopyFormat = data.format ?? "full";
+  const format: CopyFormat = data.format ?? "confirmation_success";
   const sections = SECTION_CONFIG[format];
   const reasoning: SectionReasoning = data.reasoning ?? {};
 
   const hasHeadline = !!sections.headline && data.variants.some((v) => v.headline);
   const hasBody     = !!sections.body     && data.variants.some((v) => v.body);
-  const hasCtas     = !!sections.ctas     && data.variants.some((v) => v.ctas.length > 0);
 
   const promptQuoted = prompt
     ? (prompt.match(/["""«»](.+?)["""«»]/) ?? prompt.match(/'(.+?)'/))?.[ 1]
@@ -418,6 +403,16 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
   return (
     <div className="space-y-5 animate-slide-up">
 
+      {/* Detected modal subtype */}
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] font-semibold uppercase tracking-widest px-2 py-1 rounded-md bg-[var(--color-brand)]/12 text-[var(--color-brand-light)] border border-[var(--color-brand)]/20">
+          {FORMAT_LABEL[format]}
+        </span>
+        {data.formatNote && (
+          <span className="text-[11px] text-[var(--color-text-muted)] italic">{data.formatNote}</span>
+        )}
+      </div>
+
       {/* Original */}
       {data.original && (
         <div className="rounded-xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface-card)]/30 px-4 py-3">
@@ -455,61 +450,6 @@ export function ResponseCard({ data, prompt, onAnswer }: Props) {
           {reasoning.body && <SectionNote text={reasoning.body} />}
         </div>
       )}
-
-      {/* CTA variants */}
-      {hasCtas && (
-        <div className="space-y-2">
-          <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)]">{sections.ctas}</p>
-          {data.variants.flatMap((v, i) =>
-            v.ctas.map((cta, ci) => {
-              const total = data.variants.filter((x) => x.ctas.length > 0).length;
-              return renderVariantBlock(`cta-${i}-${ci}`, i, cta, i === data.recommended, total, (text) => (
-                <span className="text-sm text-[var(--color-text-primary)] font-medium">{text}</span>
-              ));
-            })
-          )}
-          {reasoning.ctas && <SectionNote text={reasoning.ctas} />}
-        </div>
-      )}
-
-      {/* Grammar Check — only shown when there is original copy to audit */}
-      {data.original && <div>
-        {data.fixes.length === 0 ? (
-          <p className="flex items-center gap-1.5 text-[11px] text-[var(--color-text-muted)]">
-            <img src={checkIconUrl} alt="" className="w-3 h-3 shrink-0 opacity-50" />
-            Grammar check passed
-          </p>
-        ) : (
-          <>
-          <p className="text-xs font-semibold tracking-wide text-[var(--color-text-muted)] mb-2">Grammar Check</p>
-          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-card)] p-4 space-y-4">
-            {data.fixes.map((fix, i) => (
-              <div key={i} className="flex gap-3">
-                {data.fixes.length > 1 && (
-                  <span className="shrink-0 flex items-center justify-center w-4 h-4 rounded-full bg-[var(--color-surface-elevated)] text-xs font-bold text-[var(--color-text-muted)] mt-0.5">
-                    {i + 1}
-                  </span>
-                )}
-                <div className="space-y-1.5 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <img src={crossIconUrl} alt="" className="w-3.5 h-3.5 shrink-0" />
-                    <p className="text-sm text-[var(--color-text-secondary)] line-through decoration-[var(--color-error)]/40">{fix.original}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <img src={checkIconUrl} alt="" className="w-3.5 h-3.5 shrink-0" />
-                    {fix.corrected ? (
-                      <p className="text-sm text-[var(--color-text-primary)] font-medium">{fix.corrected}</p>
-                    ) : (
-                      <p className="text-xs italic text-[var(--color-text-muted)]">(delete)</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          </>
-        )}
-      </div>}
 
     </div>
   );

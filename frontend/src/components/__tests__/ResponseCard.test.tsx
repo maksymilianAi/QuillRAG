@@ -10,21 +10,30 @@ vi.mock("../../api");
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
 const base: GenerateCopyResponse = {
-  format: "full",
+  format: "confirmation_success",
   recommended: 0,
   variants: [
-    { headline: "Service Created", body: "Update payout definitions.", ctas: ["Go to Services"] },
-    { headline: "Done", body: "Configure payouts.", ctas: ["View Services"] },
+    {
+      headline: "Your request has been submitted",
+      body: "You can check the status under expense details.",
+      ctas: [],
+    },
+    {
+      headline: "Request submitted!",
+      body: "Check the status anytime under expense details.",
+      ctas: [],
+    },
   ],
-  fixes: [],
-  reasoning: { headline: "Short noun phrase.", body: "Verb-first, sentence style." },
+  reasoning: {
+    headline: "Sentence case for 5-word title with personal framing.",
+    body: "Capability framing — 'you can check' instead of imperative.",
+  },
 };
 
 const rewriteResponse: GenerateCopyResponse = {
-  format: "full",
+  format: "confirmation_success",
   recommended: 0,
-  variants: [{ headline: "Service Activated", ctas: [] }],
-  fixes: [],
+  variants: [{ headline: "Request received", ctas: [] }],
   reasoning: {},
 };
 
@@ -32,17 +41,17 @@ beforeEach(() => {
   vi.mocked(api.generateCopy).mockResolvedValue(rewriteResponse);
 });
 
-// ─── Ticket: approved + approvalNote ─────────────────────────────────────────
+// ─── Approved state ──────────────────────────────────────────────────────────
 
 describe("Approved state", () => {
   it("shows approvalNote and hides variants", () => {
     render(
       <ResponseCard
-        data={{ ...base, approved: true, approvalNote: "Looks good — verb-first, ends with period." }}
+        data={{ ...base, approved: true, approvalNote: "Sentence case, present perfect, personal framing." }}
       />
     );
-    expect(screen.getByText("Looks good — verb-first, ends with period.")).toBeInTheDocument();
-    expect(screen.queryByText("Service Created")).not.toBeInTheDocument();
+    expect(screen.getByText("Sentence case, present perfect, personal framing.")).toBeInTheDocument();
+    expect(screen.queryByText(base.variants[0].headline)).not.toBeInTheDocument();
   });
 
   it("falls back to default note when approvalNote is absent", () => {
@@ -51,65 +60,29 @@ describe("Approved state", () => {
   });
 });
 
-// ─── Ticket: clarifying questions ────────────────────────────────────────────
+// ─── Clarification mode ──────────────────────────────────────────────────────
 
 describe("Clarification mode", () => {
   const clarify: GenerateCopyResponse = {
-    format: "full",
+    format: "confirmation_success",
     needsClarification: true,
-    clarifyingQuestions: ["What type of component is this?", "What is the user goal?"],
-    quickOptions: ["Empty state", "Error message"],
+    clarifyingQuestions: [
+      "Which modal subtype is this?",
+      "What action just completed?",
+    ],
     recommended: 0,
     variants: [],
-    fixes: [],
     reasoning: {},
   };
 
   it("renders all clarifying questions", () => {
     render(<ResponseCard data={clarify} />);
-    expect(screen.getByText("What type of component is this?")).toBeInTheDocument();
-    expect(screen.getByText("What is the user goal?")).toBeInTheDocument();
-  });
-
-  it("renders quick option chips", () => {
-    render(<ResponseCard data={clarify} />);
-    expect(screen.getByRole("button", { name: "Empty state" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Error message" })).toBeInTheDocument();
-  });
-
-  it("calls onAnswer with chip text when chip is clicked", async () => {
-    const user = userEvent.setup();
-    const onAnswer = vi.fn();
-    render(<ResponseCard data={clarify} onAnswer={onAnswer} />);
-    await user.click(screen.getByRole("button", { name: "Empty state" }));
-    expect(onAnswer).toHaveBeenCalledWith("Empty state");
+    expect(screen.getByText("Which modal subtype is this?")).toBeInTheDocument();
+    expect(screen.getByText("What action just completed?")).toBeInTheDocument();
   });
 });
 
-// ─── Ticket: grammar "No issues found" empty state ───────────────────────────
-
-describe("Grammar & Style section", () => {
-  it('shows "No issues found" when original is present but fixes is empty', () => {
-    render(<ResponseCard data={{ ...base, original: "Service created!", fixes: [] }} />);
-    expect(screen.getByText(/no issues found/i)).toBeInTheDocument();
-  });
-
-  it("hides grammar section when no original copy", () => {
-    render(<ResponseCard data={{ ...base, fixes: [] }} />);
-    expect(screen.queryByText(/grammar check/i)).not.toBeInTheDocument();
-  });
-
-  it("renders fix cards when fixes are present", () => {
-    const fixes = [
-      { original: "Don't forget", rule: "No reminder phrasing", corrected: "Update definitions" },
-    ];
-    render(<ResponseCard data={{ ...base, original: "Don't forget to update.", fixes }} />);
-    expect(screen.getByText("Don't forget")).toBeInTheDocument();
-    expect(screen.getByText("Update definitions")).toBeInTheDocument();
-  });
-});
-
-// ─── Ticket: "Already correct" badge ─────────────────────────────────────────
+// ─── "Already correct" badge ─────────────────────────────────────────────────
 
 describe('"Already correct" badge', () => {
   it("shows badge when variant headline matches data.original", () => {
@@ -117,28 +90,12 @@ describe('"Already correct" badge', () => {
       <ResponseCard
         data={{
           ...base,
-          original: "Service Created",
+          original: "Your request has been submitted",
           variants: [
-            { headline: "Service Created", ctas: [] },
-            { headline: "Done", ctas: [] },
+            { headline: "Your request has been submitted", ctas: [] },
+            { headline: "Request submitted!", ctas: [] },
           ],
         }}
-      />
-    );
-    expect(screen.getByText("Already correct")).toBeInTheDocument();
-  });
-
-  it("shows badge when variant matches quoted text in prompt", () => {
-    render(
-      <ResponseCard
-        data={{
-          ...base,
-          variants: [
-            { headline: "Service Created", ctas: [] },
-            { headline: "Done", ctas: [] },
-          ],
-        }}
-        prompt='"Service Created"'
       />
     );
     expect(screen.getByText("Already correct")).toBeInTheDocument();
@@ -150,7 +107,7 @@ describe('"Already correct" badge', () => {
   });
 });
 
-// ─── Ticket: collapsible "Why" reasoning ─────────────────────────────────────
+// ─── Collapsible "Why" reasoning ─────────────────────────────────────────────
 
 describe('Collapsible "Why" reasoning', () => {
   it("renders Why toggles for present reasoning sections", () => {
@@ -159,104 +116,50 @@ describe('Collapsible "Why" reasoning', () => {
     expect(whys.length).toBeGreaterThanOrEqual(2);
   });
 
-  it("does not render Why toggle when reasoning section is absent", () => {
+  it("does not render Why toggle when reasoning is empty", () => {
     render(<ResponseCard data={{ ...base, reasoning: {} }} />);
     expect(screen.queryByText("Why this copy?")).not.toBeInTheDocument();
   });
 });
 
-// ─── Ticket: adaptive format rendering ───────────────────────────────────────
+// ─── Subtype badge ───────────────────────────────────────────────────────────
 
-describe("Adaptive format rendering", () => {
-  it("renders body-only section for tooltip format", () => {
-    const data: GenerateCopyResponse = {
-      format: "tooltip",
-      recommended: 0,
-      variants: [{ body: "Limits HSA contributions per year.", ctas: [] }],
-      fixes: [],
-      reasoning: { body: "Sentence style." },
-    };
-    render(<ResponseCard data={data} />);
-    expect(screen.getByText("Limits HSA contributions per year.")).toBeInTheDocument();
-    expect(screen.queryByText(/headline/i)).not.toBeInTheDocument();
+describe("Subtype badge", () => {
+  it("shows the detected subtype label", () => {
+    render(<ResponseCard data={base} />);
+    expect(screen.getByText("Confirmation · Success")).toBeInTheDocument();
   });
 
-  it("renders CTA chip for button format", () => {
-    const data: GenerateCopyResponse = {
-      format: "button",
-      recommended: 0,
-      variants: [{ ctas: ["Submit Reimbursement"] }],
-      fixes: [],
-      reasoning: {},
-    };
-    render(<ResponseCard data={data} />);
-    expect(screen.getByText("Submit Reimbursement")).toBeInTheDocument();
-  });
-
-  it("renders headline-only for label format", () => {
-    const data: GenerateCopyResponse = {
-      format: "label",
-      recommended: 0,
-      variants: [
-        { headline: "Supporting Documents", ctas: [] },
-        { headline: "Attachments", ctas: [] },
-      ],
-      fixes: [],
-      reasoning: {},
-    };
-    render(<ResponseCard data={data} />);
-    expect(screen.getByText("Supporting Documents")).toBeInTheDocument();
-    expect(screen.queryByText(/body text/i)).not.toBeInTheDocument();
-  });
-
-  it("renders headline for status format", () => {
-    const data: GenerateCopyResponse = {
-      format: "status",
-      recommended: 0,
-      variants: [{ headline: "Payment Processed", ctas: [] }],
-      fixes: [],
-      reasoning: {},
-    };
-    render(<ResponseCard data={data} />);
-    expect(screen.getByText("Payment Processed")).toBeInTheDocument();
-  });
-
-  it("does not crash when formatNote is present", () => {
-    const data: GenerateCopyResponse = {
-      ...base,
-      format: "warning",
-      formatNote: "This reads as a warning, not an info message.",
-    };
-    expect(() => render(<ResponseCard data={data} />)).not.toThrow();
+  it("shows formatNote when present", () => {
+    render(<ResponseCard data={{ ...base, formatNote: "Auto-detected as success." }} />);
+    expect(screen.getByText("Auto-detected as success.")).toBeInTheDocument();
   });
 });
 
-// ─── Ticket: adaptive variant count ──────────────────────────────────────────
+// ─── Adaptive variant count ──────────────────────────────────────────────────
 
 describe("Adaptive variant count", () => {
   it("renders a single variant without crashing", () => {
     const data: GenerateCopyResponse = {
-      format: "tooltip",
+      format: "confirmation_success",
       recommended: 0,
-      variants: [{ body: "Only one variant.", ctas: [] }],
-      fixes: [],
+      variants: [{ headline: "Saved", ctas: [] }],
       reasoning: {},
     };
     render(<ResponseCard data={data} />);
-    expect(screen.getByText("Only one variant.")).toBeInTheDocument();
+    expect(screen.getByText("Saved")).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /rewrite/i })).toHaveLength(1);
   });
 
   it("renders three variants correctly", () => {
     const data: GenerateCopyResponse = {
-      format: "status",
+      format: "confirmation_success",
       recommended: 0,
       variants: [
         { headline: "Variant A", ctas: [] },
         { headline: "Variant B", ctas: [] },
         { headline: "Variant C", ctas: [] },
       ],
-      fixes: [],
       reasoning: {},
     };
     render(<ResponseCard data={data} />);
@@ -266,7 +169,7 @@ describe("Adaptive variant count", () => {
   });
 });
 
-// ─── Ticket: Rewrite button ───────────────────────────────────────────────────
+// ─── Rewrite panel ───────────────────────────────────────────────────────────
 
 describe("Rewrite panel", () => {
   it("opens panel on Rewrite click", async () => {
@@ -312,7 +215,7 @@ describe("Rewrite panel", () => {
     await waitFor(() => {
       const call = vi.mocked(api.generateCopy).mock.calls[0][0];
       expect(call.prompt).toContain("Make it shorter");
-      expect(call.prompt).toContain("Service Created");
+      expect(call.prompt).toContain(base.variants[0].headline);
     });
   });
 
@@ -325,7 +228,7 @@ describe("Rewrite panel", () => {
     await waitFor(() => {
       const call = vi.mocked(api.generateCopy).mock.calls[0][0];
       expect(call.prompt).toContain("Use active voice");
-      expect(call.prompt).toContain("Service Created");
+      expect(call.prompt).toContain(base.variants[0].headline);
     });
   });
 

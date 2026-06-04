@@ -10,29 +10,25 @@ vi.mock("../../api");
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 
 const clarifyResponse: GenerateCopyResponse = {
-  format: "full",
+  format: "confirmation_success",
   needsClarification: true,
-  clarifyingQuestions: ["What type of component is this?"],
-  quickOptions: ["Error message", "Success confirmation"],
+  clarifyingQuestions: ["Which modal subtype is this?"],
   recommended: 0,
   variants: [],
-  fixes: [],
   reasoning: {},
 };
 
 const fullResponse: GenerateCopyResponse = {
-  format: "full",
+  format: "confirmation_success",
   recommended: 0,
   variants: [{ headline: "Done", ctas: [] }],
-  fixes: [],
   reasoning: {},
 };
 
 const fullResponse2: GenerateCopyResponse = {
-  format: "full",
+  format: "confirmation_success",
   recommended: 0,
   variants: [{ headline: "Standalone", ctas: [] }],
-  fixes: [],
   reasoning: {},
 };
 
@@ -66,7 +62,7 @@ describe("ClassicChat – clarification flow", () => {
     await user.click(screen.getByText("Rewrite a page or modal copy"));
 
     await waitFor(() => {
-      expect(screen.getByText("What type of component is this?")).toBeInTheDocument();
+      expect(screen.getByText("Which modal subtype is this?")).toBeInTheDocument();
     });
   });
 

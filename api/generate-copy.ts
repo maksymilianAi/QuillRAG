@@ -31,19 +31,23 @@ function isInjectionAttempt(prompt: string): boolean {
 
 const GENERATE_COPY_TOOL = {
   name: "generate_copy",
-  description: "Output structured UX copywriting result",
+  description: "Output structured UX copywriting result for a modal window",
   input_schema: {
     type: "object",
     properties: {
       format: {
         type: "string",
-        enum: ["full", "tooltip", "error", "warning", "info", "label", "button", "status"],
-        description: "Detected copy format",
+        enum: [
+          "confirmation_success",
+          "confirmation_prompt",
+          "destructive",
+          "notification",
+        ],
+        description: "Detected modal subtype",
       },
       formatNote: { type: "string" },
       needsClarification: { type: "boolean" },
       clarifyingQuestions: { type: "array", items: { type: "string" } },
-      quickOptions: { type: "array", items: { type: "string" } },
       approved: { type: "boolean" },
       approvalNote: { type: "string" },
       original: { type: "string" },
@@ -57,19 +61,7 @@ const GENERATE_COPY_TOOL = {
             body: { type: "string" },
             ctas: { type: "array", items: { type: "string" } },
           },
-          required: ["ctas"],
-        },
-      },
-      fixes: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            original: { type: "string" },
-            corrected: { type: "string" },
-            rule: { type: "string" },
-          },
-          required: ["original", "corrected", "rule"],
+          required: ["headline", "ctas"],
         },
       },
       reasoning: {
@@ -77,11 +69,10 @@ const GENERATE_COPY_TOOL = {
         properties: {
           headline: { type: "string" },
           body: { type: "string" },
-          ctas: { type: "string" },
         },
       },
     },
-    required: ["format", "recommended", "variants", "fixes", "reasoning"],
+    required: ["format", "recommended", "variants", "reasoning"],
   },
 };
 
@@ -162,7 +153,6 @@ export default async function handler(request: Request): Promise<Response> {
 
   const options = (body.options as Record<string, unknown>) ?? {};
   const variantCount = typeof options.variantCount === "number" ? options.variantCount : 2;
-  const fixGrammar = options.fixGrammar !== false;
   const includeReasoning = options.includeReasoning !== false;
 
   const apiKey = (process.env.ANTHROPIC_API_KEY ?? process.env.Claude_API) as string | undefined;
@@ -200,7 +190,6 @@ export default async function handler(request: Request): Promise<Response> {
     ragContext: retrieve(prompt),
     figmaNodes,
     variantCount,
-    fixGrammar,
     includeReasoning,
   });
 
